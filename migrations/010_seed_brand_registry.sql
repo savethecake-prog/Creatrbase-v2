@@ -562,8 +562,7 @@ SELECT
   tp.min_subscribers_observed, tp.min_engagement_rate_observed,
   tp.exclusivity_typical, 30,
   'seed'
-FROM brands b
-CROSS JOIN (VALUES
+FROM (VALUES
 
   -- CORSAIR: pc_gaming, UK
   ('corsair', 'pc_gaming', 'UK', 'micro',   'warming',   'medium', 'Active gifting programme observed in UK PC gaming niche 2024-2025', 'integrated_60s',  5000,  15000, 'GBP', 'low',    30, 90, 1000,  0.0300, 'none'),

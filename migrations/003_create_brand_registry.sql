@@ -219,7 +219,7 @@ CREATE INDEX idx_bci_brand_id   ON brand_creator_interactions(brand_id);
 CREATE INDEX idx_bci_creator_id ON brand_creator_interactions(creator_id)
   WHERE creator_id IS NOT NULL;
 CREATE INDEX idx_bci_niche_geo  ON brand_creator_interactions(niche, geo, interaction_date DESC);
-CREATE INDEX idx_bci_public     ON brand_creator_interactions(niche, geo, creator_tier)
+CREATE INDEX idx_bci_public     ON brand_creator_interactions(niche, geo, external_creator_tier)
   WHERE is_public = TRUE AND interaction_type = 'paid_deal_confirmed';
 
 INSERT INTO schema_migrations (version) VALUES ('003');

@@ -1,10 +1,8 @@
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
+import { useAuth } from '../../lib/AuthContext';
 import styles from './Dashboard.module.css';
-
-// Placeholder user — will come from auth context once auth is built
-const MOCK_USER = { name: 'Alex' };
 
 const COMING_SOON = [
   {
@@ -26,13 +24,14 @@ const COMING_SOON = [
 ];
 
 export function Dashboard() {
-  const user = MOCK_USER;
+  const { user } = useAuth();
+  const firstName = user?.displayName?.split(' ')[0] ?? 'there';
 
   return (
     <AppLayout user={user}>
       <div className={styles.header}>
         <h1 className={styles.greeting}>
-          Hey, <span>{user.name}</span>.
+          Hey, <span>{firstName}</span>.
         </h1>
         <p className={styles.sub}>Connect your platforms to get started.</p>
       </div>

@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../lib/AuthContext';
+import { logout } from '../../lib/auth';
 import styles from './AppLayout.module.css';
 
 const NAV = [
@@ -32,19 +34,29 @@ const NAV = [
   },
 ];
 
-export function AppLayout({ children, user }) {
-  const initials = user?.name
-    ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+export function AppLayout({ children }) {
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const displayName = user?.displayName ?? '';
+  const initials = displayName
+    ? displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : '?';
+
+  async function handleLogout() {
+    await logout();
+    setUser(null);
+    navigate('/login');
+  }
 
   return (
     <div className={styles.layout}>
       <header className={styles.topbar}>
         <span className={styles.topbarLogo}>creatr<span>base</span></span>
         <div className={styles.topbarSpacer} />
-        <div className={styles.topbarUser}>
+        <div className={styles.topbarUser} onClick={handleLogout} title="Sign out">
           <div className={styles.avatar}>{initials}</div>
-          <span>{user?.name ?? 'Account'}</span>
+          <span>{displayName || 'Account'}</span>
         </div>
       </header>
 

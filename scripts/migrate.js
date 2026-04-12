@@ -25,6 +25,7 @@ const FILES = [
   '009_create_knowledge_layer.sql',
   '010_seed_reference_data.sql',
   '010_seed_brand_registry.sql',
+  '011_seed_subscription_plans.sql',
 ];
 
 async function run() {

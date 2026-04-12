@@ -1,0 +1,66 @@
+/* ─────────────────────────────────────────────
+   CREATRBASE DESIGN TOKENS
+   Single source of truth. Never use raw values
+   in components — always reference a token.
+───────────────────────────────────────────── */
+:root {
+  /* Brand core */
+  --cb-mint:       #9EFFD8;
+  --cb-peach:      #FFBFA3;
+  --cb-lavender:   #C8AAFF;
+  --cb-purple-bg:  #3D1F7A;
+  --cb-navy:       #1B1040;
+  --cb-white:      #FFFFFF;
+
+  /* Dark surface system */
+  --surface-0:  #0F0A1E;  /* page bg */
+  --surface-1:  #1A1230;  /* cards */
+  --surface-2:  #231A3F;  /* elevated / hover */
+  --surface-3:  #2E2352;  /* selected / active */
+  --border:     #3A2E62;
+
+  /* Text on dark */
+  --text-primary:   #F0ECFF;
+  --text-secondary: #A899D4;
+  --text-muted:     #6B5EA8;
+
+  /* Semantic */
+  --success: #9EFFD8;
+  --warning: #FFBFA3;
+  --error:   #FF7A7A;
+  --info:    #C8AAFF;
+
+  /* Sticker stroke */
+  --stroke-outer: #1B1040;
+  --stroke-inner: #FFFFFF;
+
+  /* Spacing scale (4px base) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 96px;
+
+  /* Border radius */
+  --r-sm:   6px;
+  --r-md:   12px;
+  --r-lg:   20px;
+  --r-pill: 999px;
+
+  /* Typography */
+  --font-display: 'Shrikhand', serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Shadows */
+  --shadow-sticker: 4px 4px 0px #1B1040;
+  --shadow-card:    0 4px 24px rgba(11, 5, 30, 0.5);
+  --shadow-float:   0 8px 40px rgba(11, 5, 30, 0.7);
+
+  /* Transitions */
+  --t-fast:   80ms ease;
+  --t-normal: 150ms ease;
+}

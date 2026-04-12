@@ -1,0 +1,164 @@
+.header {
+  margin-bottom: var(--s8);
+}
+
+.greeting {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1.1;
+  color: var(--text-primary);
+  margin-bottom: var(--s2);
+}
+
+.greeting span {
+  color: var(--cb-mint);
+}
+
+.sub {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* Connect banner */
+.connectBanner {
+  background: var(--cb-purple-bg);
+  border: 1px solid rgba(200, 170, 255, 0.2);
+  border-radius: var(--r-lg);
+  padding: var(--s6) var(--s7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s6);
+  margin-bottom: var(--s8);
+  position: relative;
+  overflow: hidden;
+}
+
+.connectBanner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(200, 170, 255, 0.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.connectText {
+  position: relative;
+}
+
+.connectTitle {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--s2);
+}
+
+.connectDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.connectActions {
+  display: flex;
+  gap: var(--s3);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Section */
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--s5);
+}
+
+/* KPI grid */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s4);
+  margin-bottom: var(--s8);
+}
+
+.kpiCard {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s5) var(--s6);
+}
+
+.kpiLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--s2);
+}
+
+.kpiValue {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: var(--s2);
+  color: var(--text-primary);
+}
+
+.kpiEmpty {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1;
+  color: var(--surface-3);
+  margin-bottom: var(--s2);
+}
+
+.kpiHint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Coming soon cards */
+.comingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s4);
+}
+
+.comingCard {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s6);
+  opacity: 0.6;
+}
+
+.comingCardTitle {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: var(--s2);
+}
+
+.comingCardDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .kpiGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .connectBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

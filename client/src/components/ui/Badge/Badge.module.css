@@ -1,0 +1,25 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  line-height: 1;
+}
+
+.badge.dot::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.mint     { background: rgba(158,255,216,0.15); color: var(--cb-mint);    border: 1px solid rgba(158,255,216,0.3); }
+.peach    { background: rgba(255,191,163,0.15); color: var(--cb-peach);   border: 1px solid rgba(255,191,163,0.3); }
+.lavender { background: rgba(200,170,255,0.15); color: var(--cb-lavender);border: 1px solid rgba(200,170,255,0.3); }
+.error    { background: rgba(255,122,122,0.15); color: var(--error);      border: 1px solid rgba(255,122,122,0.3); }

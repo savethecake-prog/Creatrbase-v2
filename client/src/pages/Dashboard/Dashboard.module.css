@@ -1,3 +1,32 @@
+/* Trial banner */
+.trialBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s5);
+  padding: var(--s3) var(--s5);
+  background: rgba(200, 170, 255, 0.08);
+  border: 1px solid rgba(200, 170, 255, 0.25);
+  border-radius: var(--r-md);
+  margin-bottom: var(--s6);
+}
+
+.trialText {
+  font-size: 13px;
+  color: var(--cb-lavender);
+  font-weight: 500;
+}
+
+.trialText strong {
+  color: var(--text-primary);
+}
+
+.trialActions {
+  display: flex;
+  gap: var(--s3);
+  flex-shrink: 0;
+}
+
 .header {
   margin-bottom: var(--s8);
 }

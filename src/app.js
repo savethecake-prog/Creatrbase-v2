@@ -33,6 +33,10 @@ app.get('/health', async () => ({ status: 'ok' }));
 
 app.register(require('./domains/auth/authRoutes'));
 
+const { billingRoutes, webhookRoute } = require('./domains/billing/billingRoutes');
+app.register(billingRoutes);
+app.register(webhookRoute);
+
 // ── Static frontend (production only) ────────────────────────────────────────
 
 if (process.env.NODE_ENV === 'production') {

@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const { getPool } = require('../../db/pool');
+const { createStripeCustomer, createTrialSubscription } = require('../billing/billingService');
 
 const BCRYPT_ROUNDS = 12;
 const SESSION_TTL_DAYS = 7;
@@ -51,6 +52,17 @@ async function signup({ firstName, lastName, email, password, ip, userAgent }) {
       `INSERT INTO creators (tenant_id, user_id, display_name) VALUES ($1, $2, $3)`,
       [tenant.id, user.id, displayName]
     );
+
+    // Stripe customer + trial subscription (outside transaction — Stripe is external)
+    // If Stripe fails, we still complete signup and retry can be done later
+    let stripeCustomerId = 'pending';
+    try {
+      stripeCustomerId = await createStripeCustomer(email.toLowerCase().trim(), displayName);
+      await createTrialSubscription(client, { tenantId: tenant.id, stripeCustomerId });
+    } catch (stripeErr) {
+      // Non-fatal: log but don't fail signup
+      console.error('Stripe setup failed at signup (non-fatal):', stripeErr.message);
+    }
 
     const session = await createSession(client, { userId: user.id, tenantId: tenant.id, ip, userAgent });
 

@@ -6,6 +6,7 @@ const Fastify = require('fastify');
 const app = Fastify({ logger: true });
 
 app.get('/health', async () => ({ status: 'ok' }));
+app.get('/', async () => ({ name: 'Creatrbase API', status: 'ok' }));
 
 const start = async () => {
   try {

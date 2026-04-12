@@ -3,11 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../layouts/AuthLayout/AuthLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Input } from '../../components/ui/Input/Input';
+import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
+import { getMe } from '../../lib/auth';
 import styles from './Signup.module.css';
 
 export function Signup() {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,6 +25,8 @@ export function Signup() {
     setLoading(true);
     try {
       await api.post('/auth/signup', form);
+      const me = await getMe();
+      setUser(me);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');

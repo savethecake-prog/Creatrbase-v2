@@ -3,11 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../layouts/AuthLayout/AuthLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Input } from '../../components/ui/Input/Input';
+import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
+import { getMe } from '../../lib/auth';
 import styles from './Login.module.css';
 
 export function Login() {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,6 +22,8 @@ export function Login() {
     setLoading(true);
     try {
       await api.post('/auth/login', { email, password });
+      const me = await getMe();
+      setUser(me);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');

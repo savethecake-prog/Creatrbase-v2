@@ -4,9 +4,12 @@
 -- pricing (core / pro) and seed both plans.
 -- ============================================================
 
+-- Clear existing plan rows before changing the constraint
+DELETE FROM subscription_plans;
+
 -- Drop the old constraint that referenced wrong plan names
 ALTER TABLE subscription_plans
-  DROP CONSTRAINT subscription_plans_name_check;
+  DROP CONSTRAINT IF EXISTS subscription_plans_name_check;
 
 ALTER TABLE subscription_plans
   ADD CONSTRAINT subscription_plans_name_check

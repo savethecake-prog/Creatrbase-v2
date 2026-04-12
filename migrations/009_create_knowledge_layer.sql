@@ -96,7 +96,7 @@ CREATE INDEX idx_pks_niche_geo_type
 
 CREATE INDEX idx_pks_active
   ON pattern_knowledge_store(niche, geo, creator_tier, pattern_type)
-  WHERE valid_until IS NULL OR valid_until > CURRENT_DATE;
+  WHERE valid_until IS NULL;
 
 CREATE INDEX idx_pks_embedding
   ON pattern_knowledge_store USING ivfflat (embedding vector_cosine_ops)

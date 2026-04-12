@@ -3,23 +3,46 @@
 require('dotenv').config();
 const path = require('path');
 const Fastify = require('fastify');
-const staticPlugin = require('@fastify/static');
 
 const app = Fastify({ logger: true });
 
-// API routes
+// ── Plugins ───────────────────────────────────────────────────────────────────
+
+app.register(require('@fastify/helmet'), {
+  contentSecurityPolicy: false, // will tighten once frontend is stable
+});
+
+app.register(require('@fastify/cors'), {
+  origin:      process.env.NODE_ENV === 'production' ? 'https://creatrbase.com' : true,
+  credentials: true,
+});
+
+app.register(require('@fastify/cookie'));
+
+app.register(require('@fastify/jwt'), {
+  secret: process.env.JWT_SECRET || process.env.SESSION_SECRET,
+  cookie: {
+    cookieName: 'cb_session',
+    signed:     false,
+  },
+});
+
+// ── Routes ────────────────────────────────────────────────────────────────────
+
 app.get('/health', async () => ({ status: 'ok' }));
 
-// Serve built frontend in production
+app.register(require('./domains/auth/authRoutes'));
+
+// ── Static frontend (production only) ────────────────────────────────────────
+
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '..', 'dist', 'client');
 
-  app.register(staticPlugin, {
-    root: clientDist,
+  app.register(require('@fastify/static'), {
+    root:   clientDist,
     prefix: '/',
   });
 
-  // SPA fallback — all non-API routes serve index.html
   app.setNotFoundHandler(async (req, reply) => {
     if (req.url.startsWith('/api/')) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
@@ -27,6 +50,19 @@ if (process.env.NODE_ENV === 'production') {
     return reply.sendFile('index.html');
   });
 }
+
+// ── Error handler ─────────────────────────────────────────────────────────────
+
+app.setErrorHandler((err, req, reply) => {
+  const status = err.statusCode ?? err.status ?? 500;
+  app.log.error(err);
+  return reply.code(status).send({
+    error:      err.message || 'Internal Server Error',
+    statusCode: status,
+  });
+});
+
+// ── Start ─────────────────────────────────────────────────────────────────────
 
 const start = async () => {
   try {

@@ -1,0 +1,37 @@
+{
+  "name": "creatrbase",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Creator intelligence platform",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "migrate": "node scripts/migrate.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.27.0",
+    "@fastify/cors": "^9.0.0",
+    "@fastify/helmet": "^11.0.0",
+    "@fastify/jwt": "^8.0.0",
+    "@fastify/passport": "^2.4.0",
+    "@fastify/session": "^10.0.0",
+    "bcrypt": "^5.1.0",
+    "bull": "^4.16.0",
+    "dotenv": "^16.4.0",
+    "fastify": "^4.28.0",
+    "ioredis": "^5.3.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-twitch-new": "^1.0.3",
+    "pg": "^8.11.0",
+    "resend": "^3.5.0",
+    "stripe": "^16.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

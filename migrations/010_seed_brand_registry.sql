@@ -232,7 +232,7 @@ VALUES
   ARRAY['US'],
   'direct',
   'established',
-  'US-only men\'s health and wellness. Hair, sexual health, skincare. Active creator programme in gaming and lifestyle niches targeting 25-40 male audience. 60s integrations standard. Conversion-tracked via codes. Not shipping to UK. Rising tier minimum for paid. Compliance requirements strict — script approval required before filming.',
+  'US-only men''s health and wellness. Hair, sexual health, skincare. Active creator programme in gaming and lifestyle niches targeting 25-40 male audience. 60s integrations standard. Conversion-tracked via codes. Not shipping to UK. Rising tier minimum for paid. Compliance requirements strict — script approval required before filming.',
   'seed'),
 
 -- WREN KITCHEN

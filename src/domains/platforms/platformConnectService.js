@@ -132,35 +132,69 @@ async function getConnectedPlatforms(userId, tenantId) {
     where:   { creatorId: creator.id },
     orderBy: { connectedAt: 'asc' },
     select:  {
-      platform:            true,
-      platformUsername:    true,
-      platformDisplayName: true,
-      platformUrl:         true,
-      connectedAt:         true,
-      syncStatus:          true,
-      lastSyncedAt:        true,
-      subscriberCount:     true,
-      totalViewCount:      true,
-      watchHours12mo:      true,
+      platform:             true,
+      platformUsername:     true,
+      platformDisplayName:  true,
+      platformUrl:          true,
+      connectedAt:          true,
+      syncStatus:           true,
+      lastSyncedAt:         true,
+      analyticsLastSyncedAt: true,
+      subscriberCount:      true,
+      totalViewCount:       true,
+      watchHours12mo:       true,
+      engagementRate30d:    true,
+      publicUploads90d:     true,
+      primaryAudienceGeo:   true,
       avgConcurrentViewers30d: true,
     },
   });
 
   // Serialise BigInt and Decimal for JSON transport
   return profiles.map(p => ({
-    platform:             p.platform,
-    platform_username:    p.platformUsername,
+    platform:              p.platform,
+    platform_username:     p.platformUsername,
     platform_display_name: p.platformDisplayName,
-    platform_url:         p.platformUrl,
-    connected_at:         p.connectedAt,
-    sync_status:          p.syncStatus,
-    last_synced_at:       p.lastSyncedAt,
-    subscriber_count:     p.subscriberCount,
-    total_view_count:     p.totalViewCount !== null ? Number(p.totalViewCount) : null,
-    watch_hours_12mo:     p.watchHours12mo !== null ? Number(p.watchHours12mo) : null,
+    platform_url:          p.platformUrl,
+    connected_at:          p.connectedAt,
+    sync_status:           p.syncStatus,
+    last_synced_at:        p.lastSyncedAt,
+    analytics_last_synced_at: p.analyticsLastSyncedAt,
+    subscriber_count:      p.subscriberCount,
+    total_view_count:      p.totalViewCount !== null ? Number(p.totalViewCount) : null,
+    watch_hours_12mo:      p.watchHours12mo !== null ? Number(p.watchHours12mo) : null,
+    engagement_rate_30d:   p.engagementRate30d !== null ? Number(p.engagementRate30d) : null,
+    public_uploads_90d:    p.publicUploads90d,
+    primary_audience_geo:  p.primaryAudienceGeo,
     avg_concurrent_viewers_30d: p.avgConcurrentViewers30d !== null
                                   ? Number(p.avgConcurrentViewers30d) : null,
   }));
 }
 
-module.exports = { connectPlatform, getConnectedPlatforms };
+// ─── disconnectPlatform ───────────────────────────────────────────────────────
+// Clears tokens and marks the profile as disconnected.
+// accessToken is non-nullable in the schema, so we store an encrypted sentinel.
+
+async function disconnectPlatform(creatorId, platform) {
+  const prisma = getPrisma();
+
+  const profile = await prisma.creatorPlatformProfile.findFirst({
+    where:  { creatorId, platform },
+    select: { id: true },
+  });
+  if (!profile) return null;
+
+  await prisma.creatorPlatformProfile.update({
+    where: { id: profile.id },
+    data:  {
+      syncStatus:     'disconnected',
+      accessToken:    encrypt('disconnected'),
+      refreshToken:   null,
+      tokenExpiresAt: null,
+    },
+  });
+
+  return { id: profile.id };
+}
+
+module.exports = { connectPlatform, getConnectedPlatforms, disconnectPlatform };

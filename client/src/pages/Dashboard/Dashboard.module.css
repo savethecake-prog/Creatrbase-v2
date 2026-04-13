@@ -248,6 +248,80 @@
   line-height: 1.5;
 }
 
+/* ── Milestone celebration ───────────────────────────────────────────────────── */
+
+.celebration {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s5);
+  padding: var(--s5) var(--s6);
+  background: linear-gradient(135deg, rgba(158,255,216,0.07) 0%, rgba(200,170,255,0.05) 100%);
+  border: 1px solid rgba(158,255,216,0.3);
+  border-radius: var(--r-lg);
+  margin-bottom: var(--s6);
+}
+
+.celebrationContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.celebrationEyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--cb-mint);
+  opacity: 0.7;
+}
+
+.celebrationTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cb-mint);
+  text-transform: capitalize;
+}
+
+.celebrationMsg {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 500px;
+}
+
+.celebrationDismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: var(--s1);
+  flex-shrink: 0;
+  opacity: 0.6;
+  line-height: 1;
+}
+
+.celebrationDismiss:hover { opacity: 1; }
+
+/* ── Score trend chart ────────────────────────────────────────────────────────── */
+
+.chartSection {
+  margin-top: var(--s5);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--border);
+}
+
+.chartLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: var(--s3);
+}
+
 /* ── Viability score card ───────────────────────────────────────────────────── */
 
 .scoreSection {

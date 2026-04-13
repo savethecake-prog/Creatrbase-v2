@@ -1,10 +1,104 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import styles from './Dashboard.module.css';
+
+// ─── Score history chart ──────────────────────────────────────────────────────
+
+const W = 560, H = 130;
+const PAD = { top: 12, right: 12, bottom: 26, left: 32 };
+const PW  = W - PAD.left - PAD.right;
+const PH  = H - PAD.top  - PAD.bottom;
+
+const TIER_LINES = [
+  { score: 75, label: 'established' },
+  { score: 50, label: 'viable' },
+  { score: 25, label: 'emerging' },
+];
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
+
+function ScoreChart({ history }) {
+  if (!history || history.length < 2) return null;
+
+  const toX = i  => PAD.left + (i / (history.length - 1)) * PW;
+  const toY = sc => PAD.top  + (1 - (sc ?? 0) / 100) * PH;
+
+  const points = history.map((p, i) => `${toX(i)},${toY(p.overall_score)}`).join(' ');
+
+  // Show up to 3 x-axis date labels
+  const dateIdxs = history.length <= 3
+    ? history.map((_, i) => i)
+    : [0, Math.floor((history.length - 1) / 2), history.length - 1];
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', display: 'block' }}>
+      {/* Tier threshold lines */}
+      {TIER_LINES.map(({ score, label }) => {
+        const y = toY(score);
+        return (
+          <g key={score}>
+            <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y}
+              stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="4 3" />
+            <text x={W - PAD.right + 4} y={y + 4} fontSize="9" fill="rgba(255,255,255,0.22)">{label}</text>
+          </g>
+        );
+      })}
+      {/* Y-axis extremes */}
+      <text x={PAD.left - 4} y={PAD.top + 4}  textAnchor="end" fontSize="9" fill="rgba(255,255,255,0.2)">100</text>
+      <text x={PAD.left - 4} y={PAD.top + PH + 4} textAnchor="end" fontSize="9" fill="rgba(255,255,255,0.2)">0</text>
+      {/* Gradient fill under the line */}
+      <defs>
+        <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="rgba(158,255,216,0.18)" />
+          <stop offset="100%" stopColor="rgba(158,255,216,0)" />
+        </linearGradient>
+      </defs>
+      <polygon
+        points={`${toX(0)},${PAD.top + PH} ${points} ${toX(history.length - 1)},${PAD.top + PH}`}
+        fill="url(#scoreGrad)"
+      />
+      {/* Score line */}
+      <polyline points={points} fill="none" stroke="var(--cb-mint)"
+        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Dots */}
+      {history.map((p, i) => (
+        <circle key={i} cx={toX(i)} cy={toY(p.overall_score)} r="3" fill="var(--cb-mint)">
+          <title>{fmtDate(p.scored_at)} — {p.overall_score ?? '–'}</title>
+        </circle>
+      ))}
+      {/* X-axis labels */}
+      {dateIdxs.map((idx, j) => (
+        <text key={idx} x={toX(idx)} y={H - 4}
+          textAnchor={j === 0 ? 'start' : j === dateIdxs.length - 1 ? 'end' : 'middle'}
+          fontSize="10" fill="rgba(255,255,255,0.28)"
+        >
+          {fmtDate(history[idx].scored_at)}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
+// ─── Milestone celebration ────────────────────────────────────────────────────
+
+const MILESTONE_ORDER = [
+  'giftable', 'outreach_ready', 'paid_integration_viable',
+  'rate_negotiation_power', 'portfolio_creator',
+];
+
+const MILESTONE_MESSAGES = {
+  giftable:                 'Brands are now open to gifting you products. Your niche is commercially identifiable.',
+  outreach_ready:           "You're ready to start reaching out to brands directly. Start warm.",
+  paid_integration_viable:  'Brands will now consider paid integrations. You have a viable commercial profile.',
+  rate_negotiation_power:   'You have the leverage to negotiate better rates. Use it.',
+  portfolio_creator:        "Portfolio creator status. You're in the top tier.",
+};
 
 const COMING_SOON = [
   {
@@ -48,12 +142,21 @@ export function Dashboard() {
   const [scoreData, setScoreData]       = useState(null);  // { score, milestones, status }
   const [recData, setRecData]           = useState(null);  // { recommendation, status }
   const [recResponding, setRecResponding] = useState(false);
+  const [history, setHistory]           = useState(null);  // { history: [...], status }
+  const [dismissedCelebrations, setDismissedCelebrations] = useState(() => {
+    const s = new Set();
+    for (const t of MILESTONE_ORDER) {
+      if (localStorage.getItem(`cb_celebrate_${t}`) === '1') s.add(t);
+    }
+    return s;
+  });
 
   useEffect(() => {
     api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
     api.get('/creator/niche').then(setNiche).catch(() => {});
     api.get('/creator/score').then(setScoreData).catch(() => {});
     api.get('/creator/recommendation').then(setRecData).catch(() => {});
+    api.get('/creator/score/history').then(setHistory).catch(() => {});
   }, []);
 
   // Handle ?connected= and ?connect_error= params on return from OAuth
@@ -79,6 +182,22 @@ export function Dashboard() {
 
   const ytSubscribers = yt?.subscriber_count;
   const ytWatchHours  = yt?.watch_hours_12mo;
+
+  const celebrateMilestone = useMemo(() => {
+    if (!scoreData?.milestones) return null;
+    for (let i = MILESTONE_ORDER.length - 1; i >= 0; i--) {
+      const type = MILESTONE_ORDER[i];
+      if (dismissedCelebrations.has(type)) continue;
+      const ms = scoreData.milestones.find(m => m.type === type && m.status === 'crossed');
+      if (ms) return ms;
+    }
+    return null;
+  }, [scoreData, dismissedCelebrations]);
+
+  function dismissCelebration(type) {
+    localStorage.setItem(`cb_celebrate_${type}`, '1');
+    setDismissedCelebrations(prev => new Set([...prev, type]));
+  }
 
   async function respondToRec(id, response) {
     setRecResponding(true);
@@ -200,6 +319,17 @@ export function Dashboard() {
         </div>
       </div>
 
+      {celebrateMilestone && (
+        <div className={styles.celebration}>
+          <div className={styles.celebrationContent}>
+            <p className={styles.celebrationEyebrow}>Milestone reached</p>
+            <p className={styles.celebrationTitle}>{celebrateMilestone.type.replace(/_/g, ' ')}</p>
+            <p className={styles.celebrationMsg}>{MILESTONE_MESSAGES[celebrateMilestone.type]}</p>
+          </div>
+          <button className={styles.celebrationDismiss} onClick={() => dismissCelebration(celebrateMilestone.type)}>✕</button>
+        </div>
+      )}
+
       {scoreData && scoreData.status === 'ready' && scoreData.score && (
         <div className={styles.scoreSection}>
           <p className={styles.sectionTitle}>Commercial Viability</p>
@@ -272,6 +402,13 @@ export function Dashboard() {
                   </span>
                 </div>
               ))}
+            </div>
+          )}
+
+          {history?.history?.length >= 2 && (
+            <div className={styles.chartSection}>
+              <p className={styles.chartLabel}>Score trend</p>
+              <ScoreChart history={history.history} />
             </div>
           )}
         </div>

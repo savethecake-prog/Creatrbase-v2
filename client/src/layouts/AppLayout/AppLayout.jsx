@@ -28,7 +28,7 @@ const NAV = [
   {
     group: 'Account',
     items: [
-      { label: 'Connections', to: '/connections', soon: true },
+      { label: 'Connections', to: '/connections' },
       { label: 'Settings', to: '/settings', soon: true },
     ],
   },

@@ -4,6 +4,36 @@ const { authenticate } = require('../../middleware/authenticate');
 const { getPrisma }    = require('../../lib/prisma');
 
 async function scoreRoutes(app) {
+  // GET /api/creator/score/history
+  // Returns last 30 scored_at snapshots, oldest → newest, for the trend chart.
+  app.get('/api/creator/score/history', { preHandler: authenticate }, async (req) => {
+    const prisma = getPrisma();
+
+    const creator = await prisma.creator.findFirst({
+      where:  { userId: req.user.userId, tenantId: req.user.tenantId },
+      select: { id: true },
+    });
+    if (!creator) return { history: [], status: 'no_creator' };
+
+    const rows = await prisma.dimensionScoreHistory.findMany({
+      where:   { creatorId: creator.id },
+      orderBy: { scoredAt: 'asc' },
+      take:    30,
+      select:  { scoredAt: true, overallScore: true, commercialTier: true },
+    });
+
+    if (rows.length === 0) return { history: [], status: 'no_data' };
+
+    return {
+      history: rows.map(r => ({
+        scored_at:     r.scoredAt,
+        overall_score: r.overallScore,
+        tier:          r.commercialTier,
+      })),
+      status: 'ok',
+    };
+  });
+
   // GET /api/creator/score
   // Returns commercial viability score, dimension breakdown, milestones.
   app.get('/api/creator/score', { preHandler: authenticate }, async (req) => {

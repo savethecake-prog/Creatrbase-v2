@@ -19,8 +19,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const { authenticate }    = require('../../middleware/authenticate');
-const { connectPlatform, getConnectedPlatforms } = require('./platformConnectService');
+const { connectPlatform, getConnectedPlatforms, disconnectPlatform } = require('./platformConnectService');
 const { getDataCollectionQueue }                 = require('../../jobs/queue');
+const { getPrisma }       = require('../../lib/prisma');
 
 // YouTube scopes needed for channel data + analytics
 const YT_SCOPES = [
@@ -241,6 +242,54 @@ async function platformConnectRoutes(app) {
   app.get('/api/connect/platforms', { preHandler: authenticate }, async (req) => {
     const platforms = await getConnectedPlatforms(req.user.userId, req.user.tenantId);
     return { platforms };
+  });
+
+  // ── POST /api/connect/:platform/sync ───────────────────────────────────────
+  // Queues an immediate platform-sync job for the given platform.
+
+  app.post('/api/connect/:platform/sync', { preHandler: authenticate }, async (req, reply) => {
+    const { platform } = req.params;
+    if (!['youtube', 'twitch'].includes(platform)) {
+      return reply.code(400).send({ error: 'Unknown platform' });
+    }
+
+    const prisma  = getPrisma();
+    const creator = await prisma.creator.findFirst({
+      where:  { userId: req.user.userId, tenantId: req.user.tenantId },
+      select: { id: true },
+    });
+    if (!creator) return reply.code(404).send({ error: 'Creator not found' });
+
+    const profile = await prisma.creatorPlatformProfile.findFirst({
+      where:  { creatorId: creator.id, platform, syncStatus: { not: 'disconnected' } },
+      select: { id: true },
+    });
+    if (!profile) return reply.code(404).send({ error: `${platform} not connected` });
+
+    await getDataCollectionQueue().add('platform-sync', { platformProfileId: profile.id });
+    return { ok: true, message: 'Sync queued' };
+  });
+
+  // ── DELETE /api/connect/:platform ──────────────────────────────────────────
+  // Disconnects a platform — clears tokens, marks syncStatus = 'disconnected'.
+
+  app.delete('/api/connect/:platform', { preHandler: authenticate }, async (req, reply) => {
+    const { platform } = req.params;
+    if (!['youtube', 'twitch'].includes(platform)) {
+      return reply.code(400).send({ error: 'Unknown platform' });
+    }
+
+    const prisma  = getPrisma();
+    const creator = await prisma.creator.findFirst({
+      where:  { userId: req.user.userId, tenantId: req.user.tenantId },
+      select: { id: true },
+    });
+    if (!creator) return reply.code(404).send({ error: 'Creator not found' });
+
+    const result = await disconnectPlatform(creator.id, platform);
+    if (!result) return reply.code(404).send({ error: `${platform} not connected` });
+
+    return { ok: true };
   });
 }
 

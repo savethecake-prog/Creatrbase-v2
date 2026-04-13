@@ -6,6 +6,7 @@ import { Signup } from './pages/Signup/Signup';
 import { Dashboard }   from './pages/Dashboard/Dashboard';
 import { GapTracker }  from './pages/GapTracker/GapTracker';
 import { Tasks }       from './pages/Tasks/Tasks';
+import { Connections } from './pages/Connections/Connections';
 
 export default function App() {
   return (
@@ -22,6 +23,9 @@ export default function App() {
           } />
           <Route path="/tasks" element={
             <RequireAuth><Tasks /></RequireAuth>
+          } />
+          <Route path="/connections" element={
+            <RequireAuth><Connections /></RequireAuth>
           } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>

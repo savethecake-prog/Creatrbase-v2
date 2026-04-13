@@ -46,6 +46,18 @@ async function connectPlatform({
         throw err;
       }
 
+      // If this platform account already exists under a different creator row within
+      // the SAME tenant (e.g. after account recreation), remove it so the INSERT below
+      // can proceed. Cross-tenant conflicts are NOT cleared here — they will still
+      // trigger the 23505 handler and return 409.
+      await tx.$executeRaw`
+        DELETE FROM creator_platform_profiles
+        WHERE  platform          = ${platform}
+          AND  platform_user_id  = ${platformUserId}
+          AND  tenant_id         = ${tenantId}::uuid
+          AND  creator_id       != ${creator.id}::uuid
+      `;
+
       // Upsert — reconnecting the same platform updates credentials, doesn't duplicate.
       // COALESCE on refresh_token preserves the existing token if the new one is null
       // (Google doesn't always re-issue a refresh token on subsequent consents).
@@ -89,9 +101,16 @@ async function connectPlatform({
     return { creatorId, platform, platformProfileId };
 
   } catch (err) {
-    // Unique constraint: this platform account is already connected to another tenant
-    if (err.code === '23505' &&
-        err.message?.includes('creator_platform_profiles_platform_platform_user_id_key')) {
+    // Unique constraint: this platform account is already connected to another tenant.
+    // Prisma wraps $queryRaw errors as P2010 with the PG code inside the message,
+    // so we match on both the direct PG code and the Prisma wrapper.
+    const is23505 = err.code === '23505' ||
+                    (err.code === 'P2010' && err.message?.includes('23505'));
+    const isPlatformUserIdConflict =
+      err.message?.includes('(platform, platform_user_id)') ||
+      err.message?.includes('creator_platform_profiles_platform_platform_user_id_key');
+
+    if (is23505 && isPlatformUserIdConflict) {
       const e = new Error('This platform account is already connected to another Creatrbase account.');
       e.statusCode = 409;
       throw e;

@@ -1,3 +1,68 @@
+/* Connect feedback messages */
+.msgSuccess,
+.msgError {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: var(--s3) var(--s5);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: var(--s5);
+}
+
+.msgSuccess {
+  background: rgba(158, 255, 216, 0.08);
+  border: 1px solid rgba(158, 255, 216, 0.25);
+  color: var(--cb-mint);
+}
+
+.msgError {
+  background: rgba(255, 122, 122, 0.08);
+  border: 1px solid rgba(255, 122, 122, 0.25);
+  color: #ff7a7a;
+}
+
+.msgDismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 12px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.msgDismiss:hover {
+  opacity: 1;
+}
+
+/* Connected platform pill */
+.connectedPill {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 0 var(--s4);
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(158, 255, 216, 0.08);
+  border: 1px solid rgba(158, 255, 216, 0.3);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cb-mint);
+  white-space: nowrap;
+}
+
+.connectedDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cb-mint);
+  flex-shrink: 0;
+}
+
 /* Trial banner */
 .trialBanner {
   display: flex;

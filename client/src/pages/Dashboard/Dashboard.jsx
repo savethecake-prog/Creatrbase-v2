@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
@@ -24,6 +25,15 @@ const COMING_SOON = [
   },
 ];
 
+const CONNECT_ERRORS = {
+  youtube_denied:         'YouTube access was denied. Please try again.',
+  youtube_no_channel:     'No YouTube channel found on that Google account.',
+  youtube_already_claimed:'That YouTube channel is already connected to another Creatrbase account.',
+  twitch_denied:          'Twitch access was denied. Please try again.',
+  twitch_no_profile:      'Could not retrieve your Twitch profile. Please try again.',
+  twitch_already_claimed: 'That Twitch account is already connected to another Creatrbase account.',
+};
+
 async function goToCheckout(plan) {
   const { url } = await api.post('/billing/checkout', { plan });
   window.location.href = url;
@@ -39,7 +49,37 @@ export function Dashboard() {
   const firstName = user?.displayName?.split(' ')[0] ?? 'there';
   const sub = user?.subscription;
   const isTrialling = sub?.status === 'trialling';
-  const isActive    = sub?.status === 'active';
+
+  const [platforms, setPlatforms]   = useState([]);
+  const [connectMsg, setConnectMsg] = useState(null); // { type: 'success'|'error', text }
+
+  useEffect(() => {
+    api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+  }, []);
+
+  // Handle ?connected= and ?connect_error= params on return from OAuth
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const connected = params.get('connected');
+    const error     = params.get('connect_error');
+    if (connected) {
+      const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
+      setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
+      window.history.replaceState({}, '', '/dashboard');
+      // Refresh platform list
+      api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+    } else if (error) {
+      setConnectMsg({ type: 'error', text: CONNECT_ERRORS[error] ?? 'Connection failed. Please try again.' });
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, []);
+
+  const yt     = platforms.find(p => p.platform === 'youtube');
+  const twitch = platforms.find(p => p.platform === 'twitch');
+  const allConnected = yt && twitch;
+
+  const ytSubscribers = yt?.subscriber_count;
+  const ytWatchHours  = yt?.watch_hours_12mo;
 
   return (
     <AppLayout>
@@ -60,38 +100,71 @@ export function Dashboard() {
         </div>
       )}
 
+      {connectMsg && (
+        <div className={connectMsg.type === 'success' ? styles.msgSuccess : styles.msgError}>
+          {connectMsg.text}
+          <button className={styles.msgDismiss} onClick={() => setConnectMsg(null)}>✕</button>
+        </div>
+      )}
+
       <div className={styles.header}>
         <h1 className={styles.greeting}>
           Hey, <span>{firstName}</span>.
         </h1>
-        <p className={styles.sub}>Connect your platforms to get started.</p>
+        <p className={styles.sub}>
+          {allConnected ? 'Your platforms are connected.' : 'Connect your platforms to get started.'}
+        </p>
       </div>
 
-      <div className={styles.connectBanner}>
-        <div className={styles.connectText}>
-          <p className={styles.connectTitle}>Connect YouTube or Twitch</p>
-          <p className={styles.connectDesc}>
-            Creatrbase needs access to your channel metrics to calculate your commercial viability score,
-            track your gap to monetisation thresholds, and generate your weekly tasks.
-          </p>
+      {!allConnected && (
+        <div className={styles.connectBanner}>
+          <div className={styles.connectText}>
+            <p className={styles.connectTitle}>Connect YouTube or Twitch</p>
+            <p className={styles.connectDesc}>
+              Creatrbase needs access to your channel metrics to calculate your commercial viability score,
+              track your gap to monetisation thresholds, and generate your weekly tasks.
+            </p>
+          </div>
+          <div className={styles.connectActions}>
+            {yt ? (
+              <div className={styles.connectedPill}>
+                <span className={styles.connectedDot} />
+                YouTube — {yt.platform_display_name ?? yt.platform_username}
+              </div>
+            ) : (
+              <Button variant="primary" onClick={() => { window.location.href = '/api/connect/youtube'; }}>
+                Connect YouTube
+              </Button>
+            )}
+            {twitch ? (
+              <div className={styles.connectedPill}>
+                <span className={styles.connectedDot} />
+                Twitch — {twitch.platform_display_name ?? twitch.platform_username}
+              </div>
+            ) : (
+              <Button variant="ghost" onClick={() => { window.location.href = '/api/connect/twitch'; }}>
+                Connect Twitch
+              </Button>
+            )}
+          </div>
         </div>
-        <div className={styles.connectActions}>
-          <Button variant="primary">Connect YouTube</Button>
-          <Button variant="ghost">Connect Twitch</Button>
-        </div>
-      </div>
+      )}
 
       <p className={styles.sectionTitle}>Your Metrics</p>
       <div className={styles.kpiGrid}>
         <div className={styles.kpiCard}>
           <p className={styles.kpiLabel}>Subscribers</p>
-          <p className={styles.kpiEmpty}>—</p>
-          <p className={styles.kpiHint}>Connect YouTube to see this</p>
+          {ytSubscribers != null
+            ? <p className={styles.kpiValue}>{ytSubscribers.toLocaleString()}</p>
+            : <p className={styles.kpiEmpty}>—</p>}
+          <p className={styles.kpiHint}>{yt ? 'Last synced: pending first sync' : 'Connect YouTube to see this'}</p>
         </div>
         <div className={styles.kpiCard}>
           <p className={styles.kpiLabel}>Watch Hours (12m)</p>
-          <p className={styles.kpiEmpty}>—</p>
-          <p className={styles.kpiHint}>Connect YouTube to see this</p>
+          {ytWatchHours != null
+            ? <p className={styles.kpiValue}>{Math.round(ytWatchHours).toLocaleString()}</p>
+            : <p className={styles.kpiEmpty}>—</p>}
+          <p className={styles.kpiHint}>{yt ? 'Last synced: pending first sync' : 'Connect YouTube to see this'}</p>
         </div>
         <div className={styles.kpiCard}>
           <p className={styles.kpiLabel}>Viability Score</p>

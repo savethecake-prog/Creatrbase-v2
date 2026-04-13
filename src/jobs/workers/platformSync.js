@@ -1,16 +1,16 @@
 'use strict';
 
 // ─── Platform sync worker ─────────────────────────────────────────────────────
-// Processes `platform-sync` jobs from the data-collection queue.
+// Two job types processed here:
 //
-// Job payload: { platformProfileId }
+//   platform-sync       { platformProfileId }
+//     Syncs a single platform profile — fetches metrics, persists to DB.
+//     Queued immediately on connect and by the daily dispatcher.
 //
-// Steps:
-//   1. Fetch the platform profile row (includes encrypted tokens)
-//   2. Decrypt the access token; refresh if expired (or within 5-minute buffer)
-//   3. Call the appropriate platform API(s) to fetch latest metrics
-//   4. Persist metrics + last_synced_at back to creator_platform_profiles
-//   5. On error: mark sync_status='error' so the dashboard can surface it
+//   sync-all-platforms  {}
+//     Daily dispatcher — queries all active profiles and enqueues a
+//     platform-sync job for each. Registered as a Bull repeatable job
+//     (runs at 04:00 UTC every day) so metrics stay fresh automatically.
 //
 // Token refresh:
 //   When a new access token is issued we re-encrypt it and update the DB.
@@ -133,7 +133,38 @@ function startPlatformSyncWorker() {
     }
   });
 
+  // ── Daily dispatcher ──────────────────────────────────────────────────────
+  // Runs at 04:00 UTC every day. Fetches all active profiles and fans out
+  // individual platform-sync jobs. Bull deduplicates the repeatable job
+  // across restarts — safe to re-register on every startup.
+
+  queue.process('sync-all-platforms', async (job) => {
+    const { rows } = await getPool().query(
+      `SELECT id FROM creator_platform_profiles WHERE sync_status != 'disconnected'`
+    );
+
+    if (rows.length === 0) {
+      job.log('No active platform profiles — nothing to sync');
+      return;
+    }
+
+    for (const row of rows) {
+      await queue.add('platform-sync', { platformProfileId: row.id });
+    }
+
+    job.log(`Dispatched ${rows.length} platform-sync job(s)`);
+    console.log(`[platformSync] daily dispatch: queued ${rows.length} sync job(s)`);
+  });
+
+  // Register the repeatable dispatcher job (Bull deduplicates by name + cron)
+  queue.add('sync-all-platforms', {}, {
+    repeat:           { cron: '0 4 * * *' },  // 04:00 UTC daily
+    removeOnComplete: 10,
+    removeOnFail:     10,
+  });
+
   console.log('[platformSync] worker registered on data-collection queue');
+  console.log('[platformSync] daily sync scheduled at 04:00 UTC');
 }
 
 module.exports = { startPlatformSyncWorker };

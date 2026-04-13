@@ -1,0 +1,248 @@
+// ─── Prisma schema ────────────────────────────────────────────────────────────
+// We use our own SQL migration runner (scripts/migrate.js).
+// Prisma is used for the client only — do NOT use `prisma migrate`.
+//
+// To regenerate the client after schema changes: npx prisma generate
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Tenants ──────────────────────────────────────────────────────────────────
+
+model Tenant {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  status      String    @default("active")
+  suspendedAt DateTime? @map("suspended_at") @db.Timestamptz(6)
+  suspendedBy String?   @map("suspended_by")
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+  deletedBy   String?   @map("deleted_by")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  users                   User[]
+  sessions                Session[]
+  creators                Creator[]
+  creatorPlatformProfiles CreatorPlatformProfile[]
+  platformMetricsSnapshots PlatformMetricsSnapshot[]
+  subscriptions           Subscription[]
+
+  @@map("tenants")
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId         String    @map("tenant_id") @db.Uuid
+  email            String    @unique
+  passwordHash     String?   @map("password_hash")
+  emailVerified    Boolean   @default(false) @map("email_verified")
+  emailVerifiedAt  DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  authProviders AuthProvider[]
+  sessions      Session[]
+  creator       Creator?
+
+  @@map("users")
+}
+
+// ─── Auth providers ───────────────────────────────────────────────────────────
+
+model AuthProvider {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  provider   String
+  providerId String?  @map("provider_id")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@map("auth_providers")
+}
+
+// ─── Sessions ─────────────────────────────────────────────────────────────────
+
+model Session {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  tenantId   String   @map("tenant_id") @db.Uuid
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastActive DateTime @default(now()) @map("last_active") @db.Timestamptz(6)
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(6)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ─── Creators ─────────────────────────────────────────────────────────────────
+
+model Creator {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId              String    @map("tenant_id") @db.Uuid
+  userId                String    @unique @map("user_id") @db.Uuid
+  displayName           String    @map("display_name")
+  onboardingStep        String    @default("account_created") @map("onboarding_step")
+  onboardingCompletedAt DateTime? @map("onboarding_completed_at") @db.Timestamptz(6)
+  firstInsightShownAt   DateTime? @map("first_insight_shown_at") @db.Timestamptz(6)
+  firstActionAcceptedAt DateTime? @map("first_action_accepted_at") @db.Timestamptz(6)
+  digestSendDay         Int       @default(1) @map("digest_send_day")
+  digestSendTime        String    @default("08:00:00") @map("digest_send_time")
+  analysisMode          String    @default("automatic") @map("analysis_mode")
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant           Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user             User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platformProfiles CreatorPlatformProfile[]
+
+  @@map("creators")
+}
+
+// ─── Creator platform profiles ────────────────────────────────────────────────
+
+model CreatorPlatformProfile {
+  id                       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                 String    @map("tenant_id") @db.Uuid
+  creatorId                String    @map("creator_id") @db.Uuid
+  platform                 String
+  platformUserId           String    @map("platform_user_id")
+  platformUsername         String?   @map("platform_username")
+  platformDisplayName      String?   @map("platform_display_name")
+  platformUrl              String?   @map("platform_url")
+  connectedAt              DateTime  @default(now()) @map("connected_at") @db.Timestamptz(6)
+  lastSyncedAt             DateTime? @map("last_synced_at") @db.Timestamptz(6)
+  syncStatus               String    @default("active") @map("sync_status")
+  accessToken              String    @map("access_token")
+  refreshToken             String?   @map("refresh_token")
+  tokenExpiresAt           DateTime? @map("token_expires_at") @db.Timestamptz(6)
+  scopesGranted            String[]  @map("scopes_granted")
+  subscriberCount          Int?      @map("subscriber_count")
+  totalViewCount           BigInt?   @map("total_view_count")
+  videoCount               Int?      @map("video_count")
+  avgViewsPerVideo30d      Decimal?  @map("avg_views_per_video_30d") @db.Decimal(10, 2)
+  engagementRate30d        Decimal?  @map("engagement_rate_30d") @db.Decimal(5, 4)
+  watchHours12mo           Decimal?  @map("watch_hours_12mo") @db.Decimal(10, 2)
+  shortsViews90d           BigInt?   @map("shorts_views_90d")
+  publicUploads90d         Int?      @map("public_uploads_90d")
+  analyticsLastSyncedAt    DateTime? @map("analytics_last_synced_at") @db.Timestamptz(6)
+  avgConcurrentViewers30d  Decimal?  @map("avg_concurrent_viewers_30d") @db.Decimal(6, 2)
+  streamHours30d           Decimal?  @map("stream_hours_30d") @db.Decimal(8, 2)
+  uniqueBroadcastDays30d   Int?      @map("unique_broadcast_days_30d")
+  primaryAudienceGeo       String?   @map("primary_audience_geo")
+  secondaryAudienceGeo     String?   @map("secondary_audience_geo")
+  audienceAgeRange         String?   @map("audience_age_range")
+  audienceGenderSkew       String?   @map("audience_gender_skew")
+  yppStatus                String?   @map("ypp_status")
+  twitchAffiliate          Boolean?  @map("twitch_affiliate")
+  twitchPartner            Boolean?  @map("twitch_partner")
+  pubsubTopic              String?   @map("pubsub_topic")
+  pubsubSubscribedAt       DateTime? @map("pubsub_subscribed_at") @db.Timestamptz(6)
+  pubsubExpiresAt          DateTime? @map("pubsub_expires_at") @db.Timestamptz(6)
+  createdAt                DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant    Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator   Creator                   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  snapshots PlatformMetricsSnapshot[]
+
+  @@unique([creatorId, platform])
+  @@unique([platform, platformUserId])
+  @@map("creator_platform_profiles")
+}
+
+// ─── Platform metrics snapshots ───────────────────────────────────────────────
+
+model PlatformMetricsSnapshot {
+  id                      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                String   @map("tenant_id") @db.Uuid
+  platformProfileId       String   @map("platform_profile_id") @db.Uuid
+  platform                String
+  subscriberCount         Int?     @map("subscriber_count")
+  watchHours12mo          Decimal? @map("watch_hours_12mo") @db.Decimal(10, 2)
+  totalViewCount          BigInt?  @map("total_view_count")
+  videoCount              Int?     @map("video_count")
+  avgConcurrentViewers30d Decimal? @map("avg_concurrent_viewers_30d") @db.Decimal(6, 2)
+  recordedAt              DateTime @default(now()) @map("recorded_at") @db.Timestamptz(6)
+
+  tenant          Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  platformProfile CreatorPlatformProfile @relation(fields: [platformProfileId], references: [id], onDelete: Cascade)
+
+  @@map("platform_metrics_snapshots")
+}
+
+// ─── Subscription plans ───────────────────────────────────────────────────────
+
+model SubscriptionPlan {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String
+  stripePriceIdMonthly String   @map("stripe_price_id_monthly")
+  stripePriceIdAnnual  String?  @map("stripe_price_id_annual")
+  amountMonthly        Int      @map("amount_monthly")
+  amountAnnual         Int?     @map("amount_annual")
+  currency             String
+  analysisRunsPerWeek  Int      @map("analysis_runs_per_week")
+  features             Json
+  isActive             Boolean  @default(true) @map("is_active")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  subscriptions Subscription[]
+
+  @@unique([name, currency])
+  @@map("subscription_plans")
+}
+
+// ─── Subscriptions ────────────────────────────────────────────────────────────
+
+model Subscription {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId             String    @unique @map("tenant_id") @db.Uuid
+  planId               String    @map("plan_id") @db.Uuid
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  stripeCustomerId     String    @map("stripe_customer_id")
+  status               String    @default("trialling")
+  billingInterval      String    @default("month") @map("billing_interval")
+  trialStart           DateTime? @map("trial_start") @db.Timestamptz(6)
+  trialEnd             DateTime? @map("trial_end") @db.Timestamptz(6)
+  trialWarningSent     Boolean   @default(false) @map("trial_warning_sent")
+  currentPeriodStart   DateTime? @map("current_period_start") @db.Timestamptz(6)
+  currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  cancelledAt          DateTime? @map("cancelled_at") @db.Timestamptz(6)
+  cancellationReason   String?   @map("cancellation_reason")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
+}
+
+// ─── Billing events ───────────────────────────────────────────────────────────
+
+model BillingEvent {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stripeEventId String    @unique @map("stripe_event_id")
+  eventType     String    @map("event_type")
+  payload       Json
+  processed     Boolean   @default(false)
+  processedAt   DateTime? @map("processed_at") @db.Timestamptz(6)
+  error         String?
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("billing_events")
+}

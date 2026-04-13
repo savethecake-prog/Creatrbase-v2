@@ -1,252 +1,204 @@
 'use strict';
 
 const bcrypt = require('bcrypt');
-const { getPool } = require('../../db/pool');
+const { getPrisma } = require('../../lib/prisma');
 const { createStripeCustomer, createTrialSubscription } = require('../billing/billingService');
 
-const BCRYPT_ROUNDS = 12;
+const BCRYPT_ROUNDS  = 12;
 const SESSION_TTL_DAYS = 7;
 
 // ─── Signup ──────────────────────────────────────────────────────────────────
 
 async function signup({ firstName, lastName, email, password, ip, userAgent }) {
-  const pool = getPool();
-  const client = await pool.connect();
+  const prisma = getPrisma();
+  const normalEmail = email.toLowerCase().trim();
 
-  try {
-    await client.query('BEGIN');
-
-    // Reject if email already exists
-    const existing = await client.query(
-      'SELECT id FROM users WHERE email = $1',
-      [email.toLowerCase().trim()]
-    );
-    if (existing.rowCount > 0) {
+  // 1. Core DB transaction — tenant, user, creator, session
+  const { userId, tenantId, sessionId, displayName } = await prisma.$transaction(async (tx) => {
+    const existing = await tx.user.findUnique({ where: { email: normalEmail } });
+    if (existing) {
       const err = new Error('An account with this email already exists.');
       err.statusCode = 409;
       throw err;
     }
 
-    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    const passwordHash  = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    const resolvedName  = [firstName, lastName].filter(Boolean).join(' ').trim() || normalEmail;
 
-    // tenant → user → auth_provider (local) → creator — all in one transaction
-    const { rows: [tenant] } = await client.query(
-      `INSERT INTO tenants DEFAULT VALUES RETURNING id`
-    );
+    const tenant = await tx.tenant.create({ data: {} });
+    const user   = await tx.user.create({
+      data: { tenantId: tenant.id, email: normalEmail, passwordHash },
+    });
 
-    const displayName = [firstName, lastName].filter(Boolean).join(' ').trim() || email;
+    await tx.authProvider.create({ data: { userId: user.id, provider: 'local' } });
+    await tx.creator.create({
+      data: { tenantId: tenant.id, userId: user.id, displayName: resolvedName },
+    });
 
-    const { rows: [user] } = await client.query(
-      `INSERT INTO users (tenant_id, email, password_hash)
-       VALUES ($1, $2, $3)
-       RETURNING id, tenant_id, email`,
-      [tenant.id, email.toLowerCase().trim(), passwordHash]
-    );
+    const session = await createSession(tx, { userId: user.id, tenantId: tenant.id, ip, userAgent });
 
-    await client.query(
-      `INSERT INTO auth_providers (user_id, provider) VALUES ($1, 'local')`,
-      [user.id]
-    );
+    return { userId: user.id, tenantId: tenant.id, sessionId: session.id, displayName: resolvedName };
+  });
 
-    await client.query(
-      `INSERT INTO creators (tenant_id, user_id, display_name) VALUES ($1, $2, $3)`,
-      [tenant.id, user.id, displayName]
-    );
-
-    // Stripe customer + trial subscription (outside transaction — Stripe is external)
-    // If Stripe fails, we still complete signup and retry can be done later
-    let stripeCustomerId = 'pending';
-    try {
-      stripeCustomerId = await createStripeCustomer(email.toLowerCase().trim(), displayName);
-      await createTrialSubscription(client, { tenantId: tenant.id, stripeCustomerId });
-    } catch (stripeErr) {
-      // Non-fatal: log but don't fail signup
-      console.error('Stripe setup failed at signup (non-fatal):', stripeErr.message);
-    }
-
-    const session = await createSession(client, { userId: user.id, tenantId: tenant.id, ip, userAgent });
-
-    await client.query('COMMIT');
-
-    return { userId: user.id, tenantId: tenant.id, sessionId: session.id, displayName };
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
+  // 2. Stripe setup — outside the transaction (external call, non-fatal)
+  try {
+    const stripeCustomerId = await createStripeCustomer(normalEmail, displayName);
+    await createTrialSubscription({ tenantId, stripeCustomerId });
+  } catch (stripeErr) {
+    console.error('Stripe setup failed at signup (non-fatal):', stripeErr.message);
   }
+
+  return { userId, tenantId, sessionId, displayName };
 }
 
 // ─── Login ───────────────────────────────────────────────────────────────────
 
 async function login({ email, password, ip, userAgent }) {
-  const pool = getPool();
+  const prisma = getPrisma();
 
-  const { rows } = await pool.query(
-    `SELECT u.id, u.tenant_id, u.password_hash,
-            c.display_name
-     FROM users u
-     JOIN creators c ON c.user_id = u.id
-     WHERE u.email = $1`,
-    [email.toLowerCase().trim()]
-  );
+  const user = await prisma.user.findUnique({
+    where:   { email: email.toLowerCase().trim() },
+    include: { creator: { select: { displayName: true } } },
+  });
 
-  const user = rows[0];
   const invalid = new Error('Incorrect email or password.');
   invalid.statusCode = 401;
 
   if (!user) throw invalid;
-  if (!user.password_hash) {
-    // OAuth-only account — no password set
+
+  if (!user.passwordHash) {
     const err = new Error('This account uses Google or Twitch to sign in.');
     err.statusCode = 401;
     throw err;
   }
 
-  const valid = await bcrypt.compare(password, user.password_hash);
+  const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) throw invalid;
 
-  const client = await pool.connect();
-  try {
-    const session = await createSession(client, {
-      userId: user.id,
-      tenantId: user.tenant_id,
-      ip,
-      userAgent,
-    });
-    return {
-      userId: user.id,
-      tenantId: user.tenant_id,
-      sessionId: session.id,
-      displayName: user.display_name,
-    };
-  } finally {
-    client.release();
-  }
+  const session = await prisma.$transaction(async (tx) =>
+    createSession(tx, { userId: user.id, tenantId: user.tenantId, ip, userAgent })
+  );
+
+  return {
+    userId:      user.id,
+    tenantId:    user.tenantId,
+    sessionId:   session.id,
+    displayName: user.creator?.displayName ?? '',
+  };
 }
 
 // ─── OAuth upsert ─────────────────────────────────────────────────────────────
-// Called after a successful OAuth callback. Creates the user if they don't
-// exist, or finds the existing one. Returns the same shape as login/signup.
 
 async function oauthUpsert({ provider, providerId, email, displayName, ip, userAgent }) {
-  const pool = getPool();
-  const client = await pool.connect();
+  const prisma     = getPrisma();
+  const normalEmail = email.toLowerCase().trim();
 
-  try {
-    await client.query('BEGIN');
+  const { userId, tenantId, sessionId, resolvedName, isNew } =
+    await prisma.$transaction(async (tx) => {
 
-    // Check if this OAuth identity already exists
-    const { rows: existing } = await client.query(
-      `SELECT u.id, u.tenant_id, c.display_name
-       FROM auth_providers ap
-       JOIN users u ON u.id = ap.user_id
-       JOIN creators c ON c.user_id = u.id
-       WHERE ap.provider = $1 AND ap.provider_id = $2`,
-      [provider, providerId]
-    );
-
-    if (existing[0]) {
-      const u = existing[0];
-      const session = await createSession(client, {
-        userId: u.id, tenantId: u.tenant_id, ip, userAgent,
+      // Check if this OAuth identity already exists
+      const existingProvider = await tx.authProvider.findUnique({
+        where:   { provider_providerId: { provider, providerId } },
+        include: { user: { include: { creator: { select: { displayName: true } } } } },
       });
-      await client.query('COMMIT');
-      return { userId: u.id, tenantId: u.tenant_id, sessionId: session.id, displayName: u.display_name };
-    }
 
-    // Check if email already exists (link provider to existing account)
-    const { rows: byEmail } = await client.query(
-      `SELECT u.id, u.tenant_id, c.display_name
-       FROM users u JOIN creators c ON c.user_id = u.id
-       WHERE u.email = $1`,
-      [email.toLowerCase().trim()]
-    );
-
-    let userId, tenantId, resolvedName;
-
-    if (byEmail[0]) {
-      // Link new provider to existing account
-      userId      = byEmail[0].id;
-      tenantId    = byEmail[0].tenant_id;
-      resolvedName = byEmail[0].display_name;
-      await client.query(
-        `INSERT INTO auth_providers (user_id, provider, provider_id) VALUES ($1, $2, $3)`,
-        [userId, provider, providerId]
-      );
-    } else {
-      // Brand new user — same setup as email/password signup
-      const { rows: [tenant] } = await client.query(
-        `INSERT INTO tenants DEFAULT VALUES RETURNING id`
-      );
-      const { rows: [user] } = await client.query(
-        `INSERT INTO users (tenant_id, email) VALUES ($1, $2) RETURNING id, tenant_id`,
-        [tenant.id, email.toLowerCase().trim()]
-      );
-      await client.query(
-        `INSERT INTO auth_providers (user_id, provider, provider_id) VALUES ($1, $2, $3)`,
-        [user.id, provider, providerId]
-      );
-      const name = displayName || email;
-      await client.query(
-        `INSERT INTO creators (tenant_id, user_id, display_name) VALUES ($1, $2, $3)`,
-        [tenant.id, user.id, name]
-      );
-
-      // Stripe customer + trial subscription — non-fatal, same as signup
-      try {
-        const stripeCustomerId = await createStripeCustomer(email.toLowerCase().trim(), name);
-        await createTrialSubscription(client, { tenantId: tenant.id, stripeCustomerId });
-      } catch (stripeErr) {
-        console.error('Stripe setup failed at OAuth signup (non-fatal):', stripeErr.message);
+      if (existingProvider) {
+        const u       = existingProvider.user;
+        const session = await createSession(tx, { userId: u.id, tenantId: u.tenantId, ip, userAgent });
+        return { userId: u.id, tenantId: u.tenantId, sessionId: session.id,
+                 resolvedName: u.creator?.displayName ?? '', isNew: false };
       }
 
-      userId       = user.id;
-      tenantId     = tenant.id;
-      resolvedName = name;
-    }
+      // Check if email already exists — link provider to existing account
+      const existingUser = await tx.user.findUnique({
+        where:   { email: normalEmail },
+        include: { creator: { select: { displayName: true } } },
+      });
 
-    const session = await createSession(client, { userId, tenantId, ip, userAgent });
-    await client.query('COMMIT');
-    return { userId, tenantId, sessionId: session.id, displayName: resolvedName };
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
+      let userId, tenantId, resolvedName;
+
+      if (existingUser) {
+        userId       = existingUser.id;
+        tenantId     = existingUser.tenantId;
+        resolvedName = existingUser.creator?.displayName ?? '';
+        await tx.authProvider.create({ data: { userId, provider, providerId } });
+      } else {
+        // Brand new user
+        const name   = displayName || normalEmail;
+        const tenant = await tx.tenant.create({ data: {} });
+        const user   = await tx.user.create({ data: { tenantId: tenant.id, email: normalEmail } });
+        await tx.authProvider.create({ data: { userId: user.id, provider, providerId } });
+        await tx.creator.create({
+          data: { tenantId: tenant.id, userId: user.id, displayName: name },
+        });
+        userId       = user.id;
+        tenantId     = tenant.id;
+        resolvedName = name;
+      }
+
+      const session = await createSession(tx, { userId, tenantId, ip, userAgent });
+      return { userId, tenantId, sessionId: session.id, resolvedName, isNew: !existingUser };
+    });
+
+  // Stripe setup for brand-new users only — outside transaction, non-fatal
+  if (isNew) {
+    try {
+      const stripeCustomerId = await createStripeCustomer(normalEmail, resolvedName);
+      await createTrialSubscription({ tenantId, stripeCustomerId });
+    } catch (stripeErr) {
+      console.error('Stripe setup failed at OAuth signup (non-fatal):', stripeErr.message);
+    }
   }
+
+  return { userId, tenantId, sessionId, displayName: resolvedName };
 }
 
-// ─── Session management ───────────────────────────────────────────────────────
+// ─── Session helpers ──────────────────────────────────────────────────────────
 
-async function createSession(client, { userId, tenantId, ip, userAgent }) {
+async function createSession(tx, { userId, tenantId, ip, userAgent }) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + SESSION_TTL_DAYS);
 
-  const { rows: [session] } = await client.query(
-    `INSERT INTO sessions (user_id, tenant_id, ip_address, user_agent, expires_at)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id`,
-    [userId, tenantId, ip ?? null, userAgent ?? null, expiresAt]
-  );
-  return session;
+  return tx.session.create({
+    data: {
+      userId,
+      tenantId,
+      ipAddress: ip       ?? null,
+      userAgent: userAgent ?? null,
+      expiresAt,
+    },
+  });
 }
 
 async function validateSession(sessionId) {
-  const { rows } = await getPool().query(
-    `SELECT s.id, s.user_id, s.tenant_id, s.expires_at,
-            u.email, c.display_name
-     FROM sessions s
-     JOIN users u ON u.id = s.user_id
-     JOIN creators c ON c.user_id = s.user_id
-     WHERE s.id = $1 AND s.expires_at > NOW()`,
-    [sessionId]
-  );
-  return rows[0] ?? null;
+  const session = await getPrisma().session.findFirst({
+    where:   { id: sessionId, expiresAt: { gt: new Date() } },
+    include: {
+      user:    { select: { email: true } },
+      creator: false,
+    },
+  });
+
+  if (!session) return null;
+
+  // Fetch displayName via the user relation → creator
+  const creator = await getPrisma().creator.findUnique({
+    where:  { userId: session.userId },
+    select: { displayName: true },
+  });
+
+  return {
+    id:          session.id,
+    user_id:     session.userId,
+    tenant_id:   session.tenantId,
+    expires_at:  session.expiresAt,
+    email:       session.user.email,
+    display_name: creator?.displayName ?? '',
+  };
 }
 
 async function revokeSession(sessionId) {
-  await getPool().query('DELETE FROM sessions WHERE id = $1', [sessionId]);
+  await getPrisma().session.delete({ where: { id: sessionId } }).catch(() => {});
 }
 
 module.exports = { signup, login, oauthUpsert, validateSession, revokeSession };

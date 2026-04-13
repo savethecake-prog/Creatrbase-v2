@@ -4,7 +4,7 @@
 // Job type: analysis:baseline-run   { platformProfileId }
 //
 // Flow:
-//   1. Resolve creator + decrypt access token (same pattern as platformSync)
+//   1. Resolve creator + decrypt access token
 //   2. Fetch video signals via youtubeContent.getVideoSignals()
 //   3. Build + send the niche-classification-v1 prompt to Claude
 //   4. Validate JSON output — retry ONCE on malformed response
@@ -20,10 +20,9 @@ const fs              = require('fs');
 const path            = require('path');
 const Anthropic       = require('@anthropic-ai/sdk');
 const { getPrisma }   = require('../../lib/prisma');
-const { decrypt }     = require('../../lib/crypto');
-const { getVideoSignals } = require('../../services/youtubeContent');
+const { decrypt, encrypt } = require('../../lib/crypto');
+const { getVideoSignals }  = require('../../services/youtubeContent');
 const { refreshAccessToken } = require('../../services/youtube');
-const { encrypt }     = require('../../lib/crypto');
 const { getDataCollectionQueue } = require('../queue');
 
 const PROMPT_VERSION  = 'niche-classification-v1';
@@ -31,10 +30,9 @@ const PROMPT_TEMPLATE = fs.readFileSync(
   path.join(__dirname, '../../prompts/niche-classification-v1.txt'),
   'utf8'
 );
-const MODEL           = 'claude-sonnet-4-6';
-const MAX_TOKENS      = 1024;
+const MODEL      = 'claude-sonnet-4-6';
+const MAX_TOKENS = 1024;
 
-// Expected top-level keys from the output schema
 const REQUIRED_KEYS = [
   'primary_niche_category',
   'primary_niche_specific',
@@ -50,19 +48,15 @@ const REQUIRED_KEYS = [
 ];
 
 function buildPrompt(signals) {
-  const videoSignalsJson = JSON.stringify(signals.videoSignals, null, 2);
-  const affiliateRaw     = signals.affiliateDomains.join(', ') || 'none detected';
-  const promoRaw         = signals.promoCodes.join(', ') || 'none detected';
-
   return PROMPT_TEMPLATE
-    .replace('{{platform}}',             'youtube')
-    .replace('{{video_count}}',          String(signals.videoCount))
-    .replace('{{sample_days}}',          String(signals.sampleDays))
-    .replace('{{video_signals_json}}',   videoSignalsJson)
-    .replace('{{channel_description}}',  signals.channelDescription || 'Not provided')
-    .replace('{{channel_keywords}}',     signals.channelKeywords    || 'Not provided')
-    .replace('{{affiliate_domains_raw}}', affiliateRaw)
-    .replace('{{promo_codes_raw}}',       promoRaw);
+    .replace('{{platform}}',              'youtube')
+    .replace('{{video_count}}',           String(signals.videoCount))
+    .replace('{{sample_days}}',           String(signals.sampleDays))
+    .replace('{{video_signals_json}}',    JSON.stringify(signals.videoSignals, null, 2))
+    .replace('{{channel_description}}',   signals.channelDescription || 'Not provided')
+    .replace('{{channel_keywords}}',      signals.channelKeywords    || 'Not provided')
+    .replace('{{affiliate_domains_raw}}', signals.affiliateDomains.join(', ') || 'none detected')
+    .replace('{{promo_codes_raw}}',       signals.promoCodes.join(', ')       || 'none detected');
 }
 
 function validateOutput(parsed) {
@@ -73,7 +67,7 @@ function validateOutput(parsed) {
 async function callClaude(prompt) {
   const client = new Anthropic();
 
-  // Split SYSTEM / USER sections on the "USER\n----" divider
+  // Split SYSTEM / USER sections on the "USER\n----" divider in the template
   const [systemSection, userSection] = prompt.split(/^USER\n-+$/m);
 
   const response = await client.messages.create({
@@ -142,28 +136,33 @@ function startContentAnalysisWorker() {
     const signals = await getVideoSignals(accessToken);
     job.log(`Fetched ${signals.videoCount} video signals`);
 
-    const prompt = buildPrompt(signals);
-    const rawInput = {
-      videoCount:        signals.videoCount,
-      sampleDays:        signals.sampleDays,
+    const signalsExtracted = {
+      videoCount:         signals.videoCount,
+      sampleDays:         signals.sampleDays,
       channelDescription: signals.channelDescription,
-      channelKeywords:   signals.channelKeywords,
-      affiliateDomains:  signals.affiliateDomains,
-      promoCodes:        signals.promoCodes,
-      videoSignals:      signals.videoSignals,
+      channelKeywords:    signals.channelKeywords,
+      affiliateDomains:   signals.affiliateDomains,
+      promoCodes:         signals.promoCodes,
+      videoSignals:       signals.videoSignals,
     };
 
-    // ── 4. Create run record (pending) ────────────────────────────────────────
+    // ── 4. Create run record ───────────────────────────────────────────────────
     const run = await prisma.contentAnalysisRun.create({
       data: {
-        tenantId:         profile.tenantId,
-        creatorId:        profile.creatorId,
+        tenantId:           profile.tenantId,
+        creatorId:          profile.creatorId,
         platformProfileId,
-        promptVersion:    PROMPT_VERSION,
-        rawInput,
-        status:           'pending',
+        platform:           'youtube',
+        runType:            'baseline',
+        triggeredBy:        'system_onboarding',
+        runStatus:          'running',
+        claudePromptVersion: PROMPT_VERSION,
+        signalsExtracted,
+        startedAt:          new Date(),
       },
     });
+
+    const prompt = buildPrompt(signals);
 
     // ── 5. Call Claude — one retry on invalid JSON ────────────────────────────
     let rawOutput, tokensUsed, parsed;
@@ -173,26 +172,22 @@ function startContentAnalysisWorker() {
         ({ rawOutput, tokensUsed } = await callClaude(prompt));
         job.log(`Claude response (attempt ${attempt}): ${rawOutput.slice(0, 200)}`);
 
-        // Log raw output as required by CREATRBASE_INSTRUCTIONS Rule #3
+        // Rule #3: log prompt_version + raw output on every Claude call
         console.log(`[contentAnalysis] prompt_version=${PROMPT_VERSION} raw_output=${rawOutput}`);
 
         parsed = JSON.parse(rawOutput.trim());
-
-        if (!validateOutput(parsed)) {
-          throw new Error('Missing required fields in Claude output');
-        }
-
-        break; // valid
+        if (!validateOutput(parsed)) throw new Error('Missing required fields in Claude output');
+        break;
       } catch (parseErr) {
         if (attempt === 2) {
-          // Both attempts failed — mark run as failed and rethrow
           await prisma.contentAnalysisRun.update({
             where: { id: run.id },
             data:  {
-              rawOutput:     rawOutput ?? null,
-              tokensUsed:    tokensUsed ?? null,
-              status:        'failed',
-              failureReason: parseErr.message,
+              claudeRawOutput: rawOutput ? { text: rawOutput } : null,
+              tokensUsed:      tokensUsed ?? null,
+              runStatus:       'failed',
+              errorDetails:    parseErr.message,
+              completedAt:     new Date(),
             },
           });
           throw parseErr;
@@ -206,55 +201,58 @@ function startContentAnalysisWorker() {
       await tx.contentAnalysisRun.update({
         where: { id: run.id },
         data:  {
-          rawOutput,
-          parsedOutput:  parsed,
+          claudeRawOutput:     { text: rawOutput },
+          classificationOutput: parsed,
           tokensUsed,
-          status:        'complete',
+          runStatus:           'complete',
+          completedAt:         new Date(),
         },
       });
 
-      // Upsert: one niche profile per creator, always updated from latest run
+      // Upsert — one niche profile per creator per platform
       await tx.creatorNicheProfile.upsert({
-        where:  { creatorId: profile.creatorId },
+        where:  { creatorId_platform: { creatorId: profile.creatorId, platform: 'youtube' } },
         update: {
-          analysisRunId:             run.id,
-          primaryNicheCategory:      parsed.primary_niche_category,
-          primaryNicheSpecific:      parsed.primary_niche_specific,
-          secondaryNicheSpecific:    parsed.secondary_niche_specific ?? null,
-          contentFormatPrimary:      parsed.content_format_primary,
-          contentFormatSecondary:    parsed.content_format_secondary ?? null,
-          affiliateDomainsDetected:  parsed.affiliate_domains_detected ?? [],
-          promoCodesDetected:        parsed.promo_codes_detected ?? [],
-          brandMentions:             parsed.brand_mentions ?? [],
-          existingPartnershipsLikely: parsed.existing_partnerships_likely,
-          classificationConfidence:  parsed.classification_confidence,
-          confidenceReasoning:       parsed.confidence_reasoning,
-          nicheCommercialNotes:      parsed.niche_commercial_notes,
-          classificationReasoning:   parsed.classification_reasoning,
-          updatedAt:                 new Date(),
+          primaryNicheCategory:    parsed.primary_niche_category,
+          primaryNicheSpecific:    parsed.primary_niche_specific,
+          secondaryNicheSpecific:  parsed.secondary_niche_specific ?? null,
+          contentFormatPrimary:    parsed.content_format_primary,
+          contentFormatSecondary:  parsed.content_format_secondary ?? null,
+          affiliateDomainsDetected: parsed.affiliate_domains_detected ?? [],
+          promoCodesDetected:      parsed.promo_codes_detected ?? [],
+          brandMentions:           parsed.brand_mentions ?? [],
+          existingPartnerships:    Boolean(parsed.existing_partnerships_likely),
+          classificationConfidence: parsed.classification_confidence,
+          confidenceReasoning:     parsed.confidence_reasoning,
+          nicheCommercialNotes:    parsed.niche_commercial_notes,
+          classificationReasoning: parsed.classification_reasoning,
+          baselineRunId:           run.id,
+          lastRefinedAt:           new Date(),
+          updatedAt:               new Date(),
         },
         create: {
-          tenantId:                  profile.tenantId,
-          creatorId:                 profile.creatorId,
-          analysisRunId:             run.id,
-          primaryNicheCategory:      parsed.primary_niche_category,
-          primaryNicheSpecific:      parsed.primary_niche_specific,
-          secondaryNicheSpecific:    parsed.secondary_niche_specific ?? null,
-          contentFormatPrimary:      parsed.content_format_primary,
-          contentFormatSecondary:    parsed.content_format_secondary ?? null,
-          affiliateDomainsDetected:  parsed.affiliate_domains_detected ?? [],
-          promoCodesDetected:        parsed.promo_codes_detected ?? [],
-          brandMentions:             parsed.brand_mentions ?? [],
-          existingPartnershipsLikely: parsed.existing_partnerships_likely,
-          classificationConfidence:  parsed.classification_confidence,
-          confidenceReasoning:       parsed.confidence_reasoning,
-          nicheCommercialNotes:      parsed.niche_commercial_notes,
-          classificationReasoning:   parsed.classification_reasoning,
+          tenantId:                profile.tenantId,
+          creatorId:               profile.creatorId,
+          platform:                'youtube',
+          primaryNicheCategory:    parsed.primary_niche_category,
+          primaryNicheSpecific:    parsed.primary_niche_specific,
+          secondaryNicheSpecific:  parsed.secondary_niche_specific ?? null,
+          contentFormatPrimary:    parsed.content_format_primary,
+          contentFormatSecondary:  parsed.content_format_secondary ?? null,
+          affiliateDomainsDetected: parsed.affiliate_domains_detected ?? [],
+          promoCodesDetected:      parsed.promo_codes_detected ?? [],
+          brandMentions:           parsed.brand_mentions ?? [],
+          existingPartnerships:    Boolean(parsed.existing_partnerships_likely),
+          classificationConfidence: parsed.classification_confidence,
+          confidenceReasoning:     parsed.confidence_reasoning,
+          nicheCommercialNotes:    parsed.niche_commercial_notes,
+          classificationReasoning: parsed.classification_reasoning,
+          baselineRunId:           run.id,
         },
       });
     });
 
-    job.log(`Baseline analysis complete: ${parsed.primary_niche_specific} (${parsed.classification_confidence} confidence)`);
+    job.log(`Analysis complete: ${parsed.primary_niche_specific} (${parsed.classification_confidence} confidence)`);
     console.log(`[contentAnalysis] creator=${profile.creatorId} niche=${parsed.primary_niche_specific} confidence=${parsed.classification_confidence}`);
   });
 

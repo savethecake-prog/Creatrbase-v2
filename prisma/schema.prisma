@@ -235,55 +235,73 @@ model Subscription {
   @@map("subscriptions")
 }
 
-// ─── Content analysis runs ────────────────────────────────────────────────────
+// ─── Content analysis runs ───────────────────────────────────────────────────
+// Created in migration 002. Migration 013 added platform_profile_id + tokens_used.
 
 model ContentAnalysisRun {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantId          String    @map("tenant_id") @db.Uuid
-  creatorId         String    @map("creator_id") @db.Uuid
-  platformProfileId String    @map("platform_profile_id") @db.Uuid
-  promptVersion     String    @map("prompt_version")
-  rawInput          Json      @map("raw_input")
-  rawOutput         String?   @map("raw_output") @db.Text
-  parsedOutput      Json?     @map("parsed_output")
-  status            String    @default("pending")
-  failureReason     String?   @map("failure_reason") @db.Text
-  tokensUsed        Int?      @map("tokens_used")
-  recordedAt        DateTime  @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId            String    @map("tenant_id") @db.Uuid
+  creatorId           String    @map("creator_id") @db.Uuid
+  platformProfileId   String?   @map("platform_profile_id") @db.Uuid
+  platform            String
+  runType             String    @default("baseline") @map("run_type")
+  triggeredBy         String    @default("system_onboarding") @map("triggered_by")
+  runStatus           String    @default("queued") @map("run_status")
+  videosSampled       Int?      @map("videos_sampled")
+  videoIdsSampled     String[]  @map("video_ids_sampled")
+  signalsExtracted    Json?     @map("signals_extracted")
+  claudePromptVersion String?   @map("claude_prompt_version")
+  claudeRawOutput     Json?     @map("claude_raw_output")
+  classificationOutput Json?    @map("classification_output")
+  confidenceScore     Int?      @map("confidence_score")
+  errorDetails        String?   @map("error_details") @db.Text
+  tokensUsed          Int?      @map("tokens_used")
+  startedAt           DateTime? @map("started_at") @db.Timestamptz(6)
+  completedAt         DateTime? @map("completed_at") @db.Timestamptz(6)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  tenant          Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  platformProfile CreatorPlatformProfile @relation(fields: [platformProfileId], references: [id], onDelete: Cascade)
+  tenant          Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  platformProfile CreatorPlatformProfile? @relation(fields: [platformProfileId], references: [id], onDelete: Cascade)
   nicheProfile    CreatorNicheProfile?
 
   @@map("content_analysis_runs")
 }
 
 // ─── Creator niche profiles ───────────────────────────────────────────────────
+// Created in migration 002. Migration 013 added brand_mentions + reasoning fields.
+// UNIQUE(creator_id, platform) — one profile per creator per platform.
+// brands_mentioned UUID[] is omitted here (references brand registry, not used by worker).
 
 model CreatorNicheProfile {
   id                         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tenantId                   String    @map("tenant_id") @db.Uuid
-  creatorId                  String    @unique @map("creator_id") @db.Uuid
-  analysisRunId              String    @unique @map("analysis_run_id") @db.Uuid
-  primaryNicheCategory       String    @map("primary_niche_category")
-  primaryNicheSpecific       String    @map("primary_niche_specific")
+  creatorId                  String    @map("creator_id") @db.Uuid
+  platform                   String
+  primaryNicheCategory       String?   @map("primary_niche_category")
+  primaryNicheSpecific       String?   @map("primary_niche_specific")
   secondaryNicheSpecific     String?   @map("secondary_niche_specific")
-  contentFormatPrimary       String    @map("content_format_primary")
+  contentFormatPrimary       String?   @map("content_format_primary")
   contentFormatSecondary     String?   @map("content_format_secondary")
   affiliateDomainsDetected   String[]  @map("affiliate_domains_detected")
   promoCodesDetected         String[]  @map("promo_codes_detected")
   brandMentions              String[]  @map("brand_mentions")
-  existingPartnershipsLikely Boolean   @map("existing_partnerships_likely")
-  classificationConfidence   String    @map("classification_confidence")
-  confidenceReasoning        String    @map("confidence_reasoning") @db.Text
-  nicheCommercialNotes       String    @map("niche_commercial_notes") @db.Text
-  classificationReasoning    String    @map("classification_reasoning") @db.Text
+  existingPartnerships       Boolean   @default(false) @map("existing_partnerships")
+  classificationConfidence   String    @default("low") @map("classification_confidence")
+  classificationMethod       String    @default("baseline_run") @map("classification_method")
+  userConfirmed              Boolean   @default(false) @map("user_confirmed")
+  userConfirmedAt            DateTime? @map("user_confirmed_at") @db.Timestamptz(6)
+  confidenceReasoning        String?   @map("confidence_reasoning") @db.Text
+  nicheCommercialNotes       String?   @map("niche_commercial_notes") @db.Text
+  classificationReasoning    String?   @map("classification_reasoning") @db.Text
+  baselineRunId              String?   @map("baseline_run_id") @db.Uuid
+  lastRefinedAt              DateTime? @map("last_refined_at") @db.Timestamptz(6)
   createdAt                  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                  DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant      Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  analysisRun ContentAnalysisRun @relation(fields: [analysisRunId], references: [id])
+  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  analysisRun ContentAnalysisRun? @relation(fields: [baselineRunId], references: [id])
 
+  @@unique([creatorId, platform])
   @@map("creator_niche_profiles")
 }
 

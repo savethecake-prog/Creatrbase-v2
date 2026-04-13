@@ -106,6 +106,17 @@ function startPlatformSyncWorker() {
           ]
         );
 
+        // Append a snapshot for velocity calculations in Gap Tracker
+        await client.query(
+          `INSERT INTO platform_metrics_snapshots
+             (tenant_id, platform_profile_id, platform,
+              subscriber_count, watch_hours_12mo, total_view_count, video_count)
+           SELECT tenant_id, $1, 'youtube', $2, $3, $4, $5
+             FROM creator_platform_profiles WHERE id = $1`,
+          [platformProfileId, stats.subscriberCount, watchHours,
+           stats.totalViewCount, stats.videoCount]
+        );
+
         job.log(`YouTube sync complete: ${stats.subscriberCount} subscribers, ${watchHours} watch hours`);
 
       } else {

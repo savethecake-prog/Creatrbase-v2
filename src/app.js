@@ -38,6 +38,7 @@ app.register(billingRoutes);
 app.register(webhookRoute);
 
 app.register(require('./domains/platforms/platformConnectRoutes'));
+app.register(require('./domains/gapTracker/gapTrackerRoutes'));
 
 // ── Background workers ────────────────────────────────────────────────────────
 

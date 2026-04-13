@@ -26,6 +26,7 @@ const FILES = [
   '010_seed_reference_data.sql',
   '010_seed_brand_registry.sql',
   '011_seed_subscription_plans.sql',
+  '012_platform_metrics_snapshots.sql',
 ];
 
 async function run() {

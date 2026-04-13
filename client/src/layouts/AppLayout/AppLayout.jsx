@@ -8,7 +8,7 @@ const NAV = [
     group: 'Overview',
     items: [
       { label: 'Dashboard', to: '/dashboard' },
-      { label: 'Gap Tracker', to: '/gap', soon: true },
+      { label: 'Gap Tracker', to: '/gap' },
     ],
   },
   {

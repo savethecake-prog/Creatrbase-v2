@@ -8,10 +8,6 @@ import styles from './Dashboard.module.css';
 
 const COMING_SOON = [
   {
-    title: 'Gap Tracker',
-    desc: 'See exactly how far you are from each monetisation threshold, with velocity and projection.',
-  },
-  {
     title: 'Weekly Tasks',
     desc: 'One specific, data-backed action each week targeting your weakest dimension.',
   },

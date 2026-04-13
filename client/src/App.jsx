@@ -3,7 +3,8 @@ import { AuthProvider } from './lib/AuthContext';
 import { RequireAuth } from './lib/RequireAuth';
 import { Login } from './pages/Login/Login';
 import { Signup } from './pages/Signup/Signup';
-import { Dashboard } from './pages/Dashboard/Dashboard';
+import { Dashboard }   from './pages/Dashboard/Dashboard';
+import { GapTracker }  from './pages/GapTracker/GapTracker';
 
 export default function App() {
   return (
@@ -14,6 +15,9 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={
             <RequireAuth><Dashboard /></RequireAuth>
+          } />
+          <Route path="/gap" element={
+            <RequireAuth><GapTracker /></RequireAuth>
           } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>

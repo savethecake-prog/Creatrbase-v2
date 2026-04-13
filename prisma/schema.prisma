@@ -262,7 +262,6 @@ model ContentAnalysisRun {
 
   tenant          Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   platformProfile CreatorPlatformProfile? @relation(fields: [platformProfileId], references: [id], onDelete: Cascade)
-  nicheProfile    CreatorNicheProfile?
 
   @@map("content_analysis_runs")
 }
@@ -298,8 +297,7 @@ model CreatorNicheProfile {
   createdAt                  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                  DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  analysisRun ContentAnalysisRun? @relation(fields: [baselineRunId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@unique([creatorId, platform])
   @@map("creator_niche_profiles")

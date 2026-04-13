@@ -48,9 +48,11 @@ export function Dashboard() {
 
   const [platforms, setPlatforms]   = useState([]);
   const [connectMsg, setConnectMsg] = useState(null); // { type: 'success'|'error', text }
+  const [niche, setNiche]           = useState(null);  // { niche, status }
 
   useEffect(() => {
     api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+    api.get('/creator/niche').then(setNiche).catch(() => {});
   }, []);
 
   // Handle ?connected= and ?connect_error= params on return from OAuth
@@ -175,6 +177,48 @@ export function Dashboard() {
           <p className={styles.kpiHint}>Calculated after first sync</p>
         </div>
       </div>
+
+      {niche && niche.status !== 'no_youtube' && niche.status !== 'no_creator' && (
+        <div className={styles.nicheSection}>
+          <p className={styles.sectionTitle}>Content Profile</p>
+          {niche.status === 'analysing' && (
+            <div className={styles.nicheCard}>
+              <p className={styles.nichePulse}>Analysing your content…</p>
+              <p className={styles.nicheHint}>This usually takes under a minute.</p>
+            </div>
+          )}
+          {niche.status === 'ready' && niche.niche && (
+            <div className={styles.nicheCard}>
+              <div className={styles.nicheHeader}>
+                <div>
+                  <p className={styles.nicheCategory}>{niche.niche.primary_niche_category}</p>
+                  <p className={styles.nicheSpecific}>{niche.niche.primary_niche_specific.replace(/_/g, ' ')}</p>
+                </div>
+                <Badge
+                  variant={
+                    niche.niche.classification_confidence === 'high'   ? 'mint' :
+                    niche.niche.classification_confidence === 'medium' ? 'peach' : 'error'
+                  }
+                >
+                  {niche.niche.classification_confidence} confidence
+                </Badge>
+              </div>
+              {niche.niche.content_format_primary && (
+                <p className={styles.nicheFormat}>
+                  Primary format: <strong>{niche.niche.content_format_primary.replace(/_/g, ' ')}</strong>
+                  {niche.niche.content_format_secondary && (
+                    <span> · {niche.niche.content_format_secondary.replace(/_/g, ' ')}</span>
+                  )}
+                </p>
+              )}
+              <p className={styles.nicheNotes}>{niche.niche.niche_commercial_notes}</p>
+              {niche.niche.existing_partnerships_likely && (
+                <p className={styles.nichePartnerships}>Existing brand partnerships detected</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <p className={styles.sectionTitle}>
         Coming Next <Badge variant="lavender">In Development</Badge>

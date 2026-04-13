@@ -123,6 +123,8 @@ async function platformConnectRoutes(app) {
 
         // Queue an immediate sync so KPI cards populate without waiting for cron
         getDataCollectionQueue().add('platform-sync', { platformProfileId });
+        // Queue baseline content analysis (niche classification)
+        getDataCollectionQueue().add('analysis:baseline-run', { platformProfileId });
       } catch (err) {
         if (err.statusCode === 409) {
           // Channel already claimed by another Creatrbase account

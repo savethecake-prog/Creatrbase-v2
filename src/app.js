@@ -39,10 +39,12 @@ app.register(webhookRoute);
 
 app.register(require('./domains/platforms/platformConnectRoutes'));
 app.register(require('./domains/gapTracker/gapTrackerRoutes'));
+app.register(require('./domains/creator/nicheRoutes'));
 
 // ── Background workers ────────────────────────────────────────────────────────
 
 require('./jobs/workers/platformSync').startPlatformSyncWorker();
+require('./jobs/workers/contentAnalysis').startContentAnalysisWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

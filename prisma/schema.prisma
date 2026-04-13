@@ -31,6 +31,8 @@ model Tenant {
   creatorPlatformProfiles CreatorPlatformProfile[]
   platformMetricsSnapshots PlatformMetricsSnapshot[]
   subscriptions           Subscription[]
+  contentAnalysisRuns     ContentAnalysisRun[]
+  creatorNicheProfiles    CreatorNicheProfile[]
 
   @@map("tenants")
 }
@@ -155,9 +157,10 @@ model CreatorPlatformProfile {
   createdAt                DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  tenant    Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  creator   Creator                   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  snapshots PlatformMetricsSnapshot[]
+  tenant              Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator             Creator                   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  snapshots           PlatformMetricsSnapshot[]
+  contentAnalysisRuns ContentAnalysisRun[]
 
   @@unique([creatorId, platform])
   @@unique([platform, platformUserId])
@@ -230,6 +233,58 @@ model Subscription {
   plan   SubscriptionPlan @relation(fields: [planId], references: [id])
 
   @@map("subscriptions")
+}
+
+// ─── Content analysis runs ────────────────────────────────────────────────────
+
+model ContentAnalysisRun {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId          String    @map("tenant_id") @db.Uuid
+  creatorId         String    @map("creator_id") @db.Uuid
+  platformProfileId String    @map("platform_profile_id") @db.Uuid
+  promptVersion     String    @map("prompt_version")
+  rawInput          Json      @map("raw_input")
+  rawOutput         String?   @map("raw_output") @db.Text
+  parsedOutput      Json?     @map("parsed_output")
+  status            String    @default("pending")
+  failureReason     String?   @map("failure_reason") @db.Text
+  tokensUsed        Int?      @map("tokens_used")
+  recordedAt        DateTime  @default(now()) @map("recorded_at") @db.Timestamptz(6)
+
+  tenant          Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  platformProfile CreatorPlatformProfile @relation(fields: [platformProfileId], references: [id], onDelete: Cascade)
+  nicheProfile    CreatorNicheProfile?
+
+  @@map("content_analysis_runs")
+}
+
+// ─── Creator niche profiles ───────────────────────────────────────────────────
+
+model CreatorNicheProfile {
+  id                         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                   String    @map("tenant_id") @db.Uuid
+  creatorId                  String    @unique @map("creator_id") @db.Uuid
+  analysisRunId              String    @unique @map("analysis_run_id") @db.Uuid
+  primaryNicheCategory       String    @map("primary_niche_category")
+  primaryNicheSpecific       String    @map("primary_niche_specific")
+  secondaryNicheSpecific     String?   @map("secondary_niche_specific")
+  contentFormatPrimary       String    @map("content_format_primary")
+  contentFormatSecondary     String?   @map("content_format_secondary")
+  affiliateDomainsDetected   String[]  @map("affiliate_domains_detected")
+  promoCodesDetected         String[]  @map("promo_codes_detected")
+  brandMentions              String[]  @map("brand_mentions")
+  existingPartnershipsLikely Boolean   @map("existing_partnerships_likely")
+  classificationConfidence   String    @map("classification_confidence")
+  confidenceReasoning        String    @map("confidence_reasoning") @db.Text
+  nicheCommercialNotes       String    @map("niche_commercial_notes") @db.Text
+  classificationReasoning    String    @map("classification_reasoning") @db.Text
+  createdAt                  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant      Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  analysisRun ContentAnalysisRun @relation(fields: [analysisRunId], references: [id])
+
+  @@map("creator_niche_profiles")
 }
 
 // ─── Billing events ───────────────────────────────────────────────────────────

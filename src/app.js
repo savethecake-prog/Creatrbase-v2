@@ -37,6 +37,8 @@ const { billingRoutes, webhookRoute } = require('./domains/billing/billingRoutes
 app.register(billingRoutes);
 app.register(webhookRoute);
 
+app.register(require('./domains/platforms/platformConnectRoutes'));
+
 // ── Static frontend (production only) ────────────────────────────────────────
 
 if (process.env.NODE_ENV === 'production') {

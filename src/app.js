@@ -39,6 +39,10 @@ app.register(webhookRoute);
 
 app.register(require('./domains/platforms/platformConnectRoutes'));
 
+// ── Background workers ────────────────────────────────────────────────────────
+
+require('./jobs/workers/platformSync').startPlatformSyncWorker();
+
 // ── Static frontend (production only) ────────────────────────────────────────
 
 if (process.env.NODE_ENV === 'production') {

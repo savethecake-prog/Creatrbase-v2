@@ -53,7 +53,7 @@ async function connectPlatform({
     const expiresAt        = tokenExpiresAt ? new Date(tokenExpiresAt * 1000) : null;
 
     // Upsert — reconnecting the same platform updates credentials, doesn't duplicate
-    await client.query(
+    const { rows: upsertRows } = await client.query(
       `INSERT INTO creator_platform_profiles (
          tenant_id, creator_id, platform,
          platform_user_id, platform_username, platform_display_name, platform_url,
@@ -70,7 +70,8 @@ async function connectPlatform({
          token_expires_at      = EXCLUDED.token_expires_at,
          scopes_granted        = EXCLUDED.scopes_granted,
          sync_status           = 'active',
-         connected_at          = NOW()`,
+         connected_at          = NOW()
+       RETURNING id`,
       [
         tenantId, creatorId, platform,
         platformUserId,
@@ -83,6 +84,7 @@ async function connectPlatform({
         scopesGranted        ?? [],
       ]
     );
+    const platformProfileId = upsertRows[0].id;
 
     // Advance onboarding step on first connection
     await client.query(
@@ -93,7 +95,7 @@ async function connectPlatform({
     );
 
     await client.query('COMMIT');
-    return { creatorId, platform };
+    return { creatorId, platform, platformProfileId };
 
   } catch (err) {
     await client.query('ROLLBACK');

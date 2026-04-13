@@ -20,6 +20,7 @@
 
 const { authenticate }    = require('../../middleware/authenticate');
 const { connectPlatform, getConnectedPlatforms } = require('./platformConnectService');
+const { getDataCollectionQueue }                 = require('../../jobs/queue');
 
 // YouTube scopes needed for channel data + analytics
 const YT_SCOPES = [
@@ -102,7 +103,7 @@ async function platformConnectRoutes(app) {
       const customUrl = channel.snippet?.customUrl ?? null;
 
       try {
-        await connectPlatform({
+        const { platformProfileId } = await connectPlatform({
           userId:              req.user.userId,
           tenantId:            req.user.tenantId,
           platform:            'youtube',
@@ -119,6 +120,9 @@ async function platformConnectRoutes(app) {
                                  : null,
           scopesGranted:       YT_SCOPES,
         });
+
+        // Queue an immediate sync so KPI cards populate without waiting for cron
+        getDataCollectionQueue().add('platform-sync', { platformProfileId });
       } catch (err) {
         if (err.statusCode === 409) {
           // Channel already claimed by another Creatrbase account
@@ -192,7 +196,7 @@ async function platformConnectRoutes(app) {
       }
 
       try {
-        await connectPlatform({
+        const { platformProfileId } = await connectPlatform({
           userId:              req.user.userId,
           tenantId:            req.user.tenantId,
           platform:            'twitch',
@@ -207,6 +211,9 @@ async function platformConnectRoutes(app) {
                                  : null,
           scopesGranted:       TWITCH_DATA_SCOPES,
         });
+
+        // Queue immediate sync (worker will skip unsupported platforms gracefully)
+        getDataCollectionQueue().add('platform-sync', { platformProfileId });
       } catch (err) {
         if (err.statusCode === 409) {
           return reply.redirect('/dashboard?connect_error=twitch_already_claimed');

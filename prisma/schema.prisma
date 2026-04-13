@@ -36,6 +36,10 @@ model Tenant {
   creatorCommercialProfiles  CreatorCommercialProfile[]
   dimensionScoreHistories    DimensionScoreHistory[]
   creatorMilestones          CreatorMilestone[]
+  taskTemplates              TaskTemplate[]
+  tasks                      Task[]
+  engineRuns                 EngineRun[]
+  recommendations            Recommendation[]
 
   @@map("tenants")
 }
@@ -394,6 +398,129 @@ model CreatorMilestone {
 
   @@unique([creatorId, milestoneType])
   @@map("creator_milestones")
+}
+
+// ─── Task templates ───────────────────────────────────────────────────────────
+// Future: recurring task cadence config. Not used by current workers.
+
+model TaskTemplate {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                String    @map("tenant_id") @db.Uuid
+  creatorId               String    @map("creator_id") @db.Uuid
+  dimension               String?
+  templateType            String    @map("template_type")
+  cadence                 String
+  cadenceDay              Int?      @map("cadence_day")
+  lastGeneratedAt         DateTime? @map("last_generated_at") @db.Timestamptz(6)
+  nextGenerationAt        DateTime? @map("next_generation_at") @db.Timestamptz(6)
+  isActive                Boolean   @default(true) @map("is_active")
+  generationPromptContext Json?     @map("generation_prompt_context")
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tasks  Task[]
+
+  @@map("task_templates")
+}
+
+// ─── Tasks ────────────────────────────────────────────────────────────────────
+// Created from accepted recommendations or by the maintenance cadence.
+// Each row is a discrete fresh instance — never re-queue old rows.
+
+model Task {
+  id                       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                 String    @map("tenant_id") @db.Uuid
+  creatorId                String    @map("creator_id") @db.Uuid
+  templateId               String?   @map("template_id") @db.Uuid
+  taskMode                 String    @map("task_mode")
+  dimension                String?
+  dimensionStateAtCreation String?   @map("dimension_state_at_creation")
+  triggeredBy              String    @map("triggered_by")
+  triggerSignalType        String?   @map("trigger_signal_type")
+  triggerSignalId          String?   @map("trigger_signal_id") @db.Uuid
+  triggerConfidence        String?   @map("trigger_confidence")
+  title                    String
+  description              String    @db.Text
+  reasoningSummary         String?   @map("reasoning_summary") @db.Text
+  expectedImpact           String?   @map("expected_impact") @db.Text
+  relatedBrandIds          String[]  @map("related_brand_ids")
+  priority                 String
+  dueDate                  DateTime? @map("due_date") @db.Date
+  status                   String    @default("active")
+  completedAt              DateTime? @map("completed_at") @db.Timestamptz(6)
+  snoozedUntil             DateTime? @map("snoozed_until") @db.Timestamptz(6)
+  dismissedAt              DateTime? @map("dismissed_at") @db.Timestamptz(6)
+  supersededBy             String?   @map("superseded_by") @db.Uuid
+  creatorNotes             String?   @map("creator_notes") @db.Text
+  creatorFeedback          String?   @map("creator_feedback")
+  feedbackDetail           String?   @map("feedback_detail") @db.Text
+  generatedBy              String?   @map("generated_by")
+  promptVersion            String?   @map("prompt_version")
+  rawGenerationOutput      Json?     @map("raw_generation_output")
+  createdAt                DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant   Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  template TaskTemplate? @relation(fields: [templateId], references: [id])
+
+  @@map("tasks")
+}
+
+// ─── Engine runs ──────────────────────────────────────────────────────────────
+// Audit trail for every recommendation generation run.
+
+model EngineRun {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId              String    @map("tenant_id") @db.Uuid
+  creatorId             String    @map("creator_id") @db.Uuid
+  runType               String    @default("recommendation") @map("run_type")
+  status                String    @default("running")
+  constraintsIdentified Json?     @map("constraints_identified")
+  errorDetails          String?   @map("error_details") @db.Text
+  startedAt             DateTime  @default(now()) @map("started_at") @db.Timestamptz(6)
+  completedAt           DateTime? @map("completed_at") @db.Timestamptz(6)
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  recommendations Recommendation[]
+
+  @@map("engine_runs")
+}
+
+// ─── Recommendations ──────────────────────────────────────────────────────────
+// Output of the recommendation engine. Creator accepts to convert to task.
+
+model Recommendation {
+  id                        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                  String    @map("tenant_id") @db.Uuid
+  creatorId                 String    @map("creator_id") @db.Uuid
+  engineRunId               String?   @map("engine_run_id") @db.Uuid
+  generatedAt               DateTime  @default(now()) @map("generated_at") @db.Timestamptz(6)
+  constraintDimension       String?   @map("constraint_dimension")
+  constraintSeverity        String?   @map("constraint_severity")
+  recommendationCategory    String?   @map("recommendation_category")
+  title                     String
+  specificAction            String    @map("specific_action") @db.Text
+  reasoning                 String    @db.Text
+  dataReferences            Json?     @map("data_references")
+  expectedImpactDimension   String?   @map("expected_impact_dimension")
+  expectedImpactDescription String?   @map("expected_impact_description") @db.Text
+  expectedImpactConfidence  String?   @map("expected_impact_confidence")
+  timeHorizon               String?   @map("time_horizon")
+  sequencingDependencies    String[]  @map("sequencing_dependencies")
+  priorityRank              Int?      @map("priority_rank")
+  promptVersion             String?   @map("prompt_version")
+  rawInferenceOutput        Json?     @map("raw_inference_output")
+  status                    String    @default("pending")
+  convertedToTaskId         String?   @map("converted_to_task_id") @db.Uuid
+  creatorResponse           String?   @map("creator_response")
+  creatorResponseReason     String?   @map("creator_response_reason") @db.Text
+  creatorResponseAt         DateTime? @map("creator_response_at") @db.Timestamptz(6)
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  engineRun EngineRun? @relation(fields: [engineRunId], references: [id])
+
+  @@map("recommendations")
 }
 
 // ─── Billing events ───────────────────────────────────────────────────────────

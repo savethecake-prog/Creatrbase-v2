@@ -41,12 +41,15 @@ app.register(require('./domains/platforms/platformConnectRoutes'));
 app.register(require('./domains/gapTracker/gapTrackerRoutes'));
 app.register(require('./domains/creator/nicheRoutes'));
 app.register(require('./domains/creator/scoreRoutes'));
+app.register(require('./domains/creator/recommendationRoutes'));
+app.register(require('./domains/creator/taskRoutes'));
 
 // ── Background workers ────────────────────────────────────────────────────────
 
 require('./jobs/workers/platformSync').startPlatformSyncWorker();
 require('./jobs/workers/contentAnalysis').startContentAnalysisWorker();
 require('./jobs/workers/viabilityScoring').startViabilityScoringWorker();
+require('./jobs/workers/recommendationEngine').startRecommendationEngineWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

@@ -14,7 +14,7 @@ const NAV = [
   {
     group: 'Action',
     items: [
-      { label: 'Weekly Tasks', to: '/tasks', soon: true },
+      { label: 'Weekly Tasks', to: '/tasks' },
       { label: 'Brand Outreach', to: '/outreach', soon: true },
     ],
   },

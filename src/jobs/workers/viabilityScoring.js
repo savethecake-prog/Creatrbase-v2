@@ -201,6 +201,11 @@ function startViabilityScoringWorker() {
     });
 
     console.log(`[viabilityScoring] creator=${creatorId} score=${overallScore} tier=${tier} constraint=${primaryConstraint}`);
+
+    // Trigger recommendation engine — picks up the new scoring data immediately
+    if (primaryConstraint) {
+      await queue.add('analysis:generate-recommendation', { creatorId });
+    }
   });
 
   console.log('[viabilityScoring] worker registered on data-collection queue');

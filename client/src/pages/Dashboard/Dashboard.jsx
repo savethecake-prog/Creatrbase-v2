@@ -8,10 +8,6 @@ import styles from './Dashboard.module.css';
 
 const COMING_SOON = [
   {
-    title: 'Weekly Tasks',
-    desc: 'One specific, data-backed action each week targeting your weakest dimension.',
-  },
-  {
     title: 'Brand Outreach',
     desc: 'Discover brands actively buying in your niche and send approved outreach emails.',
   },
@@ -46,15 +42,18 @@ export function Dashboard() {
   const sub = user?.subscription;
   const isTrialling = sub?.status === 'trialling';
 
-  const [platforms, setPlatforms]   = useState([]);
-  const [connectMsg, setConnectMsg] = useState(null); // { type: 'success'|'error', text }
-  const [niche, setNiche]           = useState(null);  // { niche, status }
-  const [scoreData, setScoreData]   = useState(null);  // { score, milestones, status }
+  const [platforms, setPlatforms]       = useState([]);
+  const [connectMsg, setConnectMsg]     = useState(null); // { type: 'success'|'error', text }
+  const [niche, setNiche]               = useState(null);  // { niche, status }
+  const [scoreData, setScoreData]       = useState(null);  // { score, milestones, status }
+  const [recData, setRecData]           = useState(null);  // { recommendation, status }
+  const [recResponding, setRecResponding] = useState(false);
 
   useEffect(() => {
     api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
     api.get('/creator/niche').then(setNiche).catch(() => {});
     api.get('/creator/score').then(setScoreData).catch(() => {});
+    api.get('/creator/recommendation').then(setRecData).catch(() => {});
   }, []);
 
   // Handle ?connected= and ?connect_error= params on return from OAuth
@@ -80,6 +79,21 @@ export function Dashboard() {
 
   const ytSubscribers = yt?.subscriber_count;
   const ytWatchHours  = yt?.watch_hours_12mo;
+
+  async function respondToRec(id, response) {
+    setRecResponding(true);
+    try {
+      const result = await api.post(`/creator/recommendation/${id}/respond`, { response });
+      setRecData(prev => prev
+        ? { ...prev, recommendation: { ...prev.recommendation, status: result.status, creator_response: response }, status: result.status }
+        : prev
+      );
+    } catch {
+      // best-effort
+    } finally {
+      setRecResponding(false);
+    }
+  }
 
   function syncedHint(platform) {
     if (!platform) return 'Connect YouTube to see this';
@@ -258,6 +272,91 @@ export function Dashboard() {
                   </span>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {recData && recData.status !== 'no_creator' && (
+        <div className={styles.recSection}>
+          <p className={styles.sectionTitle}>This Week's Task</p>
+
+          {recData.status === 'generating' && (
+            <div className={styles.recCard}>
+              <p className={styles.recPulse}>Generating your task…</p>
+              <p className={styles.recHint}>Analysing your top constraint. Ready in under a minute.</p>
+            </div>
+          )}
+
+          {recData.status === 'no_data' && (
+            <div className={styles.recCard}>
+              <p className={styles.recEmpty}>No task available yet.</p>
+              <p className={styles.recHint}>Tasks are generated after your commercial viability score is calculated.</p>
+            </div>
+          )}
+
+          {recData.recommendation && recData.status === 'pending' && (
+            <div className={styles.recCard}>
+              <div className={styles.recHeader}>
+                <div className={styles.recBadges}>
+                  <Badge variant="peach">{recData.recommendation.constraint_dimension?.replace(/_/g, ' ')}</Badge>
+                  {recData.recommendation.constraint_severity && (
+                    <Badge variant={recData.recommendation.constraint_severity === 'critical' ? 'error' : 'lavender'}>
+                      {recData.recommendation.constraint_severity}
+                    </Badge>
+                  )}
+                  {recData.recommendation.expected_impact_confidence && (
+                    <Badge variant={
+                      recData.recommendation.expected_impact_confidence === 'high'   ? 'mint' :
+                      recData.recommendation.expected_impact_confidence === 'medium' ? 'peach' : 'lavender'
+                    }>
+                      {recData.recommendation.expected_impact_confidence} confidence
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <p className={styles.recTitle}>{recData.recommendation.title}</p>
+              <p className={styles.recAction}>{recData.recommendation.specific_action}</p>
+              {recData.recommendation.reasoning && (
+                <p className={styles.recReasoning}>{recData.recommendation.reasoning}</p>
+              )}
+              {recData.recommendation.expected_impact_description && (
+                <p className={styles.recImpact}>
+                  <span className={styles.recImpactLabel}>Expected impact</span>
+                  {recData.recommendation.expected_impact_description}
+                </p>
+              )}
+              <div className={styles.recActions}>
+                <Button
+                  size="sm"
+                  onClick={() => respondToRec(recData.recommendation.id, 'accepted')}
+                  disabled={recResponding}
+                >
+                  Add to my tasks
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => respondToRec(recData.recommendation.id, 'deferred')}
+                  disabled={recResponding}
+                >
+                  Not this week
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {recData.recommendation && recData.status === 'converted_to_task' && (
+            <div className={styles.recCard}>
+              <p className={styles.recAccepted}>Task added — check your task list.</p>
+              <p className={styles.recTitle}>{recData.recommendation.title}</p>
+            </div>
+          )}
+
+          {recData.recommendation && (recData.status === 'deferred' || recData.status === 'declined') && (
+            <div className={styles.recCard}>
+              <p className={styles.recEmpty}>You skipped this task.</p>
+              <p className={styles.recHint}>A new task will be generated after your next sync.</p>
             </div>
           )}
         </div>

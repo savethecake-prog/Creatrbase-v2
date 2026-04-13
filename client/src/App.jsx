@@ -5,6 +5,7 @@ import { Login } from './pages/Login/Login';
 import { Signup } from './pages/Signup/Signup';
 import { Dashboard }   from './pages/Dashboard/Dashboard';
 import { GapTracker }  from './pages/GapTracker/GapTracker';
+import { Tasks }       from './pages/Tasks/Tasks';
 
 export default function App() {
   return (
@@ -18,6 +19,9 @@ export default function App() {
           } />
           <Route path="/gap" element={
             <RequireAuth><GapTracker /></RequireAuth>
+          } />
+          <Route path="/tasks" element={
+            <RequireAuth><Tasks /></RequireAuth>
           } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>

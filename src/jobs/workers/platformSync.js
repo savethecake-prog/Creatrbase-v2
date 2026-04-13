@@ -15,7 +15,8 @@
 const { getPrisma }                        = require('../../lib/prisma');
 const { encrypt, decrypt }                 = require('../../lib/crypto');
 const { refreshAccessToken, getChannelStats,
-        getWatchHours12Months }            = require('../../services/youtube');
+        getWatchHours12Months,
+        getExtendedAnalytics }             = require('../../services/youtube');
 const { getDataCollectionQueue }           = require('../queue');
 
 function startPlatformSyncWorker() {
@@ -67,39 +68,66 @@ function startPlatformSyncWorker() {
           getWatchHours12Months(accessToken),
         ]);
 
+        // Extended analytics: engagement rate, avg views, uploads cadence, audience geo.
+        // Non-fatal — if Analytics returns nothing, nulls are stored and scored as
+        // insufficient_data rather than blocking the sync.
+        const extended = await getExtendedAnalytics(accessToken, {
+          uploadsPlaylistId: stats.uploadsPlaylistId,
+          videoCount:        stats.videoCount,
+        });
+
         await tx.creatorPlatformProfile.update({
           where: { id: platformProfileId },
           data:  {
-            subscriberCount: stats.subscriberCount,
-            totalViewCount:  stats.totalViewCount,
-            videoCount:      stats.videoCount,
-            watchHours12mo:  watchHours,
-            syncStatus:      'active',
-            lastSyncedAt:    new Date(),
+            subscriberCount:       stats.subscriberCount,
+            totalViewCount:        stats.totalViewCount,
+            videoCount:            stats.videoCount,
+            watchHours12mo:        watchHours,
+            engagementRate30d:     extended.engagementRate30d,
+            avgViewsPerVideo30d:   extended.avgViewsPerVideo30d,
+            publicUploads90d:      extended.publicUploads90d,
+            primaryAudienceGeo:    extended.primaryAudienceGeo,
+            analyticsLastSyncedAt: extended.engagementRate30d != null ? new Date() : undefined,
+            syncStatus:            'active',
+            lastSyncedAt:          new Date(),
           },
         });
 
         await tx.platformMetricsSnapshot.create({
           data: {
-            tenantId:           profile.tenantId,
+            tenantId:         profile.tenantId,
             platformProfileId,
-            platform:           'youtube',
-            subscriberCount:    stats.subscriberCount,
-            watchHours12mo:     watchHours,
-            totalViewCount:     stats.totalViewCount,
-            videoCount:         stats.videoCount,
+            platform:         'youtube',
+            subscriberCount:  stats.subscriberCount,
+            watchHours12mo:   watchHours,
+            totalViewCount:   stats.totalViewCount,
+            videoCount:       stats.videoCount,
           },
         });
 
-        job.log(`YouTube sync complete: ${stats.subscriberCount} subs, ${watchHours} watch hrs`);
+        job.log(
+          `YouTube sync complete: ${stats.subscriberCount} subs, ${watchHours} watch hrs` +
+          `, eng=${extended.engagementRate30d ?? 'n/a'}` +
+          `, uploads_90d=${extended.publicUploads90d ?? 'n/a'}` +
+          `, geo=${extended.primaryAudienceGeo ?? 'n/a'}`
+        );
       } else {
         job.log(`Skipping unsupported platform: ${profile.platform}`);
       }
     });
 
-    // If we get here the transaction committed — clear any previous error status
-    // (the update inside the tx already sets syncStatus='active', so this is a no-op
-    // on success, but we add it as an explicit guard outside the tx for safety)
+    // Re-score after every successful sync so new engagement/geo/cadence data
+    // immediately flows through to dimension scores and milestone statuses.
+    const synced = await prisma.creatorPlatformProfile.findUnique({
+      where:  { id: platformProfileId },
+      select: { creatorId: true },
+    });
+    if (synced?.creatorId) {
+      await queue.add('analysis:score-creator', {
+        creatorId:   synced.creatorId,
+        triggerType: 'platform_sync',
+      });
+    }
   });
 
   // Error handler — mark sync_status='error' so the dashboard can surface it

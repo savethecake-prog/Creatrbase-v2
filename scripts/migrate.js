@@ -28,6 +28,7 @@ const FILES = [
   '011_seed_subscription_plans.sql',
   '012_platform_metrics_snapshots.sql',
   '013_content_analysis.sql',
+  '014_task_metric_baseline.sql',
 ];
 
 async function run() {

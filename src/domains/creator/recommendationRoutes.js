@@ -14,6 +14,43 @@
 const { authenticate } = require('../../middleware/authenticate');
 const { getPrisma }    = require('../../lib/prisma');
 
+// Captures the single most trackable metric for a dimension at task creation time.
+// Only defined for dimensions with a clean numeric signal — others return null.
+function snapshotMetric(dimension, profile, capturedAt) {
+  if (!profile) return null;
+  switch (dimension) {
+    case 'subscriber_momentum':
+      if (profile.subscriberCount == null) return null;
+      return {
+        metric_key:   'subscriber_count',
+        metric_label: 'Subscribers',
+        value:        profile.subscriberCount,
+        unit:         null,
+        captured_at:  capturedAt.toISOString(),
+      };
+    case 'engagement_quality':
+      if (profile.engagementRate30d == null) return null;
+      return {
+        metric_key:   'engagement_rate_30d',
+        metric_label: 'Engagement rate',
+        value:        Number(profile.engagementRate30d),
+        unit:         '%',
+        captured_at:  capturedAt.toISOString(),
+      };
+    case 'content_consistency':
+      if (profile.publicUploads90d == null) return null;
+      return {
+        metric_key:   'uploads_per_week',
+        metric_label: 'Weekly uploads',
+        value:        Math.round((profile.publicUploads90d / 13) * 10) / 10,
+        unit:         '/wk',
+        captured_at:  capturedAt.toISOString(),
+      };
+    default:
+      return null;
+  }
+}
+
 async function recommendationRoutes(app) {
 
   // ── GET /api/creator/recommendation ─────────────────────────────────────────
@@ -127,6 +164,15 @@ async function recommendationRoutes(app) {
     const now = new Date();
 
     if (response === 'accepted') {
+      // Snapshot the relevant metric for this dimension so the task card
+      // can show "4,200 subscribers when assigned → 4,850 now"
+      const profile = await prisma.creatorPlatformProfile.findFirst({
+        where:  { creatorId: creator.id, platform: 'youtube' },
+        select: { subscriberCount: true, engagementRate30d: true, publicUploads90d: true },
+      });
+
+      const metricBaseline = snapshotMetric(rec.constraintDimension, profile, now);
+
       // Create a Task from this recommendation
       await prisma.$transaction(async (tx) => {
         const task = await tx.task.create({
@@ -146,6 +192,7 @@ async function recommendationRoutes(app) {
             status:                  'active',
             generatedBy:             'recommendation_engine',
             promptVersion:           rec.promptVersion,
+            metricBaseline:          metricBaseline ?? undefined,
           },
         });
 

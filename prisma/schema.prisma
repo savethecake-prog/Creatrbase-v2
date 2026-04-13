@@ -458,6 +458,7 @@ model Task {
   generatedBy              String?   @map("generated_by")
   promptVersion            String?   @map("prompt_version")
   rawGenerationOutput      Json?     @map("raw_generation_output")
+  metricBaseline           Json?     @map("metric_baseline")
   createdAt                DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 

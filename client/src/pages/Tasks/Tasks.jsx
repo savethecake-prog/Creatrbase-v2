@@ -16,10 +16,58 @@ const FEEDBACK_OPTIONS = [
 const PRIORITY_VARIANT = { high: 'error', medium: 'peach', low: 'lavender' };
 const DIMENSION_LABEL  = d => d?.replace(/_/g, ' ') ?? '';
 
-function TaskCard({ task, onComplete, onDismiss }) {
-  const [expanded, setExpanded] = useState(false);
-  const [acting, setActing]     = useState(false);
-  const [feedback, setFeedback] = useState(null);
+// ─── Metric tracker helpers ───────────────────────────────────────────────────
+
+function fmtMetric(key, value) {
+  if (value == null) return null;
+  if (key === 'subscriber_count')    return value.toLocaleString();
+  if (key === 'engagement_rate_30d') return `${(value * 100).toFixed(1)}%`;
+  if (key === 'uploads_per_week')    return `${value}/wk`;
+  return String(value);
+}
+
+function MetricTracker({ baseline, currentMetrics }) {
+  if (!baseline) return null;
+
+  const baselineStr = fmtMetric(baseline.metric_key, baseline.value);
+  const currentVal  = currentMetrics?.[baseline.metric_key];
+  const currentStr  = fmtMetric(baseline.metric_key, currentVal);
+
+  const delta = currentVal != null && baseline.value != null
+    ? currentVal - baseline.value : null;
+
+  const hasChange = delta != null && Math.abs(delta) > 0;
+  const deltaStr  = hasChange ? fmtMetric(baseline.metric_key, Math.abs(delta)) : null;
+  const isUp      = delta > 0;
+
+  return (
+    <div className={styles.metricTracker}>
+      <p className={styles.metricTrackerLabel}>{baseline.metric_label}</p>
+      <div className={styles.metricTrackerRow}>
+        <span className={styles.metricBaselineVal}>{baselineStr ?? '—'} when assigned</span>
+        {currentStr && hasChange && (
+          <>
+            <span className={styles.metricSep}>→</span>
+            <span className={styles.metricCurrentVal}>{currentStr} now</span>
+            <span className={[styles.metricDelta, isUp ? styles.metricUp : styles.metricDown].join(' ')}>
+              {isUp ? '↑' : '↓'} {deltaStr}
+            </span>
+          </>
+        )}
+        {currentStr && !hasChange && (
+          <>
+            <span className={styles.metricSep}>·</span>
+            <span className={styles.metricNoChange}>no change yet</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TaskCard({ task, currentMetrics, onComplete, onDismiss }) {
+  const [acting, setActing]         = useState(false);
+  const [feedback, setFeedback]     = useState(null);
   const [showFeedback, setShowFeedback] = useState(null); // 'complete' | 'dismiss'
 
   const isDone      = task.status === 'completed';
@@ -41,6 +89,7 @@ function TaskCard({ task, onComplete, onDismiss }) {
 
   return (
     <div className={[styles.card, isInactive ? styles.cardInactive : ''].filter(Boolean).join(' ')}>
+      {/* Badges */}
       <div className={styles.cardTop}>
         <div className={styles.cardBadges}>
           {task.dimension && (
@@ -56,30 +105,28 @@ function TaskCard({ task, onComplete, onDismiss }) {
         </div>
       </div>
 
+      {/* What to do */}
       <p className={styles.cardTitle}>{task.title}</p>
       <p className={styles.cardDesc}>{task.description}</p>
 
+      {/* Why this task — always visible, this is the critical context */}
       {task.reasoning_summary && (
-        <p
-          className={styles.cardReasoning}
-          style={{ display: expanded ? 'block' : undefined }}
-        >
-          {task.reasoning_summary}
-        </p>
+        <div className={styles.cardWhy}>
+          <p className={styles.cardWhyLabel}>Why this task</p>
+          <p className={styles.cardWhyText}>{task.reasoning_summary}</p>
+        </div>
       )}
 
-      {(task.reasoning_summary || task.expected_impact) && !expanded && (
-        <button className={styles.expandBtn} onClick={() => setExpanded(true)}>
-          Show more
-        </button>
-      )}
-
-      {expanded && task.expected_impact && (
+      {/* Expected impact */}
+      {task.expected_impact && (
         <p className={styles.cardImpact}>
           <span className={styles.cardImpactLabel}>Expected impact</span>
           {task.expected_impact}
         </p>
       )}
+
+      {/* Live metric tracker */}
+      <MetricTracker baseline={task.metric_baseline} currentMetrics={currentMetrics} />
 
       {!isInactive && showFeedback && (
         <div className={styles.feedbackRow}>
@@ -136,15 +183,17 @@ function TaskCard({ task, onComplete, onDismiss }) {
 }
 
 export function Tasks() {
-  const [data, setData]       = useState(null);  // { tasks, status }
+  const [data, setData]       = useState(null);  // { tasks, current_metrics, status }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.get('/creator/tasks')
       .then(setData)
-      .catch(() => setData({ tasks: [], status: 'error' }))
+      .catch(() => setData({ tasks: [], current_metrics: {}, status: 'error' }))
       .finally(() => setLoading(false));
   }, []);
+
+  const currentMetrics = data?.current_metrics ?? {};
 
   async function handleComplete(taskId, feedback) {
     await api.patch(`/creator/tasks/${taskId}`, { action: 'complete', feedback });
@@ -211,6 +260,7 @@ export function Tasks() {
               <TaskCard
                 key={t.id}
                 task={t}
+                currentMetrics={currentMetrics}
                 onComplete={handleComplete}
                 onDismiss={handleDismiss}
               />
@@ -227,6 +277,7 @@ export function Tasks() {
               <TaskCard
                 key={t.id}
                 task={t}
+                currentMetrics={currentMetrics}
                 onComplete={handleComplete}
                 onDismiss={handleDismiss}
               />

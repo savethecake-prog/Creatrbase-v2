@@ -23,6 +23,7 @@ const TASK_SELECT = {
   expectedImpact:   true,
   priority:         true,
   status:           true,
+  metricBaseline:   true,
   completedAt:      true,
   dismissedAt:      true,
   createdAt:        true,
@@ -39,6 +40,7 @@ function formatTask(t) {
     expected_impact:  t.expectedImpact,
     priority:         t.priority,
     status:           t.status,
+    metric_baseline:  t.metricBaseline,
     completed_at:     t.completedAt,
     dismissed_at:     t.dismissedAt,
     created_at:       t.createdAt,
@@ -76,9 +78,27 @@ async function taskRoutes(app) {
       ],
     });
 
+    // Fetch current platform metrics so the card can show baseline → now delta
+    const profile = await prisma.creatorPlatformProfile.findFirst({
+      where:  { creatorId: creator.id, platform: 'youtube' },
+      select: {
+        subscriberCount:   true,
+        engagementRate30d: true,
+        publicUploads90d:  true,
+      },
+    });
+
+    const currentMetrics = profile ? {
+      subscriber_count:    profile.subscriberCount,
+      engagement_rate_30d: profile.engagementRate30d != null ? Number(profile.engagementRate30d) : null,
+      uploads_per_week:    profile.publicUploads90d  != null
+        ? Math.round((profile.publicUploads90d / 13) * 10) / 10 : null,
+    } : {};
+
     return {
-      tasks:  tasks.map(formatTask),
-      status: 'ok',
+      tasks:          tasks.map(formatTask),
+      current_metrics: currentMetrics,
+      status:         'ok',
     };
   });
 

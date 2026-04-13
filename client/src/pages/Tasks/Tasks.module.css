@@ -116,36 +116,28 @@
   margin-bottom: var(--s4);
 }
 
-.cardReasoning {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.55;
+.cardWhy {
   padding: var(--s3) var(--s4);
   background: rgba(255, 255, 255, 0.03);
   border-radius: var(--r-md);
-  border-left: 2px solid var(--border);
-  margin-bottom: var(--s3);
-  display: none;
-}
-
-.cardReasoning[style] {
-  /* override inline display:block when expanded */
-}
-
-.expandBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--text-muted);
-  padding: 0;
+  border-left: 2px solid rgba(200, 170, 255, 0.4);
   margin-bottom: var(--s4);
-  text-decoration: underline;
-  text-decoration-style: dotted;
 }
 
-.expandBtn:hover {
+.cardWhyLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cb-lavender);
+  margin-bottom: var(--s1);
+  opacity: 0.8;
+}
+
+.cardWhyText {
+  font-size: 12px;
   color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 .cardImpact {
@@ -162,6 +154,69 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: var(--s1);
+}
+
+/* Metric tracker */
+.metricTracker {
+  padding: var(--s3) var(--s4);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  margin-bottom: var(--s4);
+}
+
+.metricTrackerLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: var(--s1);
+}
+
+.metricTrackerRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  font-size: 13px;
+}
+
+.metricBaselineVal {
+  color: var(--text-muted);
+}
+
+.metricSep {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.metricCurrentVal {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.metricDelta {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.metricUp {
+  color: var(--cb-mint);
+  background: rgba(158, 255, 216, 0.1);
+}
+
+.metricDown {
+  color: #ff7a7a;
+  background: rgba(255, 122, 122, 0.1);
+}
+
+.metricNoChange {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* Card actions */

@@ -37,7 +37,8 @@ async function connectPlatform({
     const { platformProfileId, creatorId } = await prisma.$transaction(async (tx) => {
       // Derive creator from session — never trust caller-supplied IDs
       const creator = await tx.creator.findFirst({
-        where: { userId, tenantId },
+        where:  { userId, tenantId },
+        select: { id: true, onboardingStep: true },
       });
       if (!creator) {
         const err = new Error('Creator record not found for this session');

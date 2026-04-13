@@ -100,7 +100,7 @@ model Creator {
   firstInsightShownAt   DateTime? @map("first_insight_shown_at") @db.Timestamptz(6)
   firstActionAcceptedAt DateTime? @map("first_action_accepted_at") @db.Timestamptz(6)
   digestSendDay         Int       @default(1) @map("digest_send_day")
-  digestSendTime        String    @default("08:00:00") @map("digest_send_time")
+  digestSendTime        DateTime  @default(dbgenerated("'08:00:00'::time")) @map("digest_send_time") @db.Time(6)
   analysisMode          String    @default("automatic") @map("analysis_mode")
   createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)

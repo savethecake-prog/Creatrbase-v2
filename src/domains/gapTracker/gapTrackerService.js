@@ -46,7 +46,10 @@ function daysToReach(current, required, velocityPerDay) {
 async function getGapAnalysis(userId, tenantId) {
   const prisma = getPrisma();
 
-  const creator = await prisma.creator.findFirst({ where: { userId, tenantId } });
+  const creator = await prisma.creator.findFirst({
+    where:  { userId, tenantId },
+    select: { id: true },
+  });
   if (!creator) return null;
 
   const profile = await prisma.creatorPlatformProfile.findFirst({

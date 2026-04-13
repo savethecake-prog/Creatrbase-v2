@@ -49,10 +49,12 @@ export function Dashboard() {
   const [platforms, setPlatforms]   = useState([]);
   const [connectMsg, setConnectMsg] = useState(null); // { type: 'success'|'error', text }
   const [niche, setNiche]           = useState(null);  // { niche, status }
+  const [scoreData, setScoreData]   = useState(null);  // { score, milestones, status }
 
   useEffect(() => {
     api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
     api.get('/creator/niche').then(setNiche).catch(() => {});
+    api.get('/creator/score').then(setScoreData).catch(() => {});
   }, []);
 
   // Handle ?connected= and ?connect_error= params on return from OAuth
@@ -173,10 +175,93 @@ export function Dashboard() {
         </div>
         <div className={styles.kpiCard}>
           <p className={styles.kpiLabel}>Viability Score</p>
-          <p className={styles.kpiEmpty}>—</p>
-          <p className={styles.kpiHint}>Calculated after first sync</p>
+          {scoreData?.score?.overall != null
+            ? <p className={styles.kpiValue}>{scoreData.score.overall}</p>
+            : <p className={styles.kpiEmpty}>—</p>}
+          <p className={styles.kpiHint}>
+            {scoreData?.score?.tier
+              ? scoreData.score.tier.replace(/_/g, ' ')
+              : 'Calculated after content analysis'}
+          </p>
         </div>
       </div>
+
+      {scoreData && scoreData.status === 'ready' && scoreData.score && (
+        <div className={styles.scoreSection}>
+          <p className={styles.sectionTitle}>Commercial Viability</p>
+          <div className={styles.scoreCard}>
+            <div className={styles.scoreMain}>
+              <div className={styles.scoreCircle}>
+                <span className={styles.scoreNumber}>{scoreData.score.overall ?? '—'}</span>
+                <span className={styles.scoreLabel}>/ 100</span>
+              </div>
+              <div className={styles.scoreMeta}>
+                <p className={styles.scoreTier}>
+                  {scoreData.score.tier
+                    ? scoreData.score.tier.replace(/_/g, ' ')
+                    : 'Calculating…'}
+                </p>
+                <Badge
+                  variant={
+                    scoreData.score.confidence === 'high'   ? 'mint' :
+                    scoreData.score.confidence === 'medium' ? 'peach' : 'error'
+                  }
+                >
+                  {scoreData.score.confidence} confidence
+                </Badge>
+                {scoreData.score.primary_constraint && (
+                  <p className={styles.scoreConstraint}>
+                    Top constraint: <strong>{scoreData.score.primary_constraint.replace(/_/g, ' ')}</strong>
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {scoreData.score.dimensions && (
+              <div className={styles.dimensionGrid}>
+                {Object.entries(scoreData.score.dimensions).map(([key, dim]) => (
+                  <div key={key} className={styles.dimRow}>
+                    <span className={styles.dimLabel}>{key.replace(/_/g, ' ')}</span>
+                    <div className={styles.dimBar}>
+                      <div
+                        className={styles.dimFill}
+                        style={{
+                          width: dim.score != null ? `${dim.score}%` : '0%',
+                          opacity: dim.confidence === 'insufficient_data' ? 0.25 : 1,
+                        }}
+                      />
+                    </div>
+                    <span className={styles.dimScore}>
+                      {dim.score != null ? dim.score : '—'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {scoreData.milestones?.length > 0 && (
+            <div className={styles.milestoneStrip}>
+              {scoreData.milestones.map(ms => (
+                <div
+                  key={ms.type}
+                  className={[
+                    styles.milestone,
+                    ms.status === 'crossed'     ? styles.milestoneCrossed     : '',
+                    ms.status === 'approaching' ? styles.milestoneApproaching : '',
+                    ms.status === 'in_progress' ? styles.milestoneInProgress  : '',
+                  ].filter(Boolean).join(' ')}
+                >
+                  <span className={styles.milestoneDot} />
+                  <span className={styles.milestoneLabel}>
+                    {ms.type.replace(/_/g, ' ')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {niche && niche.status !== 'no_youtube' && niche.status !== 'no_creator' && (
         <div className={styles.nicheSection}>

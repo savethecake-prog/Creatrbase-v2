@@ -254,6 +254,12 @@ function startContentAnalysisWorker() {
 
     job.log(`Analysis complete: ${parsed.primary_niche_specific} (${parsed.classification_confidence} confidence)`);
     console.log(`[contentAnalysis] creator=${profile.creatorId} niche=${parsed.primary_niche_specific} confidence=${parsed.classification_confidence}`);
+
+    // Trigger viability scoring now that niche classification is available
+    await getDataCollectionQueue().add('analysis:score-creator', {
+      creatorId:   profile.creatorId,
+      triggerType: 'content_analysis_complete',
+    });
   });
 
   console.log('[contentAnalysis] worker registered on data-collection queue');

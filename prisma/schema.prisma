@@ -31,8 +31,11 @@ model Tenant {
   creatorPlatformProfiles CreatorPlatformProfile[]
   platformMetricsSnapshots PlatformMetricsSnapshot[]
   subscriptions           Subscription[]
-  contentAnalysisRuns     ContentAnalysisRun[]
-  creatorNicheProfiles    CreatorNicheProfile[]
+  contentAnalysisRuns        ContentAnalysisRun[]
+  creatorNicheProfiles       CreatorNicheProfile[]
+  creatorCommercialProfiles  CreatorCommercialProfile[]
+  dimensionScoreHistories    DimensionScoreHistory[]
+  creatorMilestones          CreatorMilestone[]
 
   @@map("tenants")
 }
@@ -301,6 +304,96 @@ model CreatorNicheProfile {
 
   @@unique([creatorId, platform])
   @@map("creator_niche_profiles")
+}
+
+// ─── Creator commercial profiles ─────────────────────────────────────────────
+// Created in migration 002. One row per creator. Updated by viability scoring worker.
+
+model CreatorCommercialProfile {
+  id                       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                 String    @unique @map("tenant_id") @db.Uuid
+  creatorId                String    @unique @map("creator_id") @db.Uuid
+  commercialViabilityScore Int?      @map("commercial_viability_score")
+  viabilityScoreConfidence String?   @map("viability_score_confidence")
+  viabilityLastCalculated  DateTime? @map("viability_last_calculated") @db.Timestamptz(6)
+  viabilityBreakdown       Json?     @map("viability_breakdown")
+  commercialTier           String?   @map("commercial_tier")
+  gapToNextTier            Json?     @map("gap_to_next_tier")
+  gapPrimaryConstraint     String?   @map("gap_primary_constraint")
+  projectedTierUpgradeDate DateTime? @map("projected_tier_upgrade_date") @db.Date
+  estimatedRateLow         Int?      @map("estimated_rate_low")
+  estimatedRateHigh        Int?      @map("estimated_rate_high")
+  rateCurrency             String?   @map("rate_currency")
+  rateConfidence           String?   @map("rate_confidence")
+  rateLastCalculated       DateTime? @map("rate_last_calculated") @db.Timestamptz(6)
+  confirmedDealsCount      Int       @default(0) @map("confirmed_deals_count")
+  confirmedEarningsTotal   Int       @default(0) @map("confirmed_earnings_total")
+  confirmedEarnings12mo    Int       @default(0) @map("confirmed_earnings_12mo")
+  lastDealDate             DateTime? @map("last_deal_date") @db.Date
+  avgPostsPerWeek          Decimal?  @map("avg_posts_per_week") @db.Decimal(4, 2)
+  postingConsistencyScore  Int?      @map("posting_consistency_score")
+  lastPostedAt             DateTime? @map("last_posted_at") @db.Timestamptz(6)
+  createdAt                DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("creator_commercial_profiles")
+}
+
+// ─── Dimension score history ──────────────────────────────────────────────────
+// Append-only time-series. Powers the progress chart.
+
+model DimensionScoreHistory {
+  id                         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId                   String   @map("tenant_id") @db.Uuid
+  creatorId                  String   @map("creator_id") @db.Uuid
+  scoredAt                   DateTime @default(now()) @map("scored_at") @db.Timestamptz(6)
+  triggerType                String   @map("trigger_type")
+  subscriberMomentumScore    Int?     @map("subscriber_momentum_score")
+  subscriberMomentumConf     String?  @map("subscriber_momentum_conf")
+  engagementQualityScore     Int?     @map("engagement_quality_score")
+  engagementQualityConf      String?  @map("engagement_quality_conf")
+  nicheCommercialValueScore  Int?     @map("niche_commercial_value_score")
+  nicheCommercialValueConf   String?  @map("niche_commercial_value_conf")
+  audienceGeoAlignmentScore  Int?     @map("audience_geo_alignment_score")
+  audienceGeoAlignmentConf   String?  @map("audience_geo_alignment_conf")
+  contentConsistencyScore    Int?     @map("content_consistency_score")
+  contentConsistencyConf     String?  @map("content_consistency_conf")
+  contentBrandAlignmentScore Int?     @map("content_brand_alignment_score")
+  contentBrandAlignmentConf  String?  @map("content_brand_alignment_conf")
+  overallScore               Int?     @map("overall_score")
+  commercialTier             String?  @map("commercial_tier")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("dimension_score_history")
+}
+
+// ─── Creator milestones ───────────────────────────────────────────────────────
+// One row per milestone per creator. Upserted by viability scoring worker.
+
+model CreatorMilestone {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId             String    @map("tenant_id") @db.Uuid
+  creatorId            String    @map("creator_id") @db.Uuid
+  milestoneType        String    @map("milestone_type")
+  status               String    @default("not_started") @map("status")
+  approachingThreshold Decimal?  @map("approaching_threshold") @db.Decimal(5, 2)
+  crossedAt            DateTime? @map("crossed_at") @db.Timestamptz(6)
+  crossingMetric       String?   @map("crossing_metric")
+  crossingMetricValue  String?   @map("crossing_metric_value")
+  thresholdSnapshot    Json?     @map("threshold_snapshot")
+  capabilitiesUnlocked String[]  @map("capabilities_unlocked")
+  firstShownAt         DateTime? @map("first_shown_at") @db.Timestamptz(6)
+  notificationSentAt   DateTime? @map("notification_sent_at") @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorId, milestoneType])
+  @@map("creator_milestones")
 }
 
 // ─── Billing events ───────────────────────────────────────────────────────────

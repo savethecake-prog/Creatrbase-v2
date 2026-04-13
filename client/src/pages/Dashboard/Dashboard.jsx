@@ -81,6 +81,13 @@ export function Dashboard() {
   const ytSubscribers = yt?.subscriber_count;
   const ytWatchHours  = yt?.watch_hours_12mo;
 
+  function syncedHint(platform) {
+    if (!platform) return 'Connect YouTube to see this';
+    if (!platform.last_synced_at) return 'Last synced: pending first sync';
+    const d = new Date(platform.last_synced_at);
+    return `Last synced: ${d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} at ${d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  }
+
   return (
     <AppLayout>
       {isTrialling && sub.trialDaysLeft !== null && (
@@ -157,14 +164,14 @@ export function Dashboard() {
           {ytSubscribers != null
             ? <p className={styles.kpiValue}>{ytSubscribers.toLocaleString()}</p>
             : <p className={styles.kpiEmpty}>—</p>}
-          <p className={styles.kpiHint}>{yt ? 'Last synced: pending first sync' : 'Connect YouTube to see this'}</p>
+          <p className={styles.kpiHint}>{syncedHint(yt)}</p>
         </div>
         <div className={styles.kpiCard}>
           <p className={styles.kpiLabel}>Watch Hours (12m)</p>
           {ytWatchHours != null
             ? <p className={styles.kpiValue}>{Math.round(ytWatchHours).toLocaleString()}</p>
             : <p className={styles.kpiEmpty}>—</p>}
-          <p className={styles.kpiHint}>{yt ? 'Last synced: pending first sync' : 'Connect YouTube to see this'}</p>
+          <p className={styles.kpiHint}>{syncedHint(yt)}</p>
         </div>
         <div className={styles.kpiCard}>
           <p className={styles.kpiLabel}>Viability Score</p>

@@ -26,7 +26,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 60% 40%, rgba(200, 170, 255, 0.2) 0%, transparent 65%);
+  background: radial-gradient(ellipse at 60% 40%, var(--agent-brief-subtle) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -51,7 +51,7 @@
 .brandSub {
   font-size: 17px;
   line-height: 1.6;
-  color: rgba(240, 236, 255, 0.65);
+  color: var(--text-secondary);
   max-width: 340px;
 }
 
@@ -61,15 +61,11 @@
 }
 
 .logo {
-  font-family: var(--font-display);
-  font-size: 26px;
-  color: var(--cb-mint);
+  height: 40px;
+  width: 40px;
+  border-radius: var(--radius-sm);
   margin-bottom: var(--s8);
-  letter-spacing: -0.01em;
-}
-
-.logo span {
-  color: var(--cb-peach);
+  display: block;
 }
 
 .formTitle {

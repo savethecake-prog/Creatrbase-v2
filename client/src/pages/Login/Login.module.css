@@ -49,7 +49,7 @@
 
 .oauthBtn:hover {
   background: var(--surface-3);
-  border-color: rgba(200, 170, 255, 0.3);
+  border-color: var(--agent-brief-border);
 }
 
 .footer {
@@ -72,8 +72,8 @@
 
 .error {
   padding: var(--s3) var(--s4);
-  background: rgba(255, 122, 122, 0.1);
-  border: 1px solid rgba(255, 122, 122, 0.3);
+  background: var(--error-muted);
+  border: 1px solid var(--error-border);
   border-radius: var(--r-md);
   font-size: 13px;
   color: var(--error);

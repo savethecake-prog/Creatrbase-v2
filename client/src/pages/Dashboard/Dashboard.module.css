@@ -13,15 +13,15 @@
 }
 
 .msgSuccess {
-  background: rgba(158, 255, 216, 0.08);
-  border: 1px solid rgba(158, 255, 216, 0.25);
-  color: var(--cb-mint);
+  background: var(--success-muted);
+  border: 1px solid var(--success-border);
+  color: var(--success);
 }
 
 .msgError {
-  background: rgba(255, 122, 122, 0.08);
-  border: 1px solid rgba(255, 122, 122, 0.25);
-  color: #ff7a7a;
+  background: var(--error-muted);
+  border: 1px solid var(--error-border);
+  color: var(--error);
 }
 
 .msgDismiss {
@@ -47,11 +47,11 @@
   padding: 0 var(--s4);
   height: 36px;
   border-radius: 999px;
-  background: rgba(158, 255, 216, 0.08);
-  border: 1px solid rgba(158, 255, 216, 0.3);
+  background: var(--success-muted);
+  border: 1px solid var(--success-border);
   font-size: 13px;
   font-weight: 600;
-  color: var(--cb-mint);
+  color: var(--success);
   white-space: nowrap;
 }
 
@@ -70,8 +70,8 @@
   justify-content: space-between;
   gap: var(--s5);
   padding: var(--s3) var(--s5);
-  background: rgba(200, 170, 255, 0.08);
-  border: 1px solid rgba(200, 170, 255, 0.25);
+  background: var(--agent-brief-muted);
+  border: 1px solid var(--agent-brief-border);
   border-radius: var(--r-md);
   margin-bottom: var(--s6);
 }
@@ -116,7 +116,7 @@
 /* Connect banner */
 .connectBanner {
   background: var(--cb-purple-bg);
-  border: 1px solid rgba(200, 170, 255, 0.2);
+  border: 1px solid var(--agent-brief-border);
   border-radius: var(--r-lg);
   padding: var(--s6) var(--s7);
   display: flex;
@@ -132,7 +132,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 80% 50%, rgba(200, 170, 255, 0.15) 0%, transparent 65%);
+  background: radial-gradient(ellipse at 80% 50%, var(--agent-brief-subtle) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -256,8 +256,8 @@
   justify-content: space-between;
   gap: var(--s5);
   padding: var(--s5) var(--s6);
-  background: linear-gradient(135deg, rgba(158,255,216,0.07) 0%, rgba(200,170,255,0.05) 100%);
-  border: 1px solid rgba(158,255,216,0.3);
+  background: linear-gradient(135deg, var(--success-muted) 0%, var(--agent-brief-muted) 100%);
+  border: 1px solid var(--success-border);
   border-radius: var(--r-lg);
   margin-bottom: var(--s6);
 }
@@ -452,14 +452,14 @@
 
 .milestoneCrossed {
   opacity: 1;
-  border-color: rgba(158,255,216,0.3);
-  background: rgba(158,255,216,0.05);
+  border-color: var(--success-border);
+  background: var(--success-glow);
 }
 
 .milestoneApproaching {
   opacity: 0.8;
-  border-color: rgba(255,191,163,0.3);
-  background: rgba(255,191,163,0.05);
+  border-color: var(--accent-border);
+  background: var(--accent-glow);
 }
 
 .milestoneInProgress {

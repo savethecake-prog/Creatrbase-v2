@@ -18,15 +18,11 @@
 }
 
 .topbarLogo {
-  font-family: var(--font-display);
-  font-size: 22px;
-  color: var(--cb-mint);
-  letter-spacing: -0.01em;
+  height: 36px;
+  width: 36px;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
-}
-
-.topbarLogo span {
-  color: var(--cb-peach);
+  display: block;
 }
 
 .topbarSpacer {

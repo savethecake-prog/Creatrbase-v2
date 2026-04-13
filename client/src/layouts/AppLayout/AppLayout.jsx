@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
+import logoMonogram from '../../assets/logo-monogram.svg';
 import styles from './AppLayout.module.css';
 
 const NAV = [
@@ -52,7 +53,7 @@ export function AppLayout({ children }) {
   return (
     <div className={styles.layout}>
       <header className={styles.topbar}>
-        <span className={styles.topbarLogo}>creatr<span>base</span></span>
+        <img src={logoMonogram} alt="Creatrbase" className={styles.topbarLogo} />
         <div className={styles.topbarSpacer} />
         <div className={styles.topbarUser} onClick={handleLogout} title="Sign out">
           <div className={styles.avatar}>{initials}</div>

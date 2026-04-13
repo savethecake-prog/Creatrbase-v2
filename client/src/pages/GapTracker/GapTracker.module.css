@@ -31,8 +31,8 @@
 }
 
 .cardMet {
-  border-color: rgba(158, 255, 216, 0.3);
-  background: rgba(158, 255, 216, 0.04);
+  border-color: var(--success-border);
+  background: var(--success-glow);
 }
 
 .cardHeader {
@@ -62,11 +62,11 @@
   align-items: center;
   padding: 2px var(--s3);
   border-radius: var(--r-pill);
-  background: rgba(158, 255, 216, 0.12);
-  border: 1px solid rgba(158, 255, 216, 0.3);
+  background: var(--success-subtle);
+  border: 1px solid var(--success-border);
   font-size: 12px;
   font-weight: 600;
-  color: var(--cb-mint);
+  color: var(--success);
 }
 
 /* Dimensions */
@@ -172,12 +172,12 @@
 }
 
 .syncError {
-  background: rgba(255, 122, 122, 0.08);
-  border: 1px solid rgba(255, 122, 122, 0.25);
+  background: var(--error-muted);
+  border: 1px solid var(--error-border);
   border-radius: var(--r-md);
   padding: var(--s3) var(--s5);
   font-size: 13px;
-  color: #ff7a7a;
+  color: var(--error);
   margin-bottom: var(--s5);
 }
 

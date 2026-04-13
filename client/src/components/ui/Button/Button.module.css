@@ -34,16 +34,16 @@
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-sticker);
 }
-.primary:hover { background: #82F7C8; }
+.primary:hover { background: #6FCFAD; }
 
 .secondary {
   background: transparent;
-  color: var(--cb-mint);
+  color: var(--success);
   padding: 11px 23px;
   border-radius: var(--r-pill);
-  border: 2px solid var(--cb-mint);
+  border: 2px solid var(--success);
 }
-.secondary:hover { background: rgba(158, 255, 216, 0.06); }
+.secondary:hover { background: var(--success-glow); }
 
 .ghost {
   background: var(--surface-2);
@@ -60,7 +60,7 @@
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-sticker);
 }
-.peach:hover { background: #f5a98a; }
+.peach:hover { background: var(--accent-hover); }
 
 /* Sizes */
 .sm { font-size: 12px; padding: 8px 16px; }

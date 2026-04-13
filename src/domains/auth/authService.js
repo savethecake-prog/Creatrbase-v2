@@ -175,7 +175,7 @@ async function oauthUpsert({ provider, providerId, email, displayName, ip, userA
         [userId, provider, providerId]
       );
     } else {
-      // Brand new user
+      // Brand new user — same setup as email/password signup
       const { rows: [tenant] } = await client.query(
         `INSERT INTO tenants DEFAULT VALUES RETURNING id`
       );
@@ -187,13 +187,23 @@ async function oauthUpsert({ provider, providerId, email, displayName, ip, userA
         `INSERT INTO auth_providers (user_id, provider, provider_id) VALUES ($1, $2, $3)`,
         [user.id, provider, providerId]
       );
+      const name = displayName || email;
       await client.query(
         `INSERT INTO creators (tenant_id, user_id, display_name) VALUES ($1, $2, $3)`,
-        [tenant.id, user.id, displayName || email]
+        [tenant.id, user.id, name]
       );
+
+      // Stripe customer + trial subscription — non-fatal, same as signup
+      try {
+        const stripeCustomerId = await createStripeCustomer(email.toLowerCase().trim(), name);
+        await createTrialSubscription(client, { tenantId: tenant.id, stripeCustomerId });
+      } catch (stripeErr) {
+        console.error('Stripe setup failed at OAuth signup (non-fatal):', stripeErr.message);
+      }
+
       userId       = user.id;
       tenantId     = tenant.id;
-      resolvedName = displayName || email;
+      resolvedName = name;
     }
 
     const session = await createSession(client, { userId, tenantId, ip, userAgent });

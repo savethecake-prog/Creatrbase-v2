@@ -58,6 +58,11 @@ if (process.env.NODE_ENV === 'production') {
     if (req.url.startsWith('/api/')) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
     }
+    // Block common credential-scanning paths — return 404, never serve index.html
+    const blocked = /\.(env|git|aws|pem|key|crt|p12|pfx|htpasswd|bash_history|ssh)(\/|$)|wp-(admin|login|includes)|xmlrpc\.php/i;
+    if (blocked.test(req.url)) {
+      return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
+    }
     return reply.sendFile('index.html');
   });
 }

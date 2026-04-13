@@ -173,10 +173,7 @@ async function createSession(tx, { userId, tenantId, ip, userAgent }) {
 async function validateSession(sessionId) {
   const session = await getPrisma().session.findFirst({
     where:   { id: sessionId, expiresAt: { gt: new Date() } },
-    include: {
-      user:    { select: { email: true } },
-      creator: false,
-    },
+    include: { user: { select: { email: true } } },
   });
 
   if (!session) return null;

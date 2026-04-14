@@ -44,6 +44,7 @@ app.register(require('./domains/creator/scoreRoutes'));
 app.register(require('./domains/creator/recommendationRoutes'));
 app.register(require('./domains/creator/taskRoutes'));
 app.register(require('./domains/brands/brandsRoutes'));
+app.register(require('./domains/negotiations/negotiationsRoutes'));
 
 // ── Background workers ────────────────────────────────────────────────────────
 

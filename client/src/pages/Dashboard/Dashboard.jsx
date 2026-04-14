@@ -100,12 +100,7 @@ const MILESTONE_MESSAGES = {
   portfolio_creator:        "Portfolio creator status. You're in the top tier.",
 };
 
-const COMING_SOON = [
-  {
-    title: 'Negotiations',
-    desc: 'Draft, counter, and track brand deal negotiations with AI-assisted language.',
-  },
-];
+const COMING_SOON = [];
 
 const CONNECT_ERRORS = {
   youtube_denied:         'YouTube access was denied. Please try again.',
@@ -537,17 +532,6 @@ export function Dashboard() {
         </div>
       )}
 
-      <p className={styles.sectionTitle}>
-        Coming Next <Badge variant="lavender">In Development</Badge>
-      </p>
-      <div className={styles.comingGrid}>
-        {COMING_SOON.map(({ title, desc }) => (
-          <div key={title} className={styles.comingCard}>
-            <p className={styles.comingCardTitle}>{title}</p>
-            <p className={styles.comingCardDesc}>{desc}</p>
-          </div>
-        ))}
-      </div>
     </AppLayout>
   );
 }

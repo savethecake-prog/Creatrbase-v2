@@ -22,7 +22,7 @@ const NAV = [
   {
     group: 'Toolkit',
     items: [
-      { label: 'Negotiations', to: '/negotiations', soon: true },
+      { label: 'Negotiations', to: '/negotiations' },
       { label: 'Contract Review', to: '/contracts', soon: true },
     ],
   },

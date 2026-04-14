@@ -41,6 +41,7 @@ function startViabilityScoringWorker() {
         totalViewCount: true,
         videoCount: true,
         engagementRate30d: true,
+        avgViewsPerVideo30d: true,
         publicUploads90d: true,
         primaryAudienceGeo: true,
       },
@@ -84,12 +85,13 @@ function startViabilityScoringWorker() {
 
     const result = runScoringEngine({
       // Platform metrics
-      subscriberCount:     ytProfile?.subscriberCount ?? null,
-      totalViewCount:      ytProfile?.totalViewCount != null ? Number(ytProfile.totalViewCount) : null,
-      videoCount:          ytProfile?.videoCount ?? null,
-      engagementRate30d:   ytProfile?.engagementRate30d != null ? Number(ytProfile.engagementRate30d) : null,
-      publicUploads90d:    ytProfile?.publicUploads90d ?? null,
-      primaryAudienceGeo:  ytProfile?.primaryAudienceGeo ?? null,
+      subscriberCount:       ytProfile?.subscriberCount ?? null,
+      totalViewCount:        ytProfile?.totalViewCount != null ? Number(ytProfile.totalViewCount) : null,
+      videoCount:            ytProfile?.videoCount ?? null,
+      engagementRate30d:     ytProfile?.engagementRate30d != null ? Number(ytProfile.engagementRate30d) : null,
+      avgViewsPerVideo30d:   ytProfile?.avgViewsPerVideo30d != null ? Number(ytProfile.avgViewsPerVideo30d) : null,
+      publicUploads90d:      ytProfile?.publicUploads90d ?? null,
+      primaryAudienceGeo:    ytProfile?.primaryAudienceGeo ?? null,
       // Velocity
       subVelocityPerDay,
       snapshotCount:       snapshots.length,

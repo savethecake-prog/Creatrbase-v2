@@ -177,6 +177,7 @@ export function Dashboard() {
   const [recData, setRecData]           = useState(null);  // { recommendation, status }
   const [recResponding, setRecResponding] = useState(false);
   const [history, setHistory]           = useState(null);  // { history: [...], status }
+  const [showWelcome, setShowWelcome]   = useState(false);
   const [dismissedCelebrations, setDismissedCelebrations] = useState(() => {
     const s = new Set();
     for (const t of MILESTONE_ORDER) {
@@ -193,16 +194,20 @@ export function Dashboard() {
     api.get('/creator/score/history').then(setHistory).catch(() => {});
   }, []);
 
-  // Handle ?connected= and ?connect_error= params on return from OAuth
+  // Handle ?welcome=1, ?connected=, ?connect_error= params
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params    = new URLSearchParams(window.location.search);
+    const welcome   = params.get('welcome');
     const connected = params.get('connected');
     const error     = params.get('connect_error');
-    if (connected) {
+
+    if (welcome === '1') {
+      setShowWelcome(true);
+      window.history.replaceState({}, '', '/dashboard');
+    } else if (connected) {
       const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
       setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
       window.history.replaceState({}, '', '/dashboard');
-      // Refresh platform list
       api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
     } else if (error) {
       setConnectMsg({ type: 'error', text: CONNECT_ERRORS[error] ?? 'Connection failed. Please try again.' });
@@ -212,7 +217,7 @@ export function Dashboard() {
 
   const yt     = platforms.find(p => p.platform === 'youtube');
   const twitch = platforms.find(p => p.platform === 'twitch');
-  const allConnected = yt && twitch;
+
 
   const ytSubscribers    = yt?.subscriber_count;
   const ytWatchHours     = yt?.watch_hours_12mo;
@@ -277,6 +282,25 @@ export function Dashboard() {
         </div>
       )}
 
+      {showWelcome && scoreData?.score && (
+        <div className={styles.welcomeBanner}>
+          <div className={styles.welcomeContent}>
+            <p className={styles.welcomeEyebrow}>Your profile is ready</p>
+            <p className={styles.welcomeTitle}>
+              Your commercial viability score is{' '}
+              <span className={styles.welcomeScore}>{scoreData.score.overall}</span>
+              {' '}— {scoreData.score.tier?.replace(/_/g, ' ')}.
+            </p>
+            <p className={styles.welcomeDesc}>
+              {scoreData.score.primary_constraint
+                ? <>Your top constraint right now is <strong>{scoreData.score.primary_constraint.replace(/_/g, ' ')}</strong>. Your first task is already generated below — it targets exactly this.</>
+                : <>Your score is calculated. Your first task is already generated below — check it out.</>}
+            </p>
+          </div>
+          <button className={styles.welcomeDismiss} onClick={() => setShowWelcome(false)}>✕</button>
+        </div>
+      )}
+
       {connectMsg && (
         <div className={connectMsg.type === 'success' ? styles.msgSuccess : styles.msgError}>
           {connectMsg.text}
@@ -289,30 +313,22 @@ export function Dashboard() {
           Hey, <span>{firstName}</span>.
         </h1>
         <p className={styles.sub}>
-          {allConnected ? 'Your platforms are connected.' : 'Connect your platforms to get started.'}
+          {yt ? 'Your commercial intelligence dashboard.' : 'Reconnect your platforms to resume tracking.'}
         </p>
       </div>
 
-      {!allConnected && (
+      {!yt && (
         <div className={styles.connectBanner}>
           <div className={styles.connectText}>
-            <p className={styles.connectTitle}>Connect YouTube or Twitch</p>
+            <p className={styles.connectTitle}>YouTube disconnected</p>
             <p className={styles.connectDesc}>
-              Creatrbase needs access to your channel metrics to calculate your commercial viability score,
-              track your gap to monetisation thresholds, and generate your weekly tasks.
+              Reconnect to resume syncing your metrics, score updates, and weekly tasks.
             </p>
           </div>
           <div className={styles.connectActions}>
-            {yt ? (
-              <div className={styles.connectedPill}>
-                <span className={styles.connectedDot} />
-                YouTube — {yt.platform_display_name ?? yt.platform_username}
-              </div>
-            ) : (
-              <Button variant="primary" onClick={() => { window.location.href = '/api/connect/youtube'; }}>
-                Connect YouTube
-              </Button>
-            )}
+            <Button variant="primary" onClick={() => { window.location.href = '/api/connect/youtube'; }}>
+              Reconnect YouTube
+            </Button>
             {twitch ? (
               <div className={styles.connectedPill}>
                 <span className={styles.connectedDot} />

@@ -85,6 +85,8 @@ function startPlatformSyncWorker() {
             watchHours12mo:        watchHours,
             engagementRate30d:     extended.engagementRate30d,
             avgViewsPerVideo30d:   extended.avgViewsPerVideo30d,
+            avgViewsPerVideo60d:   extended.avgViewsPerVideo60d,
+            avgViewsPerVideo90d:   extended.avgViewsPerVideo90d,
             publicUploads90d:      extended.publicUploads90d,
             primaryAudienceGeo:    extended.primaryAudienceGeo,
             analyticsLastSyncedAt: extended.engagementRate30d != null ? new Date() : undefined,
@@ -108,6 +110,9 @@ function startPlatformSyncWorker() {
         job.log(
           `YouTube sync complete: ${stats.subscriberCount} subs, ${watchHours} watch hrs` +
           `, eng=${extended.engagementRate30d ?? 'n/a'}` +
+          `, avg_views_30d=${extended.avgViewsPerVideo30d ?? 'n/a'}` +
+          `, avg_views_60d=${extended.avgViewsPerVideo60d ?? 'n/a'}` +
+          `, avg_views_90d=${extended.avgViewsPerVideo90d ?? 'n/a'}` +
           `, uploads_90d=${extended.publicUploads90d ?? 'n/a'}` +
           `, geo=${extended.primaryAudienceGeo ?? 'n/a'}`
         );

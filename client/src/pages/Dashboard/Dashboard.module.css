@@ -1,3 +1,68 @@
+/* ── Welcome banner (first score reveal) ─────────────────────────────────────── */
+
+.welcomeBanner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s5);
+  background: var(--success-muted);
+  border: 1px solid var(--success-border);
+  border-radius: var(--r-lg);
+  padding: var(--s5) var(--s6);
+  margin-bottom: var(--s6);
+}
+
+.welcomeContent {
+  flex: 1;
+}
+
+.welcomeEyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--success);
+  margin-bottom: var(--s2);
+}
+
+.welcomeTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--s2);
+  line-height: 1.3;
+}
+
+.welcomeScore {
+  color: var(--success);
+}
+
+.welcomeDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.welcomeDesc strong {
+  color: var(--text-primary);
+}
+
+.welcomeDismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  padding: 0;
+  flex-shrink: 0;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.welcomeDismiss:hover {
+  opacity: 1;
+}
+
 /* Connect feedback messages */
 .msgSuccess,
 .msgError {
@@ -177,9 +242,9 @@
 /* KPI grid */
 .kpiGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--s4);
-  margin-bottom: var(--s8);
+  margin-bottom: var(--s6);
 }
 
 .kpiCard {
@@ -217,6 +282,66 @@
 .kpiHint {
   font-size: 12px;
   color: var(--text-muted);
+}
+
+/* ── View momentum section ────────────────────────────────────────────────────── */
+
+.momentumSection {
+  margin-bottom: var(--s8);
+}
+
+.momentumGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s3);
+}
+
+.momentumCard {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s4) var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.momentumLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.momentumValue {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.momentumEmpty {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--surface-3);
+}
+
+.momentumTrend {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: var(--s1);
+}
+
+.momentumUp   { color: var(--success); }
+.momentumDown { color: var(--error); }
+.momentumFlat { color: var(--text-muted); }
+
+.momentumNote {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: var(--s1);
 }
 
 /* Coming soon cards */
@@ -656,6 +781,9 @@
 @media (max-width: 900px) {
   .kpiGrid {
     grid-template-columns: 1fr 1fr;
+  }
+  .momentumGrid {
+    grid-template-columns: 1fr;
   }
   .connectBanner {
     flex-direction: column;

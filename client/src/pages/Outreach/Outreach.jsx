@@ -17,6 +17,25 @@ function getCreatorTier(subscribers) {
   return 'micro';
 }
 
+// ── View momentum helpers ─────────────────────────────────────────────────────
+
+function fmtViews(n) {
+  if (n == null) return null;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}k`;
+  return Math.round(n).toLocaleString();
+}
+
+// View-to-sub ratio: how well recent content is performing relative to audience size
+// Returns 'strong' (>30%), 'average' (10-30%), 'weak' (<10%), or null if no data
+function viewMomentumSignal(avgViews30d, subscribers) {
+  if (avgViews30d == null || !subscribers) return null;
+  const ratio = avgViews30d / subscribers;
+  if (ratio >= 0.30) return 'strong';
+  if (ratio >= 0.10) return 'average';
+  return 'weak';
+}
+
 // ── Readiness computation ─────────────────────────────────────────────────────
 //
 // signal:
@@ -28,7 +47,8 @@ function getCreatorTier(subscribers) {
 //   'no_context' — creator has no platform connected
 
 function computeReadiness(brand, ctx) {
-  const { tier, subscribers, isGiftable, isOutreachReady } = ctx;
+  const { tier, subscribers, isGiftable, isOutreachReady, avgViews30d } = ctx;
+  const momentum = viewMomentumSignal(avgViews30d, subscribers);
 
   if (!tier) {
     return {
@@ -76,10 +96,20 @@ function computeReadiness(brand, ctx) {
   }
 
   // Meets threshold — now check window + milestones
-  if (hasWindow && isOutreachReady) return { signal: 'ready',    label: 'Reach out now',         reason: `Buying in the ${tier} tier right now and your score qualifies. Go.` };
+  if (hasWindow && isOutreachReady) {
+    const extra = momentum === 'strong' ? ` Your avg views are strong right now — good timing.`
+                : momentum === 'weak'   ? ` Note: your avg views are soft — mention this in your pitch.`
+                : '';
+    return { signal: 'ready', label: 'Reach out now', reason: `Buying in the ${tier} tier right now and your score qualifies. Go.${extra}` };
+  }
   if (hasWindow && isGiftable)      return { signal: 'gifting',  label: 'Gifting ready',         reason: `Window open in your tier — reach out about gifting to start the relationship.` };
   if (hasWindow)                    return { signal: 'approaching', label: 'Window open — almost', reason: 'Buying window is live but your viability score isn\'t at outreach level yet. Keep growing.' };
-  if (isOutreachReady)              return { signal: 'ready',    label: 'Reach out',             reason: 'Tier match and your score qualifies. No active window but worth making contact.' };
+  if (isOutreachReady) {
+    const extra = momentum === 'strong' ? ` Avg views are strong — lead with that in your pitch.`
+                : momentum === 'weak'   ? ` Avg views are currently soft — worth addressing in your pitch.`
+                : '';
+    return { signal: 'ready', label: 'Reach out', reason: `Tier match and your score qualifies. No active window but worth making contact.${extra}` };
+  }
   if (isGiftable)                   return { signal: 'gifting',  label: 'Gifting ready',         reason: 'Tier match. Lead with a gifting ask — build the relationship before going paid.' };
   return                                   { signal: 'approaching', label: 'Building towards this', reason: 'Tier match exists but your viability score isn\'t at outreach level yet.' };
 }
@@ -262,12 +292,26 @@ function ReadinessBanner({ ctx, readyCounts }) {
     );
   }
 
+  // Build a momentum context string for use in banners
+  const momentumStr = ctx.avgViews30d != null
+    ? ` Avg views per video: ${fmtViews(ctx.avgViews30d)} (30d)${
+        ctx.avgViews60d != null
+          ? ctx.avgViews30d > ctx.avgViews60d * 1.05
+            ? ' — trending up.'
+            : ctx.avgViews30d < ctx.avgViews60d * 0.95
+              ? ' — softening vs 60d.'
+              : ' — holding steady.'
+          : '.'
+      }`
+    : '';
+
   if (!ctx.isGiftable && !ctx.isOutreachReady) {
     return (
       <div className={`${styles.banner} ${styles.bannerWarning}`}>
         <p className={styles.bannerTitle}>Not outreach ready yet — but keep going</p>
         <p className={styles.bannerDesc}>
           Your viability score hasn't reached the gifting threshold. Focus on the tasks in your dashboard to close the gap. You can browse brands now to understand the landscape.
+          {momentumStr && <>{' '}<strong>{momentumStr}</strong></>}
         </p>
       </div>
     );
@@ -281,7 +325,8 @@ function ReadinessBanner({ ctx, readyCounts }) {
           {readyCounts.gifting > 0 && ` · ${readyCounts.gifting} brand${readyCounts.gifting !== 1 ? 's' : ''} ready for gifting outreach`}
         </p>
         <p className={styles.bannerDesc}>
-          Brands will send you products to review. Lead every outreach with a gifting ask — build the relationship before going for paid deals. This is the right move at your current stage.
+          Brands will send you products to review. Lead every outreach with a gifting ask — build the relationship before going for paid deals.
+          {momentumStr && <>{' '}<strong>{momentumStr}</strong></>}
         </p>
       </div>
     );
@@ -296,7 +341,40 @@ function ReadinessBanner({ ctx, readyCounts }) {
       </p>
       <p className={styles.bannerDesc}>
         Your score qualifies you for paid outreach. Brands marked <strong>Reach out now</strong> are your priority — buying window is open and your size is a match. Work through those first.
+        {momentumStr && <>{' '}<strong>{momentumStr}</strong></>}
       </p>
+    </div>
+  );
+}
+
+// ── MomentumRow ───────────────────────────────────────────────────────────────
+
+function MomentumPill({ label, value, prev }) {
+  const trend = prev != null && value != null
+    ? value > prev * 1.05 ? 'up' : value < prev * 0.95 ? 'down' : 'flat'
+    : null;
+
+  const trendText  = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
+  const trendClass = trend === 'up'   ? styles.trendUp
+                   : trend === 'down' ? styles.trendDown
+                   : styles.trendFlat;
+
+  return (
+    <div className={styles.momentumPill}>
+      <span className={styles.momentumPillLabel}>{label}</span>
+      <span className={styles.momentumPillValue}>{fmtViews(value) ?? '—'}</span>
+      {trend && <span className={`${styles.momentumPillTrend} ${trendClass}`}>{trendText} vs prev</span>}
+    </div>
+  );
+}
+
+function MomentumRow({ ctx }) {
+  if (!ctx.avgViews30d && !ctx.avgViews60d && !ctx.avgViews90d) return null;
+  return (
+    <div className={styles.momentumRow}>
+      <MomentumPill label="Avg Views 30d" value={ctx.avgViews30d} prev={null} />
+      <MomentumPill label="Avg Views 60d" value={ctx.avgViews60d} prev={ctx.avgViews30d} />
+      <MomentumPill label="Avg Views 90d" value={ctx.avgViews90d} prev={ctx.avgViews60d ?? ctx.avgViews30d} />
     </div>
   );
 }
@@ -338,8 +416,11 @@ export function Outreach() {
       const milestones  = scoreRes.status === 'fulfilled' ? (scoreRes.value.milestones ?? []) : [];
       const platforms   = platformsRes.status === 'fulfilled' ? (platformsRes.value.platforms ?? []) : [];
       const yt          = platforms.find(p => p.platform === 'youtube');
-      const subscribers = yt?.subscriber_count ?? null;
-      setCreatorCtxRaw({ milestones, subscribers });
+      const subscribers  = yt?.subscriber_count ?? null;
+      const avgViews30d  = yt?.avg_views_per_video_30d ?? null;
+      const avgViews60d  = yt?.avg_views_per_video_60d ?? null;
+      const avgViews90d  = yt?.avg_views_per_video_90d ?? null;
+      setCreatorCtxRaw({ milestones, subscribers, avgViews30d, avgViews60d, avgViews90d });
     }).finally(() => setLoading(false));
   }, []);
 
@@ -352,14 +433,17 @@ export function Outreach() {
 
   // Build creator context object
   const creatorCtx = useMemo(() => {
-    if (!creatorCtxRaw) return { tier: null, subscribers: null, isGiftable: false, isOutreachReady: false };
-    const { milestones, subscribers } = creatorCtxRaw;
+    if (!creatorCtxRaw) return { tier: null, subscribers: null, avgViews30d: null, avgViews60d: null, avgViews90d: null, isGiftable: false, isOutreachReady: false };
+    const { milestones, subscribers, avgViews30d, avgViews60d, avgViews90d } = creatorCtxRaw;
     const crossed = type => milestones.some(m => m.type === type && m.status === 'crossed');
     return {
-      tier:           getCreatorTier(subscribers),
+      tier:            getCreatorTier(subscribers),
       subscribers,
-      isGiftable:     crossed('giftable'),
-      isOutreachReady:crossed('outreach_ready'),
+      avgViews30d,
+      avgViews60d,
+      avgViews90d,
+      isGiftable:      crossed('giftable'),
+      isOutreachReady: crossed('outreach_ready'),
     };
   }, [creatorCtxRaw]);
 
@@ -414,6 +498,8 @@ export function Outreach() {
       </div>
 
       {!loading && <ReadinessBanner ctx={creatorCtx} readyCounts={readyCounts} />}
+
+      {!loading && <MomentumRow ctx={creatorCtx} />}
 
       <div className={styles.filterBar}>
         {visibleFilters.map(f => (

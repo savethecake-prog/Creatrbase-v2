@@ -114,14 +114,16 @@ async function getWatchHours12Months(accessToken) {
   return minutes !== null ? Number((minutes / 60).toFixed(2)) : null;
 }
 
-// ─── Extended analytics (engagement, geo, uploads cadence) ───────────────────
-// Fetches four additional signals in parallel. All are non-fatal — if the
+// ─── Extended analytics (engagement, geo, uploads cadence, view momentum) ────
+// Fetches all rolling-window signals in parallel. All are non-fatal — if the
 // Analytics API returns 403 (new channels, restricted access), nulls are
 // returned and the sync still succeeds.
 //
 // Returns:
 //   engagementRate30d     — (likes + comments) / views as decimal (e.g. 0.034)
-//   avgViewsPerVideo30d   — total 30d views / videoCount
+//   avgViewsPerVideo30d   — 30d views / 30d uploads (fixed denominator)
+//   avgViewsPerVideo60d   — 60d views / 60d uploads
+//   avgViewsPerVideo90d   — 90d views / 90d uploads
 //   publicUploads90d      — count of videos published in last 90 days
 //   primaryAudienceGeo    — 'UK' | 'US' | 'EU' | 'global'
 
@@ -129,19 +131,34 @@ async function getExtendedAnalytics(accessToken, { uploadsPlaylistId, videoCount
   const now      = new Date();
   const endDate  = now.toISOString().split('T')[0];
   const start30  = new Date(now - 30 * 86_400_000).toISOString().split('T')[0];
+  const start60  = new Date(now - 60 * 86_400_000).toISOString().split('T')[0];
   const start90  = new Date(now - 90 * 86_400_000).toISOString().split('T')[0];
 
-  // Run all three requests in parallel; swallow errors individually
-  const [engagement30, geo90, uploads90] = await Promise.allSettled([
-    analyticsGet({ startDate: start30, endDate, metrics: 'views,likes,comments' }, accessToken),
-    analyticsGet({
-      startDate: start90, endDate,
-      dimensions: 'country', metrics: 'views', sort: '-views', maxResults: '5',
-    }, accessToken),
-    uploadsPlaylistId ? countUploads(uploadsPlaylistId, start90, accessToken) : Promise.resolve(null),
-  ]);
+  // Run all requests in parallel; swallow errors individually
+  const [engagement30, views60, views90, geo90, uploads90, uploads60, uploads30] =
+    await Promise.allSettled([
+      // 30d: views + engagement signals
+      analyticsGet({ startDate: start30, endDate, metrics: 'views,likes,comments' }, accessToken),
+      // 60d and 90d: views only (for rolling avg calculation)
+      analyticsGet({ startDate: start60, endDate, metrics: 'views' }, accessToken),
+      analyticsGet({ startDate: start90, endDate, metrics: 'views' }, accessToken),
+      // Geo: top countries by 90d view volume
+      analyticsGet({
+        startDate: start90, endDate,
+        dimensions: 'country', metrics: 'views', sort: '-views', maxResults: '5',
+      }, accessToken),
+      // Upload counts for correct per-upload denominators
+      uploadsPlaylistId ? countUploads(uploadsPlaylistId, start90, accessToken) : Promise.resolve(null),
+      uploadsPlaylistId ? countUploads(uploadsPlaylistId, start60, accessToken) : Promise.resolve(null),
+      uploadsPlaylistId ? countUploads(uploadsPlaylistId, start30, accessToken) : Promise.resolve(null),
+    ]);
 
-  // Engagement rate + avg views per video (30d)
+  // Upload counts — used as denominators to avoid the all-time videoCount flaw
+  const uploads90d = uploads90.status === 'fulfilled' ? (uploads90.value ?? 0) : 0;
+  const uploads60d = uploads60.status === 'fulfilled' ? (uploads60.value ?? 0) : 0;
+  const uploads30d = uploads30.status === 'fulfilled' ? (uploads30.value ?? 0) : 0;
+
+  // Engagement rate + fixed-denominator avg views per video (30d)
   let engagementRate30d   = null;
   let avgViewsPerVideo30d = null;
 
@@ -152,15 +169,43 @@ async function getExtendedAnalytics(accessToken, { uploadsPlaylistId, videoCount
       if (views > 0) {
         engagementRate30d = parseFloat(((likes + comments) / views).toFixed(6));
       }
-      if (videoCount && videoCount > 0) {
-        avgViewsPerVideo30d = parseFloat((views / videoCount).toFixed(2));
+      // Use 30d upload count as denominator — avoids underestimation on large back-catalogues.
+      // Fall back to total video count if uploads30d is 0 (channel with no recent uploads).
+      const denom30 = uploads30d > 0 ? uploads30d : (videoCount > 0 ? videoCount : null);
+      if (denom30) {
+        avgViewsPerVideo30d = parseFloat((views / denom30).toFixed(2));
+      }
+    }
+  }
+
+  // 60d avg views per video
+  let avgViewsPerVideo60d = null;
+  if (views60.status === 'fulfilled') {
+    const row = views60.value.rows?.[0];
+    if (row) {
+      const views = Number(row[0]);
+      const denom60 = uploads60d > 0 ? uploads60d : (videoCount > 0 ? videoCount : null);
+      if (views > 0 && denom60) {
+        avgViewsPerVideo60d = parseFloat((views / denom60).toFixed(2));
+      }
+    }
+  }
+
+  // 90d avg views per video
+  let avgViewsPerVideo90d = null;
+  if (views90.status === 'fulfilled') {
+    const row = views90.value.rows?.[0];
+    if (row) {
+      const views = Number(row[0]);
+      const denom90 = uploads90d > 0 ? uploads90d : (videoCount > 0 ? videoCount : null);
+      if (views > 0 && denom90) {
+        avgViewsPerVideo90d = parseFloat((views / denom90).toFixed(2));
       }
     }
   }
 
   // Primary audience geography — top country by 90d views
   let primaryAudienceGeo = null;
-
   if (geo90.status === 'fulfilled') {
     const topRow = geo90.value.rows?.[0];
     if (topRow) {
@@ -168,10 +213,14 @@ async function getExtendedAnalytics(accessToken, { uploadsPlaylistId, videoCount
     }
   }
 
-  // Uploads in last 90 days
-  const publicUploads90d = uploads90.status === 'fulfilled' ? uploads90.value : null;
-
-  return { engagementRate30d, avgViewsPerVideo30d, publicUploads90d, primaryAudienceGeo };
+  return {
+    engagementRate30d,
+    avgViewsPerVideo30d,
+    avgViewsPerVideo60d,
+    avgViewsPerVideo90d,
+    publicUploads90d: uploads90d || null,
+    primaryAudienceGeo,
+  };
 }
 
 // ─── Analytics API helper ─────────────────────────────────────────────────────

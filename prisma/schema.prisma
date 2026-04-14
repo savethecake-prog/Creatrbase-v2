@@ -143,6 +143,8 @@ model CreatorPlatformProfile {
   totalViewCount           BigInt?   @map("total_view_count")
   videoCount               Int?      @map("video_count")
   avgViewsPerVideo30d      Decimal?  @map("avg_views_per_video_30d") @db.Decimal(10, 2)
+  avgViewsPerVideo60d      Decimal?  @map("avg_views_per_video_60d") @db.Decimal(10, 2)
+  avgViewsPerVideo90d      Decimal?  @map("avg_views_per_video_90d") @db.Decimal(10, 2)
   engagementRate30d        Decimal?  @map("engagement_rate_30d") @db.Decimal(5, 4)
   watchHours12mo           Decimal?  @map("watch_hours_12mo") @db.Decimal(10, 2)
   shortsViews90d           BigInt?   @map("shorts_views_90d")

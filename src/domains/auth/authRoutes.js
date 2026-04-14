@@ -91,16 +91,26 @@ async function authRoutes(app) {
   const { getSubscription } = require('../billing/billingService');
 
   app.get('/api/auth/me', { preHandler: authenticate }, async (req) => {
-    const sub = await getSubscription(req.user.tenantId);
+    const prisma = require('../../lib/prisma').getPrisma();
+
+    const [sub, creator] = await Promise.all([
+      getSubscription(req.user.tenantId),
+      prisma.creator.findFirst({
+        where:  { userId: req.user.userId, tenantId: req.user.tenantId },
+        select: { onboardingStep: true },
+      }),
+    ]);
+
     const trialDaysLeft = sub?.trial_end
       ? Math.max(0, Math.ceil((new Date(sub.trial_end) - new Date()) / (1000 * 60 * 60 * 24)))
       : null;
 
     return {
-      userId:      req.user.userId,
-      tenantId:    req.user.tenantId,
-      email:       req.user.email,
-      displayName: req.user.displayName,
+      userId:         req.user.userId,
+      tenantId:       req.user.tenantId,
+      email:          req.user.email,
+      displayName:    req.user.displayName,
+      onboardingStep: creator?.onboardingStep ?? null,
       subscription: sub ? {
         status:        sub.status,
         planName:      sub.plan_name,

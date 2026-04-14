@@ -27,7 +27,7 @@ export function Signup() {
       await api.post('/auth/signup', form);
       const me = await getMe();
       setUser(me);
-      navigate('/dashboard');
+      navigate('/onboarding');
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {

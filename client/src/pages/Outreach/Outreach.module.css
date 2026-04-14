@@ -129,6 +129,48 @@
   font-weight: 500;
 }
 
+/* ── View momentum row (above filter bar) ────────────────────────────────────── */
+
+.momentumRow {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.momentumPill {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  gap: 2px;
+}
+
+.momentumPillLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.momentumPillValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.momentumPillTrend {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.trendUp   { color: var(--success); }
+.trendDown { color: var(--error); }
+.trendFlat { color: var(--text-tertiary); }
+
 /* ── Filter bar ──────────────────────────────────────────────────────────────── */
 
 .filterBar {

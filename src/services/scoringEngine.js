@@ -101,14 +101,25 @@ function scoreSubscriberMomentum({ subscriberCount, subVelocityPerDay, snapshotC
 
 // ─── Dimension: engagement_quality ───────────────────────────────────────────
 // Measures: how well content resonates relative to audience size.
-// Best input: engagement_rate_30d from DB (not yet synced at launch).
-// Fallback: views/subscribers ratio (low confidence proxy).
+//
+// Signal hierarchy:
+//   1. engagementRate30d + avgViewsPerVideo30d — both available → blend, high confidence
+//   2. engagementRate30d only                  → primary signal, medium confidence
+//   3. avgViewsPerVideo30d + subscriberCount   → view-to-sub ratio, medium confidence
+//   4. all-time views / videoCount / subs      → low confidence proxy
+//
+// avgViewsPerVideo30d is scored as a fraction of subscriberCount (view-to-sub ratio):
+//   < 5% = poor resonance (10), 5–15% = below avg (28), 15–30% = average (45),
+//   30–60% = good (62), 60–100% = very good (78), > 100% = exceptional (92)
 
-function scoreEngagementQuality({ engagementRate30d, totalViewCount, videoCount, subscriberCount }) {
-  // Preferred: explicit engagement rate
-  if (engagementRate30d != null) {
-    const rate = Number(engagementRate30d) * 100; // convert decimal to %
-    const score = clamp(Math.round(
+function scoreEngagementQuality({ engagementRate30d, avgViewsPerVideo30d, totalViewCount, videoCount, subscriberCount }) {
+  const hasEngRate = engagementRate30d != null;
+  const hasAvgViews = avgViewsPerVideo30d != null && subscriberCount != null && subscriberCount > 0;
+
+  // Score from explicit engagement rate (likes + comments / views)
+  function engRateScore(rate30d) {
+    const rate = Number(rate30d) * 100;
+    return clamp(Math.round(
       rate < 0.5 ? 10 :
       rate < 1   ? 20 :
       rate < 2   ? 38 :
@@ -116,10 +127,41 @@ function scoreEngagementQuality({ engagementRate30d, totalViewCount, videoCount,
       rate < 5   ? 65 :
       rate < 8   ? 78 : 90
     ), 0, 100);
+  }
+
+  // Score from 30d avg views relative to subscriber count
+  function avgViewsScore(avgViews30d, subs) {
+    const ratio = Number(avgViews30d) / subs;
+    return clamp(Math.round(
+      ratio < 0.05  ? 10 :
+      ratio < 0.15  ? 28 :
+      ratio < 0.30  ? 45 :
+      ratio < 0.60  ? 62 :
+      ratio < 1.00  ? 78 : 92
+    ), 0, 100);
+  }
+
+  // Both signals available — blend for highest accuracy
+  if (hasEngRate && hasAvgViews) {
+    const scoreA = engRateScore(engagementRate30d);
+    const scoreB = avgViewsScore(avgViewsPerVideo30d, subscriberCount);
+    const blended = clamp(Math.round(scoreA * 0.6 + scoreB * 0.4), 0, 100);
+    return { score: blended, confidence: 'high', state: classify(blended) };
+  }
+
+  // Engagement rate only
+  if (hasEngRate) {
+    const score = engRateScore(engagementRate30d);
     return { score, confidence: 'medium', state: classify(score) };
   }
 
-  // Fallback: views per video as fraction of subscriber count
+  // Avg views only (no engagement rate yet)
+  if (hasAvgViews) {
+    const score = avgViewsScore(avgViewsPerVideo30d, subscriberCount);
+    return { score, confidence: 'medium', state: classify(score) };
+  }
+
+  // Fallback: all-time views per video as fraction of subscriber count (low confidence)
   if (totalViewCount != null && videoCount != null && videoCount > 0 && subscriberCount != null && subscriberCount > 0) {
     const avgViews  = Number(totalViewCount) / videoCount;
     const viewRatio = avgViews / subscriberCount;
@@ -393,6 +435,7 @@ function runScoringEngine({
   totalViewCount,
   videoCount,
   engagementRate30d,
+  avgViewsPerVideo30d,
   publicUploads90d,
   primaryAudienceGeo,
   // Snapshot velocity
@@ -412,7 +455,7 @@ function runScoringEngine({
 
   const dimensions = {
     subscriber_momentum:     scoreSubscriberMomentum({ subscriberCount, subVelocityPerDay, snapshotCount }),
-    engagement_quality:      scoreEngagementQuality({ engagementRate30d, totalViewCount, videoCount, subscriberCount }),
+    engagement_quality:      scoreEngagementQuality({ engagementRate30d, avgViewsPerVideo30d, totalViewCount, videoCount, subscriberCount }),
     niche_commercial_value:  scoreNicheCommercialValue({ primaryNicheCategory, classificationConfidence, existingPartnerships, affiliateDomainsDetected, brandMentions }),
     audience_geo_alignment:  scoreAudienceGeoAlignment({ primaryAudienceGeo }),
     content_consistency:     scoreContentConsistency({ publicUploads90d, videoCount }),

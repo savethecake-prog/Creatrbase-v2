@@ -134,7 +134,15 @@ async function platformConnectRoutes(app) {
         throw err;
       }
 
-      return reply.redirect('/dashboard?connected=youtube');
+      // New users (account_created step) go back to onboarding to see the processing screen.
+      // Existing users reconnecting go to dashboard with a success banner.
+      const prisma = require('../../lib/prisma').getPrisma();
+      const creator = await prisma.creator.findFirst({
+        where:  { userId: req.user.userId, tenantId: req.user.tenantId },
+        select: { onboardingStep: true },
+      });
+      const isNewUser = !creator || creator.onboardingStep === 'account_created' || creator.onboardingStep === 'platform_connected';
+      return reply.redirect(isNewUser ? '/onboarding' : '/dashboard?connected=youtube');
     });
 
   } else {

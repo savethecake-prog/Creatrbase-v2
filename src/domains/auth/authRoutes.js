@@ -176,6 +176,9 @@ async function authRoutes(app) {
           tokenHost:     'https://id.twitch.tv',
           tokenPath:     '/oauth2/token',
         },
+        options: {
+          authorizationMethod: 'body',
+        },
       },
       startRedirectPath: '/api/auth/twitch',
       callbackUri:       `${process.env.APP_URL}/api/auth/twitch/callback`,

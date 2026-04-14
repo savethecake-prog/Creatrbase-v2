@@ -166,6 +166,9 @@ async function platformConnectRoutes(app) {
           tokenHost:     'https://id.twitch.tv',
           tokenPath:     '/oauth2/token',
         },
+        options: {
+          authorizationMethod: 'body',
+        },
       },
       callbackUri: `${process.env.APP_URL}/api/connect/twitch/callback`,
     });

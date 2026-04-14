@@ -141,8 +141,11 @@ async function platformConnectRoutes(app) {
         where:  { userId: req.user.userId, tenantId: req.user.tenantId },
         select: { onboardingStep: true },
       });
-      const isNewUser = !creator || creator.onboardingStep === 'account_created' || creator.onboardingStep === 'platform_connected';
-      return reply.redirect(isNewUser ? '/onboarding' : '/dashboard?connected=youtube');
+      // Only route to onboarding if this is a brand-new account that has never
+      // connected a platform before. Any other step means they've been through
+      // the flow already (including reconnecting after a disconnect).
+      const isFirstEverConnect = !creator || creator.onboardingStep === 'account_created';
+      return reply.redirect(isFirstEverConnect ? '/onboarding' : '/dashboard?connected=youtube');
     });
 
   } else {

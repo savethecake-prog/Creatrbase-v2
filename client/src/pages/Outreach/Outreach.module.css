@@ -79,11 +79,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
 }
 
 .card:hover {
-  border-color: var(--border-subtle);
+  border-color: var(--accent-border);
+  background: var(--bg-elevated);
 }
 
 .cardActive {
@@ -94,12 +98,23 @@
   border-color: var(--accent-border);
 }
 
+.cardContacted {
+  border-color: var(--success-border);
+}
+
 /* Card top row */
 .cardHead {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
+}
+
+.cardBadges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
 }
 
 .brandName {
@@ -218,6 +233,10 @@
 }
 
 /* Notes */
+.notesWrap {
+  position: relative;
+}
+
 .notes {
   font-size: 12px;
   color: var(--text-secondary);
@@ -228,48 +247,25 @@
   overflow: hidden;
 }
 
-/* Card actions */
-.actions {
-  display: flex;
-  gap: var(--space-2);
+.readMore {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  display: block;
+  margin-top: var(--space-1);
+}
+
+/* Card footer */
+.cardFooter {
   margin-top: auto;
-  padding-top: var(--space-2);
+  padding-top: var(--space-3);
   border-top: 1px solid var(--border-subtle);
 }
 
-.actionBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--font-body);
-  cursor: pointer;
-  text-decoration: none;
-  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
-.actionBtn:hover {
-  border-color: var(--accent-border);
-  color: var(--accent);
-  background: var(--accent-muted);
-}
-
-.actionBtnPrimary {
-  border-color: var(--accent-border);
-  background: var(--accent-subtle);
-  color: var(--accent);
-}
-
-.actionBtnPrimary:hover {
-  background: var(--accent);
-  color: var(--bg-page);
+.openHint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 /* ── Empty / loading states ──────────────────────────────────────────────────── */

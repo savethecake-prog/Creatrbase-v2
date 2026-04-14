@@ -3,11 +3,10 @@
 const { getPool } = require('../../db/pool');
 
 // ── getBrands ─────────────────────────────────────────────────────────────────
-// Returns all brands from the registry, optionally filtered by niche.
-// Left-joins brand_tier_profiles to surface buying window + rate data.
-// Results ordered: established → partial → minimal, then alphabetical.
+// Returns brands, optionally filtered by niche / category.
+// If creatorId supplied, includes the latest outreach interaction for that creator.
 
-async function getBrands({ niche = null, category = null } = {}) {
+async function getBrands({ niche = null, category = null, creatorId = null } = {}) {
   const pool = getPool();
 
   const { rows } = await pool.query(
@@ -51,7 +50,21 @@ async function getBrands({ niche = null, category = null } = {}) {
             END
         ) FILTER (WHERE btp.id IS NOT NULL),
         '[]'
-      ) AS tier_profiles
+      ) AS tier_profiles,
+
+      -- Latest outreach interaction for this creator (null if no creator or no interaction)
+      (
+        SELECT json_build_object(
+          'interaction_type', bci.interaction_type,
+          'interaction_date', bci.interaction_date,
+          'deal_notes',       bci.deal_notes
+        )
+        FROM brand_creator_interactions bci
+        WHERE bci.brand_id = b.id
+          AND ($3::uuid IS NULL OR bci.creator_id = $3)
+        ORDER BY bci.created_at DESC
+        LIMIT 1
+      ) AS latest_interaction
 
     FROM brands b
 
@@ -71,10 +84,68 @@ async function getBrands({ niche = null, category = null } = {}) {
       END,
       b.brand_name
     `,
-    [niche, category]
+    [niche, category, creatorId]
   );
 
   return rows;
 }
 
-module.exports = { getBrands };
+// ── logOutreach ───────────────────────────────────────────────────────────────
+// Records that the creator sent outreach to a brand.
+
+async function logOutreach({ brandId, creatorId, tenantId, niche, notes, userId }) {
+  const pool = getPool();
+  await pool.query(
+    `
+    INSERT INTO brand_creator_interactions
+      (brand_id, creator_id, tenant_id, niche, geo, interaction_type,
+       interaction_date, evidence_type, confidence, deal_notes, is_public, created_by)
+    VALUES
+      ($1, $2, $3, $4, 'global', 'outreach_sent',
+       CURRENT_DATE, 'user_reported', 'high', $5, FALSE, $6)
+    `,
+    [brandId, creatorId, tenantId, niche || 'general', notes || null, userId]
+  );
+}
+
+// ── updateOutreachStatus ──────────────────────────────────────────────────────
+// Logs a follow-on interaction (responded, declined, deal started).
+
+async function updateOutreachStatus({ brandId, creatorId, tenantId, interactionType, niche, notes, userId }) {
+  const pool = getPool();
+  await pool.query(
+    `
+    INSERT INTO brand_creator_interactions
+      (brand_id, creator_id, tenant_id, niche, geo, interaction_type,
+       interaction_date, evidence_type, confidence, deal_notes, is_public, created_by)
+    VALUES
+      ($1, $2, $3, $4, 'global', $5,
+       CURRENT_DATE, 'user_reported', 'high', $6, FALSE, $7)
+    `,
+    [brandId, creatorId, tenantId, niche || 'general', interactionType, notes || null, userId]
+  );
+}
+
+// ── getOutreachHistory ────────────────────────────────────────────────────────
+// Full interaction history between this creator and a specific brand.
+
+async function getOutreachHistory({ brandId, creatorId }) {
+  const pool = getPool();
+  const { rows } = await pool.query(
+    `
+    SELECT
+      id,
+      interaction_type,
+      interaction_date,
+      deal_notes,
+      created_at
+    FROM brand_creator_interactions
+    WHERE brand_id = $1 AND creator_id = $2
+    ORDER BY created_at DESC
+    `,
+    [brandId, creatorId]
+  );
+  return rows;
+}
+
+module.exports = { getBrands, logOutreach, updateOutreachStatus, getOutreachHistory };

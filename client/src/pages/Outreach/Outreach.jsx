@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Badge } from '../../components/ui/Badge/Badge';
+import { BrandModal } from './BrandModal';
 import { api } from '../../lib/api';
 import styles from './Outreach.module.css';
 
@@ -19,10 +20,10 @@ const CATEGORY_LABELS = {
 };
 
 const PROGRAMME_LABELS = {
-  direct:           'Direct programme',
+  direct:           'Direct',
   agency_managed:   'Agency managed',
   platform_managed: 'Platform managed',
-  unknown:          'Programme unknown',
+  unknown:          null, // don't show
 };
 
 const CONFIDENCE_VARIANT = {
@@ -34,55 +35,67 @@ const CONFIDENCE_VARIANT = {
 function formatRate(low, high, currency) {
   const sym = currency === 'USD' ? '$' : '£';
   const fmt = n => {
-    const pounds = Math.round(n / 100);
-    return pounds >= 1000 ? `${sym}${(pounds / 1000).toFixed(1)}k` : `${sym}${pounds}`;
+    const v = Math.round(n / 100);
+    return v >= 1000 ? `${sym}${(v / 1000).toFixed(1)}k` : `${sym}${v}`;
   };
   if (!low && !high) return null;
   if (low && high) return `${fmt(low)} – ${fmt(high)}`;
-  if (high)        return `up to ${fmt(high)}`;
+  if (high) return `up to ${fmt(high)}`;
   return fmt(low);
 }
 
 function bestWindow(tierProfiles) {
-  // Take the first profile — already sorted active → warming → ... in SQL
   return tierProfiles?.[0] ?? null;
 }
 
 // ── BrandCard ─────────────────────────────────────────────────────────────────
 
-function BrandCard({ brand }) {
-  const window    = bestWindow(brand.tier_profiles);
-  const isActive  = window?.buying_window_status === 'active';
-  const isWarming = window?.buying_window_status === 'warming';
+function BrandCard({ brand, onClick }) {
+  const notesRef  = useRef(null);
+  const [clipped, setClipped] = useState(false);
 
-  const rateStr = window ? formatRate(
-    window.rate_range_low,
-    window.rate_range_high,
-    window.rate_currency
-  ) : null;
+  useEffect(() => {
+    const el = notesRef.current;
+    if (el) setClipped(el.scrollHeight > el.clientHeight + 2);
+  }, [brand.notes]);
+
+  const window     = bestWindow(brand.tier_profiles);
+  const isActive   = window?.buying_window_status === 'active';
+  const isWarming  = window?.buying_window_status === 'warming';
+  const contacted  = !!brand.latest_interaction;
+  const rateStr    = window
+    ? formatRate(window.rate_range_low, window.rate_range_high, window.rate_currency)
+    : null;
 
   const cardClass = [
     styles.card,
-    isActive  ? styles.cardActive  : '',
-    isWarming ? styles.cardWarming : '',
+    isActive   ? styles.cardActive   : '',
+    isWarming  ? styles.cardWarming  : '',
+    contacted  ? styles.cardContacted : '',
   ].filter(Boolean).join(' ');
 
+  const progLabel = PROGRAMME_LABELS[brand.creator_programme_type];
+
   return (
-    <div className={cardClass}>
+    <button className={cardClass} onClick={onClick} type="button">
+
       <div className={styles.cardHead}>
         <p className={styles.brandName}>{brand.brand_name}</p>
-        <Badge variant={CONFIDENCE_VARIANT[brand.registry_confidence] ?? 'lavender'}>
-          {brand.registry_confidence}
-        </Badge>
+        <div className={styles.cardBadges}>
+          {contacted && (
+            <Badge variant="mint" dot>Contacted</Badge>
+          )}
+          <Badge variant={CONFIDENCE_VARIANT[brand.registry_confidence] ?? 'lavender'}>
+            {brand.registry_confidence}
+          </Badge>
+        </div>
       </div>
 
       {(isActive || isWarming) && (
-        <div className={isActive ? styles.windowActive : styles.windowWarming}>
-          <div className={`${styles.windowStrip} ${isActive ? styles.windowActive : styles.windowWarming}`}>
-            <span className={styles.windowDot} />
-            {isActive ? 'Buying now' : 'Warming up'}
-            {window.creator_tier && ` · ${window.creator_tier}`}
-          </div>
+        <div className={`${styles.windowStrip} ${isActive ? styles.windowActive : styles.windowWarming}`}>
+          <span className={styles.windowDot} />
+          {isActive ? 'Buying now' : 'Warming up'}
+          {window.creator_tier && ` · ${window.creator_tier}`}
         </div>
       )}
 
@@ -90,16 +103,12 @@ function BrandCard({ brand }) {
         <span className={styles.categoryLabel}>
           {CATEGORY_LABELS[brand.category] ?? brand.category}
         </span>
-        {brand.sub_category && (
+        {progLabel && (
           <>
             <span className={styles.metaDivider} />
-            <span className={styles.programmeLabel}>{brand.sub_category.replace(/_/g, ' ')}</span>
+            <span className={styles.programmeLabel}>{progLabel}</span>
           </>
         )}
-        <span className={styles.metaDivider} />
-        <span className={styles.programmeLabel}>
-          {PROGRAMME_LABELS[brand.creator_programme_type] ?? brand.creator_programme_type}
-        </span>
       </div>
 
       {rateStr && (
@@ -123,62 +132,42 @@ function BrandCard({ brand }) {
       )}
 
       {brand.notes && (
-        <p className={styles.notes}>{brand.notes}</p>
+        <div className={styles.notesWrap}>
+          <p ref={notesRef} className={styles.notes}>{brand.notes}</p>
+          {clipped && <span className={styles.readMore}>Read more</span>}
+        </div>
       )}
 
-      <div className={styles.actions}>
-        {brand.partnership_email && (
-          <a
-            href={`mailto:${brand.partnership_email}`}
-            className={`${styles.actionBtn} ${styles.actionBtnPrimary}`}
-          >
-            Email partnerships
-          </a>
-        )}
-        {brand.partnership_url && (
-          <a
-            href={brand.partnership_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.actionBtn}
-          >
-            Programme page
-          </a>
-        )}
-        {brand.website && !brand.partnership_email && !brand.partnership_url && (
-          <a
-            href={brand.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.actionBtn}
-          >
-            Visit website
-          </a>
-        )}
+      <div className={styles.cardFooter}>
+        <span className={styles.openHint}>
+          {contacted ? 'View outreach history' : 'Click to open & compose outreach'}
+        </span>
       </div>
-    </div>
+    </button>
   );
 }
 
 // ── Outreach ──────────────────────────────────────────────────────────────────
 
 const FILTERS = [
-  { label: 'All brands',    value: null },
-  { label: 'Hardware',      value: 'gaming_hardware' },
-  { label: 'Software',      value: 'gaming_software' },
-  { label: 'Nutrition',     value: 'gaming_nutrition' },
-  { label: 'Apparel',       value: 'gaming_apparel' },
-  { label: 'D2C Grooming',  value: 'd2c_grooming' },
-  { label: 'D2C Wellness',  value: 'd2c_wellness' },
-  { label: 'D2C Tech',      value: 'd2c_tech_accessories' },
-  { label: 'Publishers',    value: 'publisher' },
+  { label: 'All brands',   value: null },
+  { label: 'Hardware',     value: 'gaming_hardware' },
+  { label: 'Software',     value: 'gaming_software' },
+  { label: 'Nutrition',    value: 'gaming_nutrition' },
+  { label: 'Apparel',      value: 'gaming_apparel' },
+  { label: 'D2C Grooming', value: 'd2c_grooming' },
+  { label: 'D2C Wellness', value: 'd2c_wellness' },
+  { label: 'D2C Tech',     value: 'd2c_tech_accessories' },
+  { label: 'Publishers',   value: 'publisher' },
 ];
 
 export function Outreach() {
-  const [data,     setData]     = useState(null);   // { brands, niche }
-  const [loading,  setLoading]  = useState(true);
-  const [category, setCategory] = useState(null);
+  const [data,          setData]          = useState(null);
+  const [loading,       setLoading]       = useState(true);
+  const [category,      setCategory]      = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
 
+  // Initial load (no category filter)
   useEffect(() => {
     setLoading(true);
     api.get('/brands')
@@ -187,19 +176,51 @@ export function Outreach() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Re-fetch when category filter changes
+  // Re-fetch on category change (after initial load)
   useEffect(() => {
-    if (data === null) return; // skip initial — handled by first effect
+    if (data === null) return;
     const path = category ? `/brands?category=${encodeURIComponent(category)}` : '/brands';
-    api.get(path)
-      .then(res => setData(res))
-      .catch(() => {});
+    api.get(path).then(res => setData(res)).catch(() => {});
   }, [category]);
+
+  // Optimistic update after outreach is logged
+  function handleOutreachLogged(brandId, interactionType) {
+    setData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        brands: prev.brands.map(b =>
+          b.id === brandId
+            ? {
+                ...b,
+                latest_interaction: {
+                  interaction_type: interactionType,
+                  interaction_date: new Date().toISOString().split('T')[0],
+                  deal_notes: null,
+                },
+              }
+            : b
+        ),
+      };
+    });
+    // Also update selectedBrand if it's the one that changed
+    setSelectedBrand(prev =>
+      prev?.id === brandId
+        ? {
+            ...prev,
+            latest_interaction: {
+              interaction_type: interactionType,
+              interaction_date: new Date().toISOString().split('T')[0],
+              deal_notes: null,
+            },
+          }
+        : prev
+    );
+  }
 
   const brands = data?.brands ?? [];
   const niche  = data?.niche  ?? null;
 
-  // Only show filters that have at least one brand in the full set
   const activeBrandCategories = useMemo(() => {
     if (!data?.brands) return new Set();
     return new Set(data.brands.map(b => b.category));
@@ -214,11 +235,11 @@ export function Outreach() {
       <div className={styles.header}>
         <h1 className={styles.title}>Brand Outreach</h1>
         <p className={styles.subtitle}>
-          Brands actively buying in your space. Contact info, programme intelligence, and buying window signals in one place.
+          Brands actively buying in your space. Open any card to compose outreach and track your pipeline.
         </p>
         {niche && (
           <span className={styles.nicheHint}>
-            Showing brands matched to: {niche.replace(/_/g, ' ')}
+            Matched to: {niche.replace(/_/g, ' ')}
           </span>
         )}
       </div>
@@ -227,6 +248,7 @@ export function Outreach() {
         {visibleFilters.map(f => (
           <button
             key={f.value ?? 'all'}
+            type="button"
             className={[
               styles.filterChip,
               category === f.value ? styles.filterChipActive : '',
@@ -258,9 +280,22 @@ export function Outreach() {
         )}
 
         {!loading && brands.map(brand => (
-          <BrandCard key={brand.id} brand={brand} />
+          <BrandCard
+            key={brand.id}
+            brand={brand}
+            onClick={() => setSelectedBrand(brand)}
+          />
         ))}
       </div>
+
+      {selectedBrand && (
+        <BrandModal
+          brand={selectedBrand}
+          niche={niche}
+          onClose={() => setSelectedBrand(null)}
+          onOutreachLogged={handleOutreachLogged}
+        />
+      )}
     </AppLayout>
   );
 }

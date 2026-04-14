@@ -165,9 +165,32 @@ function PlatformCard({ platform, data, onSync, onDisconnect }) {
 
 export function Connections() {
   const [platforms, setPlatforms] = useState([]);
+  const [connectMsg, setConnectMsg] = useState(null);
+
+  function loadPlatforms() {
+    api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+  }
 
   useEffect(() => {
-    api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+    loadPlatforms();
+
+    // Handle ?connected= and ?connect_error= params on return from OAuth
+    const params    = new URLSearchParams(window.location.search);
+    const connected = params.get('connected');
+    const error     = params.get('connect_error');
+    if (connected) {
+      const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
+      setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
+      window.history.replaceState({}, '', '/connections');
+      loadPlatforms();
+    } else if (error) {
+      const ERRORS = {
+        youtube_already_claimed: 'That YouTube channel is already connected to another Creatrbase account.',
+        twitch_already_claimed:  'That Twitch account is already connected to another Creatrbase account.',
+      };
+      setConnectMsg({ type: 'error', text: ERRORS[error] ?? 'Connection failed. Please try again.' });
+      window.history.replaceState({}, '', '/connections');
+    }
   }, []);
 
   function handleDisconnect(platformKey) {
@@ -182,6 +205,13 @@ export function Connections() {
         <h1 className={styles.title}>Connections</h1>
         <p className={styles.sub}>Manage your connected platforms and sync settings.</p>
       </div>
+
+      {connectMsg && (
+        <div className={connectMsg.type === 'success' ? styles.msgSuccess : styles.msgError}>
+          {connectMsg.text}
+          <button className={styles.msgDismiss} onClick={() => setConnectMsg(null)}>✕</button>
+        </div>
+      )}
 
       <div className={styles.grid}>
         {PLATFORMS.map(platform => (

@@ -171,6 +171,7 @@ export function Dashboard() {
   const isTrialling = sub?.status === 'trialling';
 
   const [platforms, setPlatforms]       = useState([]);
+  const [platformsLoaded, setPlatformsLoaded] = useState(false);
   const [connectMsg, setConnectMsg]     = useState(null); // { type: 'success'|'error', text }
   const [niche, setNiche]               = useState(null);  // { niche, status }
   const [scoreData, setScoreData]       = useState(null);  // { score, milestones, status }
@@ -187,7 +188,9 @@ export function Dashboard() {
   });
 
   useEffect(() => {
-    api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+    api.get('/connect/platforms')
+      .then(({ platforms }) => { setPlatforms(platforms); setPlatformsLoaded(true); })
+      .catch(() => setPlatformsLoaded(true));
     api.get('/creator/niche').then(setNiche).catch(() => {});
     api.get('/creator/score').then(setScoreData).catch(() => {});
     api.get('/creator/recommendation').then(setRecData).catch(() => {});
@@ -317,14 +320,20 @@ export function Dashboard() {
         </p>
       </div>
 
-      {(!yt || !twitch) && platforms.length > 0 && (
+      {platformsLoaded && (!yt || !twitch) && (
         <div className={styles.connectBanner}>
           <div className={styles.connectText}>
             <p className={styles.connectTitle}>
-              {!yt && !twitch ? 'Platforms disconnected' : !yt ? 'YouTube disconnected' : 'Twitch disconnected'}
+              {!yt && platforms.length === 0
+                ? 'Connect your platforms'
+                : !yt && !twitch ? 'Platforms disconnected'
+                : !yt ? 'YouTube disconnected'
+                : 'Twitch disconnected'}
             </p>
             <p className={styles.connectDesc}>
-              Reconnect to resume syncing your metrics, score updates, and weekly tasks.
+              {platforms.length === 0
+                ? 'Connect YouTube to calculate your commercial viability score, track your gap to brand thresholds, and get a weekly action task.'
+                : 'Reconnect to resume syncing your metrics, score updates, and weekly tasks.'}
             </p>
           </div>
           <div className={styles.connectActions}>
@@ -335,7 +344,7 @@ export function Dashboard() {
               </div>
             ) : (
               <Button variant="primary" onClick={() => { window.location.href = '/api/connect/youtube'; }}>
-                Reconnect YouTube
+                {platforms.length === 0 ? 'Connect YouTube' : 'Reconnect YouTube'}
               </Button>
             )}
             {twitch ? (
@@ -345,7 +354,7 @@ export function Dashboard() {
               </div>
             ) : (
               <Button variant="ghost" onClick={() => { window.location.href = '/api/connect/twitch'; }}>
-                Reconnect Twitch
+                {platforms.length === 0 ? 'Connect Twitch' : 'Reconnect Twitch'}
               </Button>
             )}
           </div>

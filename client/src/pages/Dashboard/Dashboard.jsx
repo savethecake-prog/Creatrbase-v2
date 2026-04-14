@@ -102,6 +102,49 @@ const MILESTONE_MESSAGES = {
 
 const COMING_SOON = [];
 
+// ─── View momentum helpers ────────────────────────────────────────────────────
+
+function fmtViews(n) {
+  if (n == null) return '—';
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}k`;
+  return Math.round(n).toLocaleString();
+}
+
+function MomentumCard({ label, value, compareValue }) {
+  // compareValue is the shorter window (30d for 60d card, 60d for 90d card)
+  // Trend: positive = value > compareValue (older avg < newer avg means audience growing)
+  const trend = compareValue != null && value != null
+    ? value > compareValue * 1.05 ? 'up'
+    : value < compareValue * 0.95 ? 'down'
+    : 'flat'
+    : null;
+
+  const trendText = trend === 'up'   ? `↑ trending up`
+                  : trend === 'down' ? `↓ softening`
+                  : trend === 'flat' ? `→ holding steady`
+                  : null;
+
+  const trendClass = trend === 'up'   ? styles.momentumUp
+                   : trend === 'down' ? styles.momentumDown
+                   : styles.momentumFlat;
+
+  return (
+    <div className={styles.momentumCard}>
+      <p className={styles.momentumLabel}>{label}</p>
+      {value != null
+        ? <p className={styles.momentumValue}>{fmtViews(value)}</p>
+        : <p className={styles.momentumEmpty}>—</p>}
+      {trendText && (
+        <p className={`${styles.momentumTrend} ${trendClass}`}>{trendText}</p>
+      )}
+      {!trendText && (
+        <p className={styles.momentumNote}>vs. shorter window</p>
+      )}
+    </div>
+  );
+}
+
 const CONNECT_ERRORS = {
   youtube_denied:         'YouTube access was denied. Please try again.',
   youtube_no_channel:     'No YouTube channel found on that Google account.',
@@ -171,8 +214,11 @@ export function Dashboard() {
   const twitch = platforms.find(p => p.platform === 'twitch');
   const allConnected = yt && twitch;
 
-  const ytSubscribers = yt?.subscriber_count;
-  const ytWatchHours  = yt?.watch_hours_12mo;
+  const ytSubscribers    = yt?.subscriber_count;
+  const ytWatchHours     = yt?.watch_hours_12mo;
+  const ytAvgViews30d    = yt?.avg_views_per_video_30d ?? null;
+  const ytAvgViews60d    = yt?.avg_views_per_video_60d ?? null;
+  const ytAvgViews90d    = yt?.avg_views_per_video_90d ?? null;
 
   const celebrateMilestone = useMemo(() => {
     if (!scoreData?.milestones) return null;
@@ -298,6 +344,15 @@ export function Dashboard() {
           <p className={styles.kpiHint}>{syncedHint(yt)}</p>
         </div>
         <div className={styles.kpiCard}>
+          <p className={styles.kpiLabel}>Avg Views / Video (30d)</p>
+          {ytAvgViews30d != null
+            ? <p className={styles.kpiValue}>{fmtViews(ytAvgViews30d)}</p>
+            : <p className={styles.kpiEmpty}>—</p>}
+          <p className={styles.kpiHint}>
+            {ytAvgViews30d != null ? 'Recent upload performance' : syncedHint(yt)}
+          </p>
+        </div>
+        <div className={styles.kpiCard}>
           <p className={styles.kpiLabel}>Viability Score</p>
           {scoreData?.score?.overall != null
             ? <p className={styles.kpiValue}>{scoreData.score.overall}</p>
@@ -309,6 +364,17 @@ export function Dashboard() {
           </p>
         </div>
       </div>
+
+      {(ytAvgViews30d != null || ytAvgViews60d != null || ytAvgViews90d != null) && (
+        <div className={styles.momentumSection}>
+          <p className={styles.sectionTitle}>View Momentum</p>
+          <div className={styles.momentumGrid}>
+            <MomentumCard label="30-Day Avg" value={ytAvgViews30d} />
+            <MomentumCard label="60-Day Avg" value={ytAvgViews60d} compareValue={ytAvgViews30d} />
+            <MomentumCard label="90-Day Avg" value={ytAvgViews90d} compareValue={ytAvgViews60d ?? ytAvgViews30d} />
+          </div>
+        </div>
+      )}
 
       {celebrateMilestone && (
         <div className={styles.celebration}>
@@ -476,8 +542,36 @@ export function Dashboard() {
 
           {recData.recommendation && recData.status === 'converted_to_task' && (
             <div className={styles.recCard}>
-              <p className={styles.recAccepted}>Task added — check your task list.</p>
+              <div className={styles.recHeader}>
+                <div className={styles.recBadges}>
+                  <Badge variant="mint">Added to tasks</Badge>
+                  <Badge variant="peach">{recData.recommendation.constraint_dimension?.replace(/_/g, ' ')}</Badge>
+                  {recData.recommendation.constraint_severity && (
+                    <Badge variant={recData.recommendation.constraint_severity === 'critical' ? 'error' : 'lavender'}>
+                      {recData.recommendation.constraint_severity}
+                    </Badge>
+                  )}
+                  {recData.recommendation.expected_impact_confidence && (
+                    <Badge variant={
+                      recData.recommendation.expected_impact_confidence === 'high'   ? 'mint' :
+                      recData.recommendation.expected_impact_confidence === 'medium' ? 'peach' : 'lavender'
+                    }>
+                      {recData.recommendation.expected_impact_confidence} confidence
+                    </Badge>
+                  )}
+                </div>
+              </div>
               <p className={styles.recTitle}>{recData.recommendation.title}</p>
+              <p className={styles.recAction}>{recData.recommendation.specific_action}</p>
+              {recData.recommendation.reasoning && (
+                <p className={styles.recReasoning}>{recData.recommendation.reasoning}</p>
+              )}
+              {recData.recommendation.expected_impact_description && (
+                <p className={styles.recImpact}>
+                  <span className={styles.recImpactLabel}>Expected impact</span>
+                  {recData.recommendation.expected_impact_description}
+                </p>
+              )}
             </div>
           )}
 

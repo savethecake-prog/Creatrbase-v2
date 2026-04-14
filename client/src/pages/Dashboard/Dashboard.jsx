@@ -215,8 +215,8 @@ export function Dashboard() {
     }
   }, []);
 
-  const yt     = platforms.find(p => p.platform === 'youtube');
-  const twitch = platforms.find(p => p.platform === 'twitch');
+  const yt     = platforms.find(p => p.platform === 'youtube'  && p.sync_status !== 'disconnected') ?? null;
+  const twitch = platforms.find(p => p.platform === 'twitch'   && p.sync_status !== 'disconnected') ?? null;
 
 
   const ytSubscribers    = yt?.subscriber_count;
@@ -317,18 +317,27 @@ export function Dashboard() {
         </p>
       </div>
 
-      {!yt && (
+      {(!yt || !twitch) && platforms.length > 0 && (
         <div className={styles.connectBanner}>
           <div className={styles.connectText}>
-            <p className={styles.connectTitle}>YouTube disconnected</p>
+            <p className={styles.connectTitle}>
+              {!yt && !twitch ? 'Platforms disconnected' : !yt ? 'YouTube disconnected' : 'Twitch disconnected'}
+            </p>
             <p className={styles.connectDesc}>
               Reconnect to resume syncing your metrics, score updates, and weekly tasks.
             </p>
           </div>
           <div className={styles.connectActions}>
-            <Button variant="primary" onClick={() => { window.location.href = '/api/connect/youtube'; }}>
-              Reconnect YouTube
-            </Button>
+            {yt ? (
+              <div className={styles.connectedPill}>
+                <span className={styles.connectedDot} />
+                YouTube — {yt.platform_display_name ?? yt.platform_username}
+              </div>
+            ) : (
+              <Button variant="primary" onClick={() => { window.location.href = '/api/connect/youtube'; }}>
+                Reconnect YouTube
+              </Button>
+            )}
             {twitch ? (
               <div className={styles.connectedPill}>
                 <span className={styles.connectedDot} />
@@ -336,7 +345,7 @@ export function Dashboard() {
               </div>
             ) : (
               <Button variant="ghost" onClick={() => { window.location.href = '/api/connect/twitch'; }}>
-                Connect Twitch
+                Reconnect Twitch
               </Button>
             )}
           </div>

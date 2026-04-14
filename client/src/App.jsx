@@ -7,6 +7,7 @@ import { Dashboard }   from './pages/Dashboard/Dashboard';
 import { GapTracker }  from './pages/GapTracker/GapTracker';
 import { Tasks }       from './pages/Tasks/Tasks';
 import { Connections } from './pages/Connections/Connections';
+import { Outreach }    from './pages/Outreach/Outreach';
 
 export default function App() {
   return (
@@ -26,6 +27,9 @@ export default function App() {
           } />
           <Route path="/connections" element={
             <RequireAuth><Connections /></RequireAuth>
+          } />
+          <Route path="/outreach" element={
+            <RequireAuth><Outreach /></RequireAuth>
           } />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>

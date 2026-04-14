@@ -43,6 +43,7 @@ app.register(require('./domains/creator/nicheRoutes'));
 app.register(require('./domains/creator/scoreRoutes'));
 app.register(require('./domains/creator/recommendationRoutes'));
 app.register(require('./domains/creator/taskRoutes'));
+app.register(require('./domains/brands/brandsRoutes'));
 
 // ── Background workers ────────────────────────────────────────────────────────
 

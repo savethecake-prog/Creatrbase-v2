@@ -222,9 +222,9 @@
 /* Coming soon cards */
 .comingGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: var(--s4);
-  max-width: 640px;
+  max-width: 400px;
 }
 
 .comingCard {

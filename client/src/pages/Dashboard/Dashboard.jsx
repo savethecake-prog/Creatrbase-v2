@@ -102,10 +102,6 @@ const MILESTONE_MESSAGES = {
 
 const COMING_SOON = [
   {
-    title: 'Brand Outreach',
-    desc: 'Discover brands actively buying in your niche and send approved outreach emails.',
-  },
-  {
     title: 'Negotiations',
     desc: 'Draft, counter, and track brand deal negotiations with AI-assisted language.',
   },

@@ -264,10 +264,14 @@ async function brandsRoutes(app) {
     }
 
     // ── Parse ──────────────────────────────────────────────────────────────────
+    // Strip markdown code fences if present (```json ... ``` or ``` ... ```)
+    const cleaned = rawOutput.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+
     let parsed;
     try {
-      parsed = JSON.parse(rawOutput);
+      parsed = JSON.parse(cleaned);
     } catch {
+      app.log.error({ rawOutput }, 'Draft pitch JSON parse failed');
       return reply.code(502).send({ error: 'Draft generation returned an unexpected response. Please try again.' });
     }
 

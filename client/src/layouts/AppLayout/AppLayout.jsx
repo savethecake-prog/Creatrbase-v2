@@ -4,6 +4,7 @@ import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
 import { api } from '../../lib/api';
 import { LogoWordmark } from '../../components/ui/LogoWordmark';
+import { SupportChat } from '../../components/ui/SupportChat/SupportChat';
 import styles from './AppLayout.module.css';
 
 async function goToCheckout(plan) {
@@ -154,6 +155,8 @@ export function AppLayout({ children }) {
       <main className={styles.main}>
         {children}
       </main>
+
+      <SupportChat />
     </div>
   );
 }

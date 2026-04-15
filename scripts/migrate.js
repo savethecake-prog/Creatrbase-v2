@@ -30,6 +30,7 @@ const FILES = [
   '013_content_analysis.sql',
   '014_task_metric_baseline.sql',
   '015_avg_views_momentum.sql',
+  '016_support_tickets.sql',
 ];
 
 async function run() {

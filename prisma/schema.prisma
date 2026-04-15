@@ -40,6 +40,7 @@ model Tenant {
   tasks                      Task[]
   engineRuns                 EngineRun[]
   recommendations            Recommendation[]
+  supportTickets             SupportTicket[]
 
   @@map("tenants")
 }
@@ -539,4 +540,19 @@ model BillingEvent {
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("billing_events")
+}
+
+// ─── Support tickets ──────────────────────────────────────────────────────────
+
+model SupportTicket {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  messages  Json     @default("[]")
+  status    String   @default("open")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("support_tickets")
 }

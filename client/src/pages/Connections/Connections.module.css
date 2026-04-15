@@ -168,3 +168,119 @@
 
 .msgSuccess { background: rgba(164, 255, 219, 0.08); border: 1px solid rgba(164, 255, 219, 0.2); color: var(--neon-mint); }
 .msgError { background: rgba(232, 92, 76, 0.08); border: 1px solid rgba(232, 92, 76, 0.2); color: var(--error); }
+
+.msgDismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+  padding: 0;
+  flex-shrink: 0;
+}
+.msgDismiss:hover { opacity: 1; }
+
+/* ── Twitch info modal ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 4, 10, 0.8);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: var(--s6);
+}
+
+.modal {
+  background: #111019;
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.modalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+.modalClose:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.modalEyebrow {
+  font-family: var(--font-data);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--neon-mint);
+  margin-bottom: var(--s3);
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s4);
+  line-height: 1.2;
+}
+
+.modalBody {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--s5);
+}
+
+.modalNote {
+  background: rgba(158, 255, 216, 0.05);
+  border: 1px solid rgba(158, 255, 216, 0.15);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--neon-mint);
+  line-height: 1.6;
+  margin-bottom: var(--s6);
+}
+
+.modalAction {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  background: var(--neon-mint);
+  color: var(--bg-page);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.4);
+}
+.modalAction:hover {
+  background: #6FCFAD;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
+}

@@ -245,6 +245,7 @@ function PlatformCard({ platform, data, onSync, onDisconnect }) {
 export function Connections() {
   const [platforms, setPlatforms] = useState([]);
   const [connectMsg, setConnectMsg] = useState(null);
+  const [showTwitchModal, setShowTwitchModal] = useState(false);
 
   function loadPlatforms() {
     api.get('/connect/platforms')
@@ -262,6 +263,7 @@ export function Connections() {
     if (connected) {
       const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
       setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
+      if (connected === 'twitch') setShowTwitchModal(true);
       window.history.replaceState({}, '', '/connections');
     } else if (error) {
       const ERRORS = {
@@ -307,6 +309,25 @@ export function Connections() {
           <ComingSoonCard key={platform.key} platform={platform} />
         ))}
       </div>
+
+      {showTwitchModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowTwitchModal(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={() => setShowTwitchModal(false)} aria-label="Close">✕</button>
+            <p className={styles.modalEyebrow}>Twitch connected</p>
+            <h2 className={styles.modalTitle}>One thing to know about your live data</h2>
+            <p className={styles.modalBody}>
+              Your follower count, stream hours, and broadcast days will sync automatically every day. However, Twitch's API only exposes your live concurrent viewer count <strong>while you're actively streaming</strong> — historical averages aren't available via the public API.
+            </p>
+            <div className={styles.modalNote}>
+              Next time you go live, hit <strong>Sync now</strong> on this page and we'll capture your viewer count in real time. The more syncs we have during streams, the more accurate your viability score becomes.
+            </div>
+            <button className={styles.modalAction} onClick={() => setShowTwitchModal(false)}>
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

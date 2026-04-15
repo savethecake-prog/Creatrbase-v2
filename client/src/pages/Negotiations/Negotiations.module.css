@@ -1,99 +1,127 @@
-/* ── Header ──────────────────────────────────────────────────────────────────── */
-
 .header {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--s10);
 }
 
 .title {
   font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
-  margin-bottom: var(--space-2);
-  line-height: 1.1;
+  margin-bottom: var(--s2);
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-secondary);
-  line-height: 1.5;
 }
 
-/* ── Section ─────────────────────────────────────────────────────────────────── */
-
 .section {
-  margin-bottom: var(--space-10);
+  margin-bottom: 48px;
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--border);
-  margin-bottom: var(--space-5);
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .sectionTitle {
-  font-size: 11px;
+  font-family: var(--font-display);
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
 }
 
 .sectionCount {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  padding: 1px 8px;
-  border-radius: var(--radius-full);
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--text-muted);
 }
-
-/* ── Deal list ───────────────────────────────────────────────────────────────── */
 
 .dealList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 12px;
 }
 
-/* ── Deal card ───────────────────────────────────────────────────────────────── */
-
+/* Card */
 .card {
   background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
-  gap: var(--space-5);
-  cursor: pointer;
-  width: 100%;
+  gap: 20px;
   text-align: left;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  position: relative;
 }
 
 .card:hover {
-  border-color: var(--agent-brief-border);
-  background: var(--bg-elevated);
+  background: #111019;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(4px);
 }
 
-.cardNegotiating {
-  border-color: var(--agent-brief-border);
+.cardBody {
+  flex: 1;
 }
 
-.cardWon {
-  border-color: var(--success-border);
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
 }
 
-.cardLost {
-  opacity: 0.55;
+.brandName {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
 }
 
-/* Stage dot */
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metaDivider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-disabled);
+}
+
+.cardNotes {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  line-height: 1.4;
+  height: 1.4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 500px;
+}
+
+/* Dots */
 .stageDot {
   width: 10px;
   height: 10px;
@@ -101,138 +129,70 @@
   flex-shrink: 0;
 }
 
-.dotActive      { background: var(--accent); }
-.dotNegotiating { background: var(--agent-brief); }
-.dotWon         { background: var(--success); }
-.dotLost        { background: var(--error); }
+.dotActive { background: var(--neon-peach); box-shadow: 0 0 10px var(--neon-peach); }
+.dotNegotiating { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
+.dotWon { background: var(--neon-mint); box-shadow: 0 0 10px var(--neon-mint); }
+.dotLost { background: var(--error); }
 
-/* Card body */
-.cardBody {
-  flex: 1;
-  min-width: 0;
-}
-
-.cardTop {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.brandName {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.cardMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.metaItem {
-  font-size: 12px;
-  color: var(--text-tertiary);
-}
-
-.metaDivider {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--text-tertiary);
-  flex-shrink: 0;
-}
-
-.cardNotes {
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin-top: var(--space-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 480px;
-}
-
-/* Rate display */
+/* Rate Display */
 .rateDisplay {
-  flex-shrink: 0;
   text-align: right;
+  min-width: 100px;
+  padding-right: 20px;
 }
 
 .rateLabel {
-  font-size: 10px;
+  display: block;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
-  display: block;
+  color: var(--text-muted);
   margin-bottom: 2px;
 }
 
 .rateValue {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--neon-mint);
 }
 
 .chevron {
-  color: var(--text-tertiary);
-  font-size: 14px;
-  flex-shrink: 0;
+  font-size: 20px;
+  color: var(--text-disabled);
+  font-weight: 300;
 }
 
-/* ── Empty / loading states ──────────────────────────────────────────────────── */
-
+/* Empty State */
 .emptyState {
   background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-12) var(--space-8);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 60px 40px;
   text-align: center;
-  max-width: 480px;
 }
 
 .emptyTitle {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
 }
 
 .emptyDesc {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: var(--space-5);
+  margin-bottom: 24px;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
 }
 
 .emptyLink {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.emptyLink:hover {
-  text-decoration: underline;
-}
-
-.loadingHint {
+  color: var(--neon-mint);
   font-size: 14px;
-  color: var(--text-tertiary);
-}
-
-/* ── Responsive ──────────────────────────────────────────────────────────────── */
-
-@media (max-width: 700px) {
-  .card {
-    flex-wrap: wrap;
-  }
-  .rateDisplay {
-    text-align: left;
-  }
+  font-weight: 600;
+  text-decoration: none;
 }

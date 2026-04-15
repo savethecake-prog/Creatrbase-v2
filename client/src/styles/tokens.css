@@ -6,11 +6,23 @@
 
 :root {
   /* ── Backgrounds ── */
-  --bg-page:             #08090C;
-  --bg-surface:          #111318;
-  --bg-elevated:         #181B22;
-  --bg-hover:            #1E222B;
-  --bg-active:           #252A35;
+  --bg-page:             #05040A; /* Deep Void */
+  --bg-surface:          #0A0910; /* Elevated Surface */
+  --bg-elevated:         #111019; /* Further Elevation */
+  --bg-hover:            rgba(255, 255, 255, 0.05);
+  --bg-active:           rgba(255, 255, 255, 0.08);
+
+  /* ── Glassmorphism (Sophisticated) ── */
+  --glass-bg:            rgba(255, 255, 255, 0.03);
+  --glass-border:        rgba(255, 255, 255, 0.08);
+  --glass-blur:          blur(20px);
+  --glass-surface:       rgba(255, 255, 255, 0.02);
+  --glass-stroke:        rgba(255, 255, 255, 0.1);
+  --glass-glow-mint:     0 0 40px rgba(164, 255, 219, 0.1);
+  --glass-glow-purple:   0 0 40px rgba(209, 185, 255, 0.1);
+  --neon-mint:           #A4FFDB;
+  --neon-purple:         #D1B9FF;
+  --neon-peach:          #FF9E7A;
 
   /* ── Text ── */
   --text-primary:        #EDEDE8;
@@ -22,27 +34,27 @@
   --border:              #252A35;
   --border-subtle:       #1A1E27;
 
-  /* ── Accent ── */
-  --accent:              #E8874C;
-  --accent-hover:        #F09B64;
-  --accent-active:       #D67A42;
-  --accent-subtle:       rgba(232, 135, 76, 0.12);
-  --accent-border:       rgba(232, 135, 76, 0.22);
-  --accent-muted:        rgba(232, 135, 76, 0.08);
-  --accent-glow:         rgba(232, 135, 76, 0.05);
+  /* ── Accent (Electric Lavender) ── */
+  --accent:              #D1B9FF; /* Electric Lavender */
+  --accent-hover:        #E2D4FF;
+  --accent-active:       #BA94FF;
+  --accent-subtle:       rgba(209, 185, 255, 0.12);
+  --accent-border:       rgba(209, 185, 255, 0.22);
+  --accent-muted:        rgba(209, 185, 255, 0.08);
+  --accent-glow:         rgba(209, 185, 255, 0.1);
 
-  /* ── Semantic — success ── */
-  --success:             #5BC4A0;
-  --success-subtle:      rgba(91, 196, 160, 0.12);
-  --success-border:      rgba(91, 196, 160, 0.22);
-  --success-muted:       rgba(91, 196, 160, 0.08);
-  --success-glow:        rgba(91, 196, 160, 0.05);
+  /* ── Semantic — success (Neon Mint) ── */
+  --success:             #A4FFDB; /* Neon Mint */
+  --success-subtle:      rgba(164, 255, 219, 0.12);
+  --success-border:      rgba(164, 255, 219, 0.22);
+  --success-muted:       rgba(164, 255, 219, 0.08);
+  --success-glow:        rgba(164, 255, 219, 0.1);
 
-  /* ── Semantic — warning ── */
-  --warning:             #E8C44C;
-  --warning-subtle:      rgba(232, 196, 76, 0.12);
-  --warning-border:      rgba(232, 196, 76, 0.22);
-  --warning-muted:       rgba(232, 196, 76, 0.08);
+  /* ── Semantic — warning (Vibrant Peach) ── */
+  --warning:             #FF9E7A; /* Vibrant Peach */
+  --warning-subtle:      rgba(255, 158, 122, 0.12);
+  --warning-border:      rgba(255, 158, 122, 0.22);
+  --warning-muted:       rgba(255, 158, 122, 0.08);
 
   /* ── Semantic — error ── */
   --error:               #E85C4C;

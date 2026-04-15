@@ -2,11 +2,14 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 12px;
+  font-size: 11px; /* Slightly tighter */
+  font-weight: 700; /* Bolder */
+  padding: 5px 14px;
   border-radius: var(--r-pill);
   line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: transform var(--t-fast), box-shadow var(--t-fast);
 }
 
 .badge.dot::before {
@@ -19,7 +22,25 @@
   flex-shrink: 0;
 }
 
-.mint     { background: var(--success-subtle);      color: var(--success);       border: 1px solid var(--success-border); }
-.peach    { background: var(--accent-subtle);       color: var(--accent);        border: 1px solid var(--accent-border); }
-.lavender { background: var(--agent-brief-subtle);  color: var(--agent-brief);   border: 1px solid var(--agent-brief-border); }
-.error    { background: var(--error-subtle);        color: var(--error);         border: 1px solid var(--error-border); }
+.mint     { 
+  background: var(--success-subtle);      
+  color: var(--success);       
+  border: 1px solid var(--success-border); 
+  box-shadow: 0 0 10px var(--success-glow);
+}
+.peach    { 
+  background: var(--warning-subtle);       
+  color: var(--warning);        
+  border: 1px solid var(--warning-border); 
+}
+.lavender { 
+  background: var(--accent-subtle);  
+  color: var(--accent);   
+  border: 1px solid var(--accent-border); 
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+.error    { 
+  background: var(--error-subtle);        
+  color: var(--error);         
+  border: 1px solid var(--error-border); 
+}

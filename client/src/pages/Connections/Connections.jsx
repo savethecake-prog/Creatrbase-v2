@@ -5,6 +5,85 @@ import { Badge } from '../../components/ui/Badge/Badge';
 import { api } from '../../lib/api';
 import styles from './Connections.module.css';
 
+const COMING_SOON = [
+  {
+    key: 'meta',
+    label: 'Instagram / Meta',
+    description: 'Connect Instagram to track reach, follower growth, and brand partnership eligibility.',
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#fd5949" />
+            <stop offset="50%" stopColor="#d6249f" />
+            <stop offset="100%" stopColor="#285AEB" />
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igGrad)" />
+        <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="2" fill="none" />
+        <circle cx="17.5" cy="6.5" r="1.25" fill="white" />
+      </svg>
+    ),
+  },
+  {
+    key: 'tiktok',
+    label: 'TikTok',
+    description: 'Connect TikTok to surface short-form commercial signal data and brand-fit scores.',
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.89a8.18 8.18 0 004.78 1.52V7a4.85 4.85 0 01-1.01-.31z" />
+      </svg>
+    ),
+  },
+];
+
+function ComingSoonCard({ platform }) {
+  return (
+    <div className={styles.card} style={{ opacity: 0.7 }}>
+      <div className={styles.cardHeader}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ flexShrink: 0 }}>{platform.icon}</div>
+          <div>
+            <p className={styles.platformName}>{platform.label}</p>
+            <p className={styles.platformHandle} style={{ fontStyle: 'italic' }}>Coming Soon</p>
+          </div>
+        </div>
+        <span style={{
+          fontSize: '10px',
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'var(--neon-mint)',
+          background: 'rgba(164, 255, 219, 0.08)',
+          border: '1px solid rgba(164, 255, 219, 0.2)',
+          padding: '3px 10px',
+          borderRadius: '999px',
+        }}>Soon</span>
+      </div>
+      <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+        {platform.description}
+      </p>
+      <button
+        disabled
+        style={{
+          padding: '8px 16px',
+          borderRadius: '999px',
+          border: '1px solid var(--glass-border)',
+          background: 'transparent',
+          color: 'var(--text-muted)',
+          fontSize: '13px',
+          fontWeight: 600,
+          cursor: 'not-allowed',
+          fontFamily: 'var(--font-body)',
+        }}
+      >
+        Connect {platform.label}
+      </button>
+    </div>
+  );
+}
+
+
 const PLATFORMS = [
   {
     key:        'youtube',
@@ -223,6 +302,9 @@ export function Connections() {
             data={platforms.find(p => p.platform === platform.key) ?? null}
             onDisconnect={handleDisconnect}
           />
+        ))}
+        {COMING_SOON.map(platform => (
+          <ComingSoonCard key={platform.key} platform={platform} />
         ))}
       </div>
     </AppLayout>

@@ -2,6 +2,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  background: var(--bg-page);
 }
 
 .panel {
@@ -9,76 +10,139 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: var(--s8) var(--s7);
+  padding: 48px 40px;
 }
 
+/* ── Form Panel ── */
 .formPanel {
-  background: var(--surface-0);
+  background: var(--bg-page);
 }
 
+/* ── Brand Panel (right side) ── */
 .brandPanel {
-  background: var(--cb-purple-bg);
+  background: #0A0910;
   position: relative;
   overflow: hidden;
+  border-left: 1px solid var(--glass-border);
 }
 
+/* Deep ambient glow */
 .brandPanel::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 60% 40%, var(--agent-brief-subtle) 0%, transparent 65%);
+  background:
+    radial-gradient(circle at 65% 35%, rgba(164, 255, 219, 0.08) 0%, transparent 55%),
+    radial-gradient(circle at 30% 70%, rgba(209, 185, 255, 0.07) 0%, transparent 50%);
   pointer-events: none;
+}
+
+/* Grain texture */
+.brandPanel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+/* Glowing horizontal line accent */
+.brandPanel .brandAccentLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(164, 255, 219, 0.3), transparent);
+  transform: translateY(-80px);
 }
 
 .brandContent {
   position: relative;
-  max-width: 400px;
+  max-width: 420px;
   text-align: left;
+  z-index: 10;
 }
 
 .brandTagline {
   font-family: var(--font-display);
-  font-size: 52px;
-  line-height: 1.05;
-  color: var(--cb-mint);
-  margin-bottom: var(--s5);
+  font-size: clamp(36px, 4.5vw, 58px);
+  line-height: 0.95;
+  color: var(--text-primary);
+  margin-bottom: var(--space-8);
+  letter-spacing: -0.03em;
+  font-weight: 900;
 }
 
-.brandTagline span {
-  color: var(--cb-peach);
+.brandTagline em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--neon-mint) 0%, var(--neon-purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .brandSub {
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.65;
   color: var(--text-secondary);
-  max-width: 340px;
+  max-width: 360px;
+  margin-bottom: var(--space-10);
 }
 
+.brandStats {
+  display: flex;
+  gap: 2.5rem;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 2rem;
+}
+
+.brandStat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brandStatNum {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.brandStatLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ── Form Wrap ── */
 .formWrap {
   width: 100%;
   max-width: 400px;
 }
 
 .logoWordmark {
-  height: 48px;
-  width: auto;
-  margin-bottom: var(--s8);
+  margin-bottom: var(--space-12);
   display: block;
 }
 
 .formTitle {
-  font-family: var(--font-body);
-  font-size: 24px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: var(--s2);
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 .formSub {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-muted);
-  margin-bottom: var(--s7);
+  margin-bottom: var(--space-10);
+  line-height: 1.5;
 }
 
 @media (max-width: 768px) {

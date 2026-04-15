@@ -3,6 +3,7 @@ import { AuthProvider } from './lib/AuthContext';
 import { RequireAuth } from './lib/RequireAuth';
 import { Login } from './pages/Login/Login';
 import { Signup } from './pages/Signup/Signup';
+import { Landing } from './pages/Landing/Landing';
 import { Onboarding } from './pages/Onboarding/Onboarding';
 import { Dashboard }   from './pages/Dashboard/Dashboard';
 import { GapTracker }  from './pages/GapTracker/GapTracker';
@@ -10,6 +11,7 @@ import { Tasks }       from './pages/Tasks/Tasks';
 import { Connections } from './pages/Connections/Connections';
 import { Outreach }      from './pages/Outreach/Outreach';
 import { Negotiations }  from './pages/Negotiations/Negotiations';
+import StaticPage from './pages/Static/StaticPage';
 
 export default function App() {
   return (
@@ -18,6 +20,7 @@ export default function App() {
         <Routes>
           <Route path="/login"  element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/:slug" element={<StaticPage />} />
           <Route path="/onboarding" element={
             <RequireAuth><Onboarding /></RequireAuth>
           } />
@@ -39,7 +42,7 @@ export default function App() {
           <Route path="/negotiations" element={
             <RequireAuth><Negotiations /></RequireAuth>
           } />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Landing />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

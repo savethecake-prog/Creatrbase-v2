@@ -16,8 +16,8 @@
 }
 
 .btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: none !important;
+  transform: translate(3px, 3px); /* Collapsing most of the 4px shadow */
+  box-shadow: 1px 1px 0px var(--bg-page) !important;
 }
 
 .btn:disabled {
@@ -54,13 +54,31 @@
 .ghost:hover { background: var(--surface-3); }
 
 .peach {
-  background: var(--cb-peach);
+  background: var(--warning); /* Using the new vibrant peach */
   color: var(--cb-navy);
   padding: 12px 24px;
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-sticker);
 }
-.peach:hover { background: var(--accent-hover); }
+.peach:hover { 
+  background: var(--warning-subtle); 
+  color: var(--warning);
+  box-shadow: 0 0 20px var(--warning-glow);
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  padding: 12px 24px;
+  border-radius: var(--r-pill);
+}
+.glass:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
 /* Sizes */
 .sm { font-size: 12px; padding: 8px 16px; }

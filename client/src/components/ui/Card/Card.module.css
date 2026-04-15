@@ -1,16 +1,27 @@
 .card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
   padding: var(--s6);
-}
-
-.hover {
-  transition: transform var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal);
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--t-normal), box-shadow var(--t-normal), border-color var(--t-normal), background var(--t-normal);
 }
 
 .hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-float);
-  border-color: var(--agent-brief-border);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-float), var(--glass-glow-purple);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Subtle inner glow for that premium feel */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(209, 185, 255, 0.05) 0%, transparent 70%);
+  pointer-events: none;
 }

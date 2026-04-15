@@ -1,16 +1,33 @@
+import React from 'react';
+
 export function LogoWordmark({ className }) {
-  const textStyle = { fontFamily: "'Archivo Black', 'Arial Black', sans-serif", fontSize: 78, fontWeight: 900, fontStyle: 'italic' };
-  
+  const textColor = "#ffffff";
+  const accentColor = "var(--neon-mint)";
+
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 260" className={className}>
-      {Array.from({ length: 21 }).map((_, i) => (
-        <g key={i}>
-          <text x={40 - i} y={188 - i} style={textStyle} fill="none" stroke="#FFFFFF" strokeWidth="18" strokeLinejoin="round">CREATR</text>
-          <text x={372 - i} y={188 - i} style={textStyle} fill="none" stroke="#FFFFFF" strokeWidth="18" strokeLinejoin="round">BASE</text>
-        </g>
-      ))}
-      <text x="20" y="168" style={textStyle} fill="#9EFFD8">CREATR</text>
-      <text x="352" y="168" style={textStyle} fill="#FFBFA3">BASE</text>
-    </svg>
+    <div className={`${className} flex items-center gap-3`} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }}>
+        {/* Pixel-aligned chunky 'C' icon */}
+        <path d="M42 6H6V42H42V34H34V34H14V14H34V14H42V6Z" fill={accentColor} />
+        {/* Architectural 'Base' block - aligned to SVG bottom */}
+        <rect x="0" y="44" width="48" height="4" fill={textColor} fillOpacity="0.8" />
+      </svg>
+      
+      <div style={{ 
+        fontFamily: "var(--font-display)", 
+        fontWeight: '900', 
+        fontSize: '26px', /* Balanced to SVG 48px height */
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        lineHeight: 0.92,
+        color: textColor,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
+      }}>
+        <span>CREATR</span>
+        <span style={{ color: accentColor }}>BASE</span>
+      </div>
+    </div>
   );
 }

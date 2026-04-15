@@ -1,56 +1,19 @@
-.msgSuccess,
-.msgError {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s4);
-  padding: var(--s3) var(--s5);
-  border-radius: var(--r-md);
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: var(--s5);
-}
-
-.msgSuccess {
-  background: var(--success-muted);
-  border: 1px solid var(--success-border);
-  color: var(--success);
-}
-
-.msgError {
-  background: var(--error-muted);
-  border: 1px solid var(--error-border);
-  color: var(--error);
-}
-
-.msgDismiss {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
-  opacity: 0.6;
-  font-size: 12px;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.msgDismiss:hover { opacity: 1; }
-
 .header {
-  margin-bottom: var(--s8);
+  margin-bottom: var(--s10);
 }
 
 .title {
   font-family: var(--font-display);
   font-size: 36px;
-  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   margin-bottom: var(--s2);
 }
 
 .sub {
-  font-size: 15px;
-  color: var(--text-muted);
+  font-size: 16px;
+  color: var(--text-secondary);
 }
 
 /* Grid */
@@ -63,25 +26,29 @@
 
 /* Platform card */
 .card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: var(--s6);
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 32px;
+  transition: all 0.3s ease;
 }
+
+.card:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-4px); }
 
 .cardHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--s4);
-  margin-bottom: var(--s5);
+  margin-bottom: 24px;
 }
 
 .platformName {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--s1);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
 }
 
 .platformHandle {
@@ -89,83 +56,87 @@
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: 8px;
 }
 
 .platformLink {
-  color: var(--text-muted);
+  color: var(--neon-mint);
   text-decoration: none;
   font-size: 12px;
-  opacity: 0.6;
 }
-
-.platformLink:hover { opacity: 1; }
 
 /* Meta rows */
 .metaRow {
   display: flex;
   flex-direction: column;
-  gap: var(--s2);
-  margin-bottom: var(--s5);
+  gap: 8px;
+  margin-bottom: 24px;
 }
 
 .metaItem {
   font-size: 12px;
   color: var(--text-secondary);
   display: flex;
-  gap: var(--s2);
+  gap: 12px;
 }
 
 .metaLabel {
   color: var(--text-muted);
-  font-weight: 600;
-  min-width: 110px;
-  flex-shrink: 0;
+  font-weight: 700;
+  min-width: 100px;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.05em;
 }
 
 /* Metrics */
 .metricsRow {
   display: flex;
-  gap: var(--s6);
-  padding: var(--s4) var(--s5);
-  background: rgba(255,255,255,0.03);
-  border-radius: var(--r-md);
-  margin-bottom: var(--s5);
+  gap: 24px;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  margin-bottom: 24px;
 }
 
 .metric {
   display: flex;
   flex-direction: column;
-  gap: var(--s1);
+  gap: 4px;
 }
 
 .metricValue {
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
   line-height: 1;
 }
 
 .metricLabel {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 /* Sync message */
 .syncMsg {
   font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: var(--s4);
+  color: var(--neon-mint);
+  margin-bottom: 20px;
   font-style: italic;
+  background: rgba(164, 255, 219, 0.05);
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 
 /* Card actions */
 .cardActions {
   display: flex;
   align-items: center;
-  gap: var(--s3);
+  gap: 12px;
   flex-wrap: wrap;
 }
 
@@ -173,25 +144,26 @@
 .confirmRow {
   display: flex;
   align-items: center;
-  gap: var(--s3);
-  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .confirmText {
   font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 500;
+  color: var(--warning);
+  font-weight: 600;
 }
 
-/* Disconnected state */
-.disconnectedState {
+/* Messages */
+.msgSuccess, .msgError {
   display: flex;
-  flex-direction: column;
-  gap: var(--s4);
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 32px;
 }
 
-.disconnectedMsg {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
+.msgSuccess { background: rgba(164, 255, 219, 0.08); border: 1px solid rgba(164, 255, 219, 0.2); color: var(--neon-mint); }
+.msgError { background: rgba(232, 92, 76, 0.08); border: 1px solid rgba(232, 92, 76, 0.2); color: var(--error); }

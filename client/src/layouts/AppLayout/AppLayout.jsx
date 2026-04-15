@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
-import { LogoMonogram } from '../../components/ui/LogoMonogram';
+import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import styles from './AppLayout.module.css';
 
 const NAV = [
@@ -66,19 +66,23 @@ export function AppLayout({ children }) {
   return (
     <div className={styles.layout}>
       <header className={styles.topbar}>
-        <LogoMonogram className={styles.topbarLogo} />
-        <div className={styles.topbarSpacer} />
-        <div className={styles.topbarUserContainer} ref={dropdownRef} style={{ position: 'relative' }}>
-          <button 
-            type="button"
-            className={styles.topbarUser} 
-            onClick={() => setDropdownOpen(!dropdownOpen)} 
-            title="Account"
-            style={{ border: 'none', background: 'transparent', width: '100%' }}
-          >
-            <div className={styles.avatar}>{initials}</div>
-            <span>{displayName || 'Account'}</span>
-          </button>
+        <div className={styles.topbarLeft}>
+          <LogoWordmark className={styles.topbarLogo} />
+        </div>
+        
+        <div className={styles.topbarRight}>
+          <div className={styles.topbarUserContainer} ref={dropdownRef}>
+            <button 
+              type="button"
+              className={styles.topbarUser} 
+              onClick={() => setDropdownOpen(!dropdownOpen)} 
+            >
+              <div className={styles.avatar}>{initials}</div>
+              <span className={styles.userName}>{displayName || 'Account'}</span>
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={styles.chevron}>
+                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
 
           {dropdownOpen && (
             <div className={styles.dropdown}>
@@ -94,6 +98,7 @@ export function AppLayout({ children }) {
               </button>
             </div>
           )}
+          </div>
         </div>
       </header>
 
@@ -103,14 +108,13 @@ export function AppLayout({ children }) {
             <p className={styles.navGroupLabel}>{group}</p>
             {items.map(({ label, to, soon }) => (
               <NavLink
-                key={to}
+                key={label}
                 to={soon ? '#' : to}
                 className={({ isActive }) =>
-                  [styles.navItem, isActive && !soon ? styles.active : ''].filter(Boolean).join(' ')
+                  `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
                 }
               >
                 {label}
-                {soon && <span className={styles.navDot} />}
               </NavLink>
             ))}
           </div>

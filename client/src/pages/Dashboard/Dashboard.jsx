@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
@@ -165,6 +166,7 @@ async function goToPortal() {
 }
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const firstName = user?.displayName?.split(' ')[0] ?? 'there';
   const sub = user?.subscription;

@@ -2,13 +2,74 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 260px 1fr;
-  grid-template-rows: 72px 1fr;
+  grid-template-rows: auto 72px 1fr;
   background: var(--bg-page);
+}
+
+/* ── Trial strip ── */
+.trialStrip {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  background: linear-gradient(90deg, rgba(164, 255, 219, 0.08) 0%, rgba(209, 185, 255, 0.06) 100%);
+  border-bottom: 1px solid rgba(164, 255, 219, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s6);
+  padding: 10px var(--s6);
+  flex-wrap: wrap;
+}
+
+.trialStripText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.trialStripDays {
+  font-weight: 700;
+  color: var(--neon-mint);
+}
+
+.trialStripActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.trialStripBtn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.trialStripBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.trialStripBtnPrimary {
+  background: var(--neon-mint);
+  color: var(--bg-page);
+  border-color: var(--neon-mint);
+}
+
+.trialStripBtnPrimary:hover {
+  background: #6FCFAD;
+  border-color: #6FCFAD;
 }
 
 /* Top bar */
 .topbar {
   grid-column: 1 / -1;
+  grid-row: 2;
   background: var(--bg-page);
   border-bottom: 1px solid var(--glass-border);
   display: flex;
@@ -114,6 +175,7 @@
 
 /* Sidebar */
 .sidebar {
+  grid-row: 3;
   background: var(--bg-surface);
   border-right: 1px solid var(--glass-border);
   padding: var(--s6) var(--s4);
@@ -194,6 +256,7 @@
 
 /* Main */
 .main {
+  grid-row: 3;
   background: var(--bg-page);
   background-image: radial-gradient(
     circle at 60% -10%,

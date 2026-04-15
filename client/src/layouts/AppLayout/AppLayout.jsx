@@ -2,8 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
+import { api } from '../../lib/api';
 import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import styles from './AppLayout.module.css';
+
+async function goToCheckout(plan) {
+  const { url } = await api.post('/billing/checkout', { plan });
+  window.location.href = url;
+}
 
 const NAV = [
   {
@@ -57,6 +63,11 @@ export function AppLayout({ children }) {
     ? displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : '?';
 
+  const sub = user?.subscription;
+  const isTrialling = sub?.status === 'trialling';
+  const trialDaysLeft = sub?.trialDaysLeft ?? null;
+  const showTrialBanner = isTrialling && trialDaysLeft !== null;
+
   async function handleLogout() {
     await logout();
     setUser(null);
@@ -65,6 +76,24 @@ export function AppLayout({ children }) {
 
   return (
     <div className={styles.layout}>
+      {showTrialBanner && (
+        <div className={styles.trialStrip}>
+          <p className={styles.trialStripText}>
+            <span className={styles.trialStripDays}>
+              {trialDaysLeft === 0 ? 'Trial ends today' : `${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''} left on your free trial`}
+            </span>
+            {' '}— upgrade now to keep full access.
+          </p>
+          <div className={styles.trialStripActions}>
+            <button className={styles.trialStripBtn} onClick={() => goToCheckout('core')}>
+              Core £10/mo
+            </button>
+            <button className={`${styles.trialStripBtn} ${styles.trialStripBtnPrimary}`} onClick={() => goToCheckout('pro')}>
+              Pro £20/mo
+            </button>
+          </div>
+        </div>
+      )}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
           <LogoWordmark className={styles.topbarLogo} />

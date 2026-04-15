@@ -155,22 +155,10 @@ const CONNECT_ERRORS = {
   twitch_already_claimed: 'That Twitch account is already connected to another Creatrbase account.',
 };
 
-async function goToCheckout(plan) {
-  const { url } = await api.post('/billing/checkout', { plan });
-  window.location.href = url;
-}
-
-async function goToPortal() {
-  const { url } = await api.post('/billing/portal', {});
-  window.location.href = url;
-}
-
 export function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const firstName = user?.displayName?.split(' ')[0] ?? 'there';
-  const sub = user?.subscription;
-  const isTrialling = sub?.status === 'trialling';
 
   const [platforms, setPlatforms]       = useState([]);
   const [platformsLoaded, setPlatformsLoaded] = useState(false);
@@ -270,23 +258,6 @@ export function Dashboard() {
 
   return (
     <AppLayout>
-      {isTrialling && sub.trialDaysLeft !== null && (
-        <div className={styles.trialBanner}>
-          <p className={styles.trialText}>
-            <strong>{sub.trialDaysLeft} day{sub.trialDaysLeft !== 1 ? 's' : ''} left</strong> on your free trial.
-            Upgrade to keep full access after your trial ends.
-          </p>
-          <div className={styles.trialActions}>
-            <Button size="sm" variant="secondary" onClick={() => goToCheckout('core')}>
-              Core — £10/mo
-            </Button>
-            <Button size="sm" onClick={() => goToCheckout('pro')}>
-              Pro — £20/mo
-            </Button>
-          </div>
-        </div>
-      )}
-
       {showWelcome && scoreData?.score && (
         <div className={styles.welcomeBanner}>
           <div className={styles.welcomeContent}>

@@ -31,7 +31,7 @@ async function billingRoutes(app) {
     }
 
     const url = await createCheckoutSession({
-      stripeCustomerId: sub.stripe_customer_id,
+      stripeCustomerId: sub.stripeCustomerId,
       priceId,
       tenantId:    req.user.tenantId,
       successUrl:  `${APP_URL}/dashboard?upgraded=1`,
@@ -49,7 +49,7 @@ async function billingRoutes(app) {
     }
 
     const url = await createPortalSession({
-      stripeCustomerId: sub.stripe_customer_id,
+      stripeCustomerId: sub.stripeCustomerId,
       returnUrl:        `${APP_URL}/dashboard`,
     });
 

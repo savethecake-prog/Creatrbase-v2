@@ -115,6 +115,7 @@ export function AppLayout({ children }) {
                 }
               >
                 {label}
+                {soon && <span className={styles.navSoon}>Soon</span>}
               </NavLink>
             ))}
           </div>

@@ -29,7 +29,7 @@
 }
 
 .input:focus {
-  border-color: var(--cb-lavender);
+  border-color: var(--accent);
 }
 
 .input.error {

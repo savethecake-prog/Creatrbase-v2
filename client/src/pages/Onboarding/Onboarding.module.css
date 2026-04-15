@@ -118,19 +118,25 @@
   display: block;
   width: 100%;
   padding: var(--space-3) var(--space-5);
-  background: var(--accent);
-  color: #fff;
+  background: var(--neon-mint);
+  color: var(--bg-page);
   font-size: 14px;
-  font-weight: 600;
-  border-radius: var(--radius-md);
+  font-weight: 700;
+  border-radius: var(--radius-full);
   text-align: center;
   text-decoration: none;
-  transition: opacity var(--transition-fast);
+  box-shadow: 4px 4px 0px var(--bg-page);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
   margin-bottom: var(--space-3);
 }
 
 .connectBtn:hover {
-  opacity: 0.88;
+  background: #6FCFAD;
+}
+
+.connectBtn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px var(--bg-page);
 }
 
 .connectSecurity {

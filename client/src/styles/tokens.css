@@ -55,6 +55,7 @@
   --warning-subtle:      rgba(255, 158, 122, 0.12);
   --warning-border:      rgba(255, 158, 122, 0.22);
   --warning-muted:       rgba(255, 158, 122, 0.08);
+  --warning-glow:        rgba(255, 158, 122, 0.1);
 
   /* ── Semantic — error ── */
   --error:               #E85C4C;
@@ -100,6 +101,7 @@
   --font-display:        'Outfit', sans-serif;
   --font-body:           'DM Sans', sans-serif;
   --font-mono:           'JetBrains Mono', monospace;
+  --font-data:           var(--font-mono); /* uppercase labels, nav, data chips */
 
   /* ── Border radius ── */
   --radius-sm:           8px;

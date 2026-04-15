@@ -53,6 +53,18 @@
 }
 .ghost:hover { background: var(--surface-3); }
 
+.outline {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 11px 23px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--glass-border);
+}
+.outline:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
 .peach {
   background: var(--warning); /* Using the new vibrant peach */
   color: var(--cb-navy);
@@ -60,8 +72,8 @@
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-sticker);
 }
-.peach:hover { 
-  background: var(--warning-subtle); 
+.peach:hover {
+  background: var(--warning-subtle);
   color: var(--warning);
   box-shadow: 0 0 20px var(--warning-glow);
 }

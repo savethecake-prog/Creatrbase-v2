@@ -17,6 +17,8 @@ const { encrypt, decrypt }                 = require('../../lib/crypto');
 const { refreshAccessToken, getChannelStats,
         getWatchHours12Months,
         getExtendedAnalytics }             = require('../../services/youtube');
+const { refreshTwitchToken,
+        getTwitchChannelMetrics }          = require('../../services/twitch');
 const { getDataCollectionQueue }           = require('../queue');
 
 function startPlatformSyncWorker() {
@@ -48,18 +50,22 @@ function startPlatformSyncWorker() {
         if (!profile.refreshToken) {
           throw new Error(`Token expired for profile ${platformProfileId} and no refresh token`);
         }
-        const refreshed = await refreshAccessToken(decrypt(profile.refreshToken));
+
+        const refreshed = profile.platform === 'twitch'
+          ? await refreshTwitchToken(decrypt(profile.refreshToken))
+          : await refreshAccessToken(decrypt(profile.refreshToken));
 
         await tx.creatorPlatformProfile.update({
           where: { id: platformProfileId },
           data:  {
             accessToken:     encrypt(refreshed.accessToken),
+            refreshToken:    refreshed.refreshToken ? encrypt(refreshed.refreshToken) : undefined,
             tokenExpiresAt:  refreshed.expiresAt,
           },
         });
 
         accessToken = refreshed.accessToken;
-        job.log(`Token refreshed; new expiry ${refreshed.expiresAt.toISOString()}`);
+        job.log(`Token refreshed; new expiry ${refreshed.expiresAt?.toISOString() ?? 'unknown'}`);
       }
 
       if (profile.platform === 'youtube') {
@@ -115,6 +121,52 @@ function startPlatformSyncWorker() {
           `, avg_views_90d=${extended.avgViewsPerVideo90d ?? 'n/a'}` +
           `, uploads_90d=${extended.publicUploads90d ?? 'n/a'}` +
           `, geo=${extended.primaryAudienceGeo ?? 'n/a'}`
+        );
+      } else if (profile.platform === 'twitch') {
+        const platformUserId = await (async () => {
+          const p = await tx.creatorPlatformProfile.findUnique({
+            where:  { id: platformProfileId },
+            select: { platformUserId: true },
+          });
+          return p?.platformUserId;
+        })();
+
+        if (!platformUserId) throw new Error(`No platformUserId for Twitch profile ${platformProfileId}`);
+
+        const metrics = await getTwitchChannelMetrics(accessToken, platformUserId);
+
+        await tx.creatorPlatformProfile.update({
+          where: { id: platformProfileId },
+          data:  {
+            subscriberCount:        metrics.followerCount,
+            twitchAffiliate:        metrics.twitchAffiliate,
+            twitchPartner:          metrics.twitchPartner,
+            streamHours30d:         metrics.streamHours30d,
+            uniqueBroadcastDays30d: metrics.uniqueBroadcastDays30d,
+            avgConcurrentViewers30d: metrics.avgConcurrentViewers30d,
+            analyticsLastSyncedAt:  new Date(),
+            syncStatus:             'active',
+            lastSyncedAt:           new Date(),
+          },
+        });
+
+        await tx.platformMetricsSnapshot.create({
+          data: {
+            tenantId:               profile.tenantId,
+            platformProfileId,
+            platform:               'twitch',
+            subscriberCount:        metrics.followerCount,
+            avgConcurrentViewers30d: metrics.avgConcurrentViewers30d,
+          },
+        });
+
+        job.log(
+          `Twitch sync complete: ${metrics.followerCount} followers` +
+          `, affiliate=${metrics.twitchAffiliate}` +
+          `, partner=${metrics.twitchPartner}` +
+          `, stream_hours_30d=${metrics.streamHours30d ?? 'n/a'}` +
+          `, broadcast_days_30d=${metrics.uniqueBroadcastDays30d ?? 'n/a'}` +
+          `, avg_concurrent=${metrics.avgConcurrentViewers30d ?? 'n/a (not live)'}`
         );
       } else {
         job.log(`Skipping unsupported platform: ${profile.platform}`);

@@ -295,7 +295,7 @@ function startEmailDigestWorker() {
 
     const resend = getResend();
     const result = await resend.emails.send({
-      from:    'Creatrbase <digest@creatrbase.com>',
+      from:    'Creatrbase <digest@dashboard.creatrbase.com>',
       to:      email,
       subject: `Your weekly digest — score ${currentScore ?? '?'}/100`,
       html,

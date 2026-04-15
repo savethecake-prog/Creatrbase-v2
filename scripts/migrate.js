@@ -29,6 +29,7 @@ const FILES = [
   '012_platform_metrics_snapshots.sql',
   '013_content_analysis.sql',
   '014_task_metric_baseline.sql',
+  '015_avg_views_momentum.sql',
 ];
 
 async function run() {

@@ -145,7 +145,9 @@ async function platformConnectRoutes(app) {
       // connected a platform before. Any other step means they've been through
       // the flow already (including reconnecting after a disconnect).
       const isFirstEverConnect = !creator || creator.onboardingStep === 'account_created';
-      return reply.redirect(isFirstEverConnect ? '/onboarding' : '/dashboard?connected=youtube');
+      // New users → onboarding processing screen
+      // Existing users → connections page so panels update immediately
+      return reply.redirect(isFirstEverConnect ? '/onboarding' : '/connections?connected=youtube');
     });
 
   } else {
@@ -238,7 +240,7 @@ async function platformConnectRoutes(app) {
         throw err;
       }
 
-      return reply.redirect('/dashboard?connected=twitch');
+      return reply.redirect('/connections?connected=twitch');
     });
 
   } else {

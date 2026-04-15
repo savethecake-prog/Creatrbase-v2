@@ -1,3 +1,41 @@
+.msgSuccess,
+.msgError {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: var(--s3) var(--s5);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: var(--s5);
+}
+
+.msgSuccess {
+  background: var(--success-muted);
+  border: 1px solid var(--success-border);
+  color: var(--success);
+}
+
+.msgError {
+  background: var(--error-muted);
+  border: 1px solid var(--error-border);
+  color: var(--error);
+}
+
+.msgDismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  font-size: 12px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.msgDismiss:hover { opacity: 1; }
+
 .header {
   margin-bottom: var(--s8);
 }

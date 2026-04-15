@@ -168,12 +168,14 @@ export function Connections() {
   const [connectMsg, setConnectMsg] = useState(null);
 
   function loadPlatforms() {
-    api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+    api.get('/connect/platforms')
+      .then(({ platforms }) => setPlatforms(platforms))
+      .catch((err) => {
+        setConnectMsg({ type: 'error', text: `Failed to load platform status (${err.status ?? 'network error'}). Refresh to retry.` });
+      });
   }
 
   useEffect(() => {
-    loadPlatforms();
-
     // Handle ?connected= and ?connect_error= params on return from OAuth
     const params    = new URLSearchParams(window.location.search);
     const connected = params.get('connected');
@@ -182,7 +184,6 @@ export function Connections() {
       const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
       setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
       window.history.replaceState({}, '', '/connections');
-      loadPlatforms();
     } else if (error) {
       const ERRORS = {
         youtube_already_claimed: 'That YouTube channel is already connected to another Creatrbase account.',
@@ -191,6 +192,7 @@ export function Connections() {
       setConnectMsg({ type: 'error', text: ERRORS[error] ?? 'Connection failed. Please try again.' });
       window.history.replaceState({}, '', '/connections');
     }
+    loadPlatforms();
   }, []);
 
   function handleDisconnect(platformKey) {

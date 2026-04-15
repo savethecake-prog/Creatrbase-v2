@@ -101,8 +101,8 @@ async function authRoutes(app) {
       }),
     ]);
 
-    const trialDaysLeft = sub?.trial_end
-      ? Math.max(0, Math.ceil((new Date(sub.trial_end) - new Date()) / (1000 * 60 * 60 * 24)))
+    const trialDaysLeft = sub?.trialEnd
+      ? Math.max(0, Math.ceil((new Date(sub.trialEnd) - new Date()) / (1000 * 60 * 60 * 24)))
       : null;
 
     return {
@@ -113,10 +113,10 @@ async function authRoutes(app) {
       onboardingStep: creator?.onboardingStep ?? null,
       subscription: sub ? {
         status:        sub.status,
-        planName:      sub.plan_name,
-        trialEnd:      sub.trial_end,
+        planName:      sub.plan?.name ?? null,
+        trialEnd:      sub.trialEnd,
         trialDaysLeft,
-        features:      sub.features,
+        features:      sub.plan?.features ?? null,
       } : null,
     };
   });

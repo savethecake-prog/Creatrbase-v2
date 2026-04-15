@@ -30,6 +30,7 @@
 }
 
 .topbarUser {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--s3);
@@ -43,6 +44,39 @@
 
 .topbarUser:hover {
   background: var(--surface-2);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + var(--s2));
+  right: 0;
+  width: 160px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.dropdownItem {
+  padding: var(--s2) var(--s3);
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  text-align: left;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background var(--t-normal), color var(--t-normal);
+}
+
+.dropdownItem:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
 }
 
 .avatar {

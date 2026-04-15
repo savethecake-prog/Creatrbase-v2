@@ -1,4 +1,4 @@
-import logoMonogram from '../../assets/logo-monogram.svg';
+import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import styles from './AuthLayout.module.css';
 
 export function AuthLayout({ children, title, subtitle }) {
@@ -6,7 +6,7 @@ export function AuthLayout({ children, title, subtitle }) {
     <div className={styles.layout}>
       <div className={`${styles.panel} ${styles.formPanel}`}>
         <div className={styles.formWrap}>
-          <img src={logoMonogram} alt="Creatrbase" className={styles.logo} />
+          <LogoWordmark className={styles.logoWordmark} />
           <h1 className={styles.formTitle}>{title}</h1>
           {subtitle && <p className={styles.formSub}>{subtitle}</p>}
           {children}

@@ -60,10 +60,9 @@
   max-width: 400px;
 }
 
-.logo {
-  height: 40px;
-  width: 40px;
-  border-radius: var(--radius-sm);
+.logoWordmark {
+  height: 48px;
+  width: auto;
   margin-bottom: var(--s8);
   display: block;
 }

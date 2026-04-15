@@ -53,6 +53,7 @@ require('./jobs/workers/platformSync').startPlatformSyncWorker();
 require('./jobs/workers/contentAnalysis').startContentAnalysisWorker();
 require('./jobs/workers/viabilityScoring').startViabilityScoringWorker();
 require('./jobs/workers/recommendationEngine').startRecommendationEngineWorker();
+require('./jobs/workers/emailDigest').startEmailDigestWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

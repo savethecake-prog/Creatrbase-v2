@@ -95,6 +95,15 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
   const [history,     setHistory]     = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
+  // AI draft state
+  const [aiContext,    setAiContext]    = useState('opening_position');
+  const [aiDeliverable, setAiDeliverable] = useState('sponsored integration');
+  const [aiOfferAmt,   setAiOfferAmt]   = useState('');
+  const [aiOfferTerms, setAiOfferTerms] = useState('');
+  const [aiLoading,    setAiLoading]    = useState(false);
+  const [aiError,      setAiError]      = useState(null);
+  const [draftMeta,    setDraftMeta]    = useState(null); // { toneNotes, keyPositions, draftNotes }
+
   // Pre-fill template when switching to compose
   useEffect(() => {
     if (tab === 'compose' && !template) {
@@ -158,6 +167,33 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
       // best-effort
     } finally {
       setUpdatingStatus(false);
+    }
+  }
+
+  async function handleAiDraft() {
+    setAiLoading(true);
+    setAiError(null);
+    setDraftMeta(null);
+    try {
+      const payload = {
+        negotiationContext: aiContext,
+        deliverableType:    aiDeliverable,
+      };
+      if (aiContext === 'counter_response') {
+        payload.brandOfferAmount = aiOfferAmt ? Math.round(parseFloat(aiOfferAmt) * 100) : null;
+        payload.brandOfferTerms  = aiOfferTerms;
+      }
+      const result = await api.post(`/brands/${brand.id}/draft-pitch`, payload);
+      setTemplate(`Subject: ${result.subjectLine}\n\n${result.emailBody}`);
+      setDraftMeta({
+        toneNotes:    result.toneNotes,
+        keyPositions: result.keyPositions ?? [],
+        draftNotes:   result.draftNotes,
+      });
+    } catch (err) {
+      setAiError(err?.data?.error ?? 'Draft generation failed. Please try again.');
+    } finally {
+      setAiLoading(false);
     }
   }
 
@@ -302,12 +338,79 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
                 )}
               </p>
 
+              {/* AI draft panel */}
+              <div className={styles.aiPanel}>
+                <p className={styles.aiPanelTitle}>Draft with AI</p>
+                <div className={styles.aiFields}>
+                  <div className={styles.aiField}>
+                    <label className={styles.aiLabel}>Context</label>
+                    <select className={styles.aiSelect} value={aiContext} onChange={e => setAiContext(e.target.value)}>
+                      <option value="opening_position">Opening pitch</option>
+                      <option value="counter_response">Counter offer</option>
+                      <option value="scope_management">Scope change</option>
+                    </select>
+                  </div>
+                  <div className={styles.aiField}>
+                    <label className={styles.aiLabel}>Deliverable</label>
+                    <input
+                      className={styles.aiInput}
+                      value={aiDeliverable}
+                      onChange={e => setAiDeliverable(e.target.value)}
+                      placeholder="e.g. 60s integration"
+                    />
+                  </div>
+                  {aiContext === 'counter_response' && (
+                    <>
+                      <div className={styles.aiField}>
+                        <label className={styles.aiLabel}>Their offer (£)</label>
+                        <input
+                          className={styles.aiInput}
+                          type="number"
+                          min="0"
+                          value={aiOfferAmt}
+                          onChange={e => setAiOfferAmt(e.target.value)}
+                          placeholder="e.g. 500"
+                        />
+                      </div>
+                      <div className={styles.aiField}>
+                        <label className={styles.aiLabel}>Offer terms</label>
+                        <input
+                          className={styles.aiInput}
+                          value={aiOfferTerms}
+                          onChange={e => setAiOfferTerms(e.target.value)}
+                          placeholder="e.g. 1 video, 30d exclusivity"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+                {aiError && <p className={styles.aiError}>{aiError}</p>}
+                <button className={styles.aiGenerateBtn} onClick={handleAiDraft} disabled={aiLoading}>
+                  {aiLoading ? 'Generating…' : 'Generate draft →'}
+                </button>
+              </div>
+
               <textarea
                 className={styles.templateArea}
                 value={template}
                 onChange={e => setTemplate(e.target.value)}
                 spellCheck
               />
+
+              {draftMeta && (
+                <div className={styles.draftNotes}>
+                  <p className={styles.draftNotesLabel}>Draft notes</p>
+                  {draftMeta.toneNotes && <p className={styles.draftNotesText}>{draftMeta.toneNotes}</p>}
+                  {draftMeta.keyPositions.length > 0 && (
+                    <div className={styles.draftPositions}>
+                      {draftMeta.keyPositions.map((p, i) => (
+                        <p key={i} className={styles.draftPosition}>{p}</p>
+                      ))}
+                    </div>
+                  )}
+                  {draftMeta.draftNotes && <p className={styles.draftNotesText}>{draftMeta.draftNotes}</p>}
+                </div>
+              )}
 
               <div className={styles.composeActions}>
                 <button

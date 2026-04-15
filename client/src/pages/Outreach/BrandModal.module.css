@@ -432,3 +432,144 @@
   border-color: var(--border);
   background: var(--bg-hover);
 }
+
+/* ── AI draft panel ───────────────────────────────────────────────────────── */
+
+.aiPanel {
+  background: rgba(158, 255, 216, 0.04);
+  border: 1px solid rgba(158, 255, 216, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aiPanelTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--neon-mint);
+}
+
+.aiFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.aiField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.aiFieldFull {
+  grid-column: 1 / -1;
+}
+
+.aiLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.aiSelect,
+.aiInput {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+.aiSelect:focus,
+.aiInput:focus {
+  border-color: rgba(158, 255, 216, 0.4);
+}
+.aiSelect option {
+  background: #111019;
+}
+
+.aiGenerateBtn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  background: var(--neon-mint);
+  color: var(--bg-page);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+  box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+}
+.aiGenerateBtn:hover:not(:disabled) {
+  background: #6FCFAD;
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+}
+.aiGenerateBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+}
+
+.aiError {
+  font-size: 12px;
+  color: var(--error);
+}
+
+/* AI draft notes card */
+.draftNotes {
+  background: rgba(200, 170, 255, 0.05);
+  border: 1px solid rgba(200, 170, 255, 0.15);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.draftNotesLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--neon-purple);
+}
+
+.draftNotesText {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.draftPositions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.draftPosition {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding-left: 12px;
+  position: relative;
+}
+.draftPosition::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--neon-purple);
+}

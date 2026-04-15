@@ -16,8 +16,11 @@ The negotiation_context field in the input tells you which one to write.
 NEGOTIATION CONTEXTS
 --------------------
 opening_position:
-  The creator is about to initiate a rate discussion or respond to a first contact.
-  The draft should state their position with reasoning. Not aggressive. Confident.
+  The creator is initiating contact with the brand. They are reaching out first.
+  Do NOT open with "Thanks for reaching out", "Thanks for your message", or any
+  phrase that implies the brand contacted the creator first. The creator is the
+  one making first contact. Open by introducing yourself and your purpose directly.
+  The draft should state their rate position with reasoning. Not aggressive. Confident.
 
 counter_response:
   The brand has made an offer. The creator is responding.

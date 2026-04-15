@@ -190,7 +190,7 @@ export function Dashboard() {
   useEffect(() => {
     api.get('/connect/platforms')
       .then(({ platforms }) => { setPlatforms(platforms); setPlatformsLoaded(true); })
-      .catch(() => setPlatformsLoaded(true));
+      .catch((err) => { setPlatformsLoaded(true); setConnectMsg({ type: 'error', text: `Could not load platform status (${err.status ?? 'network error'}). Refresh to retry.` }); });
     api.get('/creator/niche').then(setNiche).catch(() => {});
     api.get('/creator/score').then(setScoreData).catch(() => {});
     api.get('/creator/recommendation').then(setRecData).catch(() => {});
@@ -211,7 +211,7 @@ export function Dashboard() {
       const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
       setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
       window.history.replaceState({}, '', '/dashboard');
-      api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch(() => {});
+      api.get('/connect/platforms').then(({ platforms }) => setPlatforms(platforms)).catch((err) => { setConnectMsg({ type: 'error', text: `Could not load platform status (${err.status ?? 'network error'}). Refresh to retry.` }); });
     } else if (error) {
       setConnectMsg({ type: 'error', text: CONNECT_ERRORS[error] ?? 'Connection failed. Please try again.' });
       window.history.replaceState({}, '', '/dashboard');

@@ -50,6 +50,8 @@ export function Landing() {
         <div className={styles.navInner}>
           <LogoWordmark className={styles.logo} />
           <div className={styles.navLinks}>
+            <Link to="/scoring-explained" className={styles.navLink}>How it works</Link>
+            <Link to="/blog" className={styles.navLink}>Blog</Link>
             <Link to="/login" className={styles.navLink}>Login</Link>
             <Button variant="primary" size="sm" onClick={() => navigate('/signup')}>
               Sign Up

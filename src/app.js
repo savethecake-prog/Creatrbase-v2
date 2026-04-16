@@ -57,6 +57,7 @@ require('./jobs/workers/viabilityScoring').startViabilityScoringWorker();
 require('./jobs/workers/recommendationEngine').startRecommendationEngineWorker();
 require('./jobs/workers/emailDigest').startEmailDigestWorker();
 require('./jobs/workers/gmailSync').startGmailSyncWorker();
+require('./jobs/workers/taskCadence').startTaskCadenceWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

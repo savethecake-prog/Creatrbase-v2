@@ -184,6 +184,8 @@ function startPlatformSyncWorker() {
         creatorId:   synced.creatorId,
         triggerType: 'platform_sync',
       });
+      // Seed default maintenance templates on first sync (no-op if already seeded)
+      await queue.add('task:seed-templates', { creatorId: synced.creatorId });
     }
   });
 

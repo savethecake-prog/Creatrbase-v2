@@ -12,6 +12,9 @@ import { Connections } from './pages/Connections/Connections';
 import { Outreach }      from './pages/Outreach/Outreach';
 import { Negotiations }  from './pages/Negotiations/Negotiations';
 import StaticPage from './pages/Static/StaticPage';
+import { ScoringMethodology } from './pages/ScoringMethodology/ScoringMethodology';
+import { BlogIndex }    from './pages/Blog/BlogIndex';
+import { BlogArticle }  from './pages/Blog/BlogArticle';
 
 export default function App() {
   return (
@@ -20,6 +23,9 @@ export default function App() {
         <Routes>
           <Route path="/login"  element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/scoring-explained" element={<ScoringMethodology />} />
+          <Route path="/blog"        element={<BlogIndex />} />
+          <Route path="/blog/:slug"  element={<BlogArticle />} />
           <Route path="/:slug" element={<StaticPage />} />
           <Route path="/onboarding" element={
             <RequireAuth><Onboarding /></RequireAuth>

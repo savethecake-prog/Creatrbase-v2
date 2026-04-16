@@ -1,8 +1,70 @@
 'use strict';
 
 const { resolveChannelId, getPublicChannelStats } = require('../../services/publicYoutube');
+const { prisma } = require('../../lib/prisma');
+
+const BASE_URL = 'https://creatrbase.com';
+
+const STATIC_PAGES = [
+  { url: '/',                  changefreq: 'weekly',  priority: '1.0' },
+  { url: '/scoring-explained', changefreq: 'monthly', priority: '0.8' },
+  { url: '/blog',              changefreq: 'daily',   priority: '0.9' },
+  { url: '/privacy',           changefreq: 'yearly',  priority: '0.3' },
+  { url: '/terms',             changefreq: 'yearly',  priority: '0.3' },
+];
+
+function xmlEscape(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
 
 async function publicRoutes(app) {
+
+  // GET /sitemap.xml — dynamic sitemap combining static pages + published blog posts
+  app.get('/sitemap.xml', async (_request, reply) => {
+    let blogPosts = [];
+    try {
+      blogPosts = await prisma.blogPost.findMany({
+        where:   { status: 'published' },
+        orderBy: { publishedAt: 'desc' },
+        select:  { slug: true, publishedAt: true, updatedAt: true },
+      });
+    } catch (_) {
+      // DB unavailable — still serve static entries
+    }
+
+    const urls = [
+      ...STATIC_PAGES.map(p => ({
+        loc:        `${BASE_URL}${p.url}`,
+        changefreq: p.changefreq,
+        priority:   p.priority,
+        lastmod:    new Date().toISOString().slice(0, 10),
+      })),
+      ...blogPosts.map(p => ({
+        loc:        `${BASE_URL}/blog/${xmlEscape(p.slug)}`,
+        changefreq: 'monthly',
+        priority:   '0.7',
+        lastmod:    (p.updatedAt || p.publishedAt || new Date()).toISOString().slice(0, 10),
+      })),
+    ];
+
+    const xml = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+      ...urls.map(u =>
+        `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${u.lastmod}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`
+      ),
+      '</urlset>',
+    ].join('\n');
+
+    return reply.type('application/xml').send(xml);
+  });
+
+
   // GET /api/public/youtube-check?url=...
   app.get('/api/public/youtube-check', async (request, reply) => {
     const { url } = request.query;

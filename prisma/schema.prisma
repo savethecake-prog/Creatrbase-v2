@@ -584,3 +584,41 @@ model GmailConnection {
 
   @@map("gmail_connections")
 }
+
+// ─── Blog ─────────────────────────────────────────────────────────────────────
+
+model BlogCategory {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String   @unique
+  name        String
+  description String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  posts BlogPost[]
+
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug           String    @unique
+  title          String
+  excerpt        String?
+  bodyHtml       String?   @map("body_html")
+  bodyMarkdown   String?   @map("body_markdown")
+  coverImageUrl  String?   @map("cover_image_url")
+  categoryId     String?   @map("category_id") @db.Uuid
+  authorName     String    @default("Creatrbase") @map("author_name")
+  authorAvatar   String?   @map("author_avatar")
+  status         String    @default("draft")
+  featured       Boolean   @default(false)
+  readingTimeMin Int?      @map("reading_time_min")
+  publishedAt    DateTime? @map("published_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  category BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("blog_posts")
+}

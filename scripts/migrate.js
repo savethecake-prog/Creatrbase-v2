@@ -35,6 +35,7 @@ const FILES = [
   '018_creator_tags.sql',
   '019_tiktok.sql',
   '020_instagram.sql',
+  '021_create_blog.sql',
 ];
 
 async function run() {

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
+import { HintCallout } from '../../components/ui/HintCallout/HintCallout';
 import { api } from '../../lib/api';
 import styles from './Tasks.module.css';
 
@@ -220,6 +221,13 @@ export function Tasks() {
 
   return (
     <AppLayout>
+      <HintCallout
+        storageKey="cb_hint_tasks_v1"
+        eyebrow="How tasks work"
+        heading="Two types of task. Both move your score."
+      >
+        <strong style={{ color: 'var(--text-primary)' }}>AI-generated tasks</strong> target your single biggest constraint — accepted from the Dashboard recommendation. <strong style={{ color: 'var(--text-primary)' }}>Maintenance tasks</strong> run on a weekly/monthly cadence and keep your fundamentals healthy. Complete them — your score updates on next sync.
+      </HintCallout>
       <div className={styles.header}>
         <h1 className={styles.title}>Tasks</h1>
         {active.length > 0 && (

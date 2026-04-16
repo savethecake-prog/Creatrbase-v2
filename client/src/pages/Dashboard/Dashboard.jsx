@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
+import { HintCallout } from '../../components/ui/HintCallout/HintCallout';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import styles from './Dashboard.module.css';
@@ -459,6 +460,13 @@ export function Dashboard() {
       {scoreData && scoreData.status === 'ready' && scoreData.score && (
         <div className={styles.scoreSection}>
           <p className={styles.sectionTitle}>Commercial Viability</p>
+          <HintCallout
+            storageKey="cb_hint_score_v1"
+            eyebrow="How your score works"
+            heading="Four tiers. Each one unlocks more."
+          >
+            Emerging (0–24) builds the baseline. Viable (25–49) opens gifting and early outreach. Established (50–74) unlocks paid integrations and rate negotiation. Portfolio (75+) puts you in front of agencies. Your score updates after every sync.
+          </HintCallout>
           <div className={styles.scoreCard}>
             <div className={styles.scoreMain}>
               <div className={styles.scoreCircle}>

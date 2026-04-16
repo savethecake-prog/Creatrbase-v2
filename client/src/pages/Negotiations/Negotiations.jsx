@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Badge } from '../../components/ui/Badge/Badge';
+import { HintCallout } from '../../components/ui/HintCallout/HintCallout';
 import { DealModal } from './DealModal';
 import { api } from '../../lib/api';
 import styles from './Negotiations.module.css';
@@ -153,6 +154,13 @@ export function Negotiations() {
 
   return (
     <AppLayout>
+      <HintCallout
+        storageKey="cb_hint_negotiations_v1"
+        eyebrow="How this works"
+        heading="Log every deal. Never let one go cold."
+      >
+        Add a deal when you start any brand conversation — outreach sent, reply received, negotiating, or closed. Creatrbase tracks the timeline and sends you a nudge if a deal goes quiet for 7+ days. Completed deals count towards your commercial viability score.
+      </HintCallout>
       <div className={styles.header}>
         <h1 className={styles.title}>Negotiations</h1>
         <p className={styles.subtitle}>

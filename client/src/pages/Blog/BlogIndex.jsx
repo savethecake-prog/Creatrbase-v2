@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { LogoWordmark } from '../../components/ui/LogoWordmark';
+import { PublicNav } from '../../components/PublicNav/PublicNav';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './BlogIndex.module.css';
 
@@ -85,15 +85,7 @@ export function BlogIndex() {
         canonical="https://creatrbase.com/blog"
       />
 
-      <nav className={styles.nav}>
-        <div className={styles.navInner}>
-          <Link to="/"><LogoWordmark className={styles.logo} /></Link>
-          <div className={styles.navActions}>
-            <Link to="/login"  className={styles.navLink}>Log in</Link>
-            <Link to="/signup" className={styles.navCta}>Get started free</Link>
-          </div>
-        </div>
-      </nav>
+      <PublicNav />
 
       <main className={styles.main}>
         <header className={styles.hero}>

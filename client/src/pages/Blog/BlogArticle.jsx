@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { LogoWordmark } from '../../components/ui/LogoWordmark';
+import { PublicNav } from '../../components/PublicNav/PublicNav';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './BlogArticle.module.css';
 
@@ -28,11 +28,7 @@ export function BlogArticle() {
     return (
       <div className={styles.page}>
         <PageMeta title="Post not found" noIndex={true} />
-        <nav className={styles.nav}>
-          <div className={styles.navInner}>
-            <Link to="/"><LogoWordmark className={styles.logo} /></Link>
-          </div>
-        </nav>
+        <PublicNav />
         <main className={styles.main}>
           <div className={styles.notFound}>
             <p className={styles.notFoundTitle}>Post not found</p>
@@ -46,11 +42,7 @@ export function BlogArticle() {
   if (!post) {
     return (
       <div className={styles.page}>
-        <nav className={styles.nav}>
-          <div className={styles.navInner}>
-            <Link to="/"><LogoWordmark className={styles.logo} /></Link>
-          </div>
-        </nav>
+        <PublicNav />
         <main className={styles.main}>
           <p className={styles.loading}>Loading…</p>
         </main>
@@ -67,15 +59,7 @@ export function BlogArticle() {
         ogImage={post.coverImageUrl}
       />
 
-      <nav className={styles.nav}>
-        <div className={styles.navInner}>
-          <Link to="/"><LogoWordmark className={styles.logo} /></Link>
-          <div className={styles.navActions}>
-            <Link to="/login"  className={styles.navLink}>Log in</Link>
-            <Link to="/signup" className={styles.navCta}>Get started free</Link>
-          </div>
-        </div>
-      </nav>
+      <PublicNav />
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>

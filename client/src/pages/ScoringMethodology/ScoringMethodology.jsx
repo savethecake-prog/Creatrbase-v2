@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LogoWordmark } from '../../components/ui/LogoWordmark';
+import { PublicNav } from '../../components/PublicNav/PublicNav';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './ScoringMethodology.module.css';
 
@@ -100,17 +100,7 @@ export function ScoringMethodology() {
         canonical="https://creatrbase.com/scoring-explained"
       />
 
-      <nav className={styles.nav}>
-        <div className={styles.navInner}>
-          <Link to="/">
-            <LogoWordmark className={styles.logo} />
-          </Link>
-          <div className={styles.navActions}>
-            <Link to="/login" className={styles.navLink}>Log in</Link>
-            <Link to="/signup" className={styles.navCta}>Get started free</Link>
-          </div>
-        </div>
-      </nav>
+      <PublicNav />
 
       <main className={styles.main}>
 

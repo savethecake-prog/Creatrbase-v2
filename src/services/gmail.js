@@ -103,15 +103,18 @@ async function applyLabel(accessToken, messageId, labelId) {
  * Build a base64url-encoded RFC 2822 MIME message.
  */
 function buildMimeMessage({ from, to, subject, body }) {
+  // Encode subject with RFC 2047 UTF-8 encoding to handle non-ASCII characters (em dashes etc.)
+  const encodedSubject = `=?UTF-8?B?${Buffer.from(subject).toString('base64')}?=`;
+
   const mime = [
     `From: ${from}`,
     `To: ${to}`,
-    `Subject: ${subject}`,
+    `Subject: ${encodedSubject}`,
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: quoted-printable',
+    'Content-Transfer-Encoding: base64',
     '',
-    body,
+    Buffer.from(body).toString('base64'),
   ].join('\r\n');
 
   return Buffer.from(mime)

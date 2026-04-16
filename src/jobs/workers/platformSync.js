@@ -85,7 +85,7 @@ function startPlatformSyncWorker() {
         await tx.creatorPlatformProfile.update({
           where: { id: platformProfileId },
           data:  {
-            uploadsPlaylistId:     stats.uploadsPlaylistId ?? undefined,
+            uploadsPlaylistId:     stats.uploadsPlaylistId ?? null,
             subscriberCount:       stats.subscriberCount,
             totalViewCount:        stats.totalViewCount,
             videoCount:            stats.videoCount,

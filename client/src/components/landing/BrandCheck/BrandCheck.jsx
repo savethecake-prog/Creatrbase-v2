@@ -38,9 +38,9 @@ export function BrandCheck() {
       {!result ? (
         <Card className={styles.checkCard} variant="glass">
           <form onSubmit={handleCheck} className={styles.form}>
-            <h3 className={styles.formTitle}>See what brands see</h3>
-            <p className={styles.formSub}>Paste your YouTube link to see your Brand-Ready score.</p>
-            
+            <h3 className={styles.formTitle}>How brand-ready are you?</h3>
+            <p className={styles.formSub}>Paste your YouTube URL and get your Commercial Viability Score in seconds — the same measure brands use to evaluate creators.</p>
+
             <div className={styles.inputWrapper}>
               <input
                 type="text"
@@ -50,14 +50,13 @@ export function BrandCheck() {
                 onChange={(e) => setUrl(e.target.value)}
                 disabled={loading}
               />
-              <Button 
-                type="submit" 
-                variant="glow" 
+              <button
+                type="submit"
                 disabled={loading}
                 className={styles.submitBtn}
               >
-                {loading ? 'Scanning...' : 'Check My Stats'}
-              </Button>
+                {loading ? 'Scanning…' : 'Get my score'}
+              </button>
             </div>
             
             {error && <p className={styles.errorMessage}>{error}</p>}

@@ -1,17 +1,20 @@
 .nav {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 1000;
+  height: 64px;
   background: rgba(5, 4, 10, 0.85);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
 }
 
 .navInner {
-  max-width: 1100px;
+  max-width: var(--page-max-width, 1200px);
   margin: 0 auto;
-  padding: 0 24px;
-  height: 60px;
+  width: 100%;
+  padding: 0 var(--page-gutter, 24px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,14 +28,17 @@
 .links {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 2.5rem;
 }
 
 .link {
-  font-size: 14px;
+  font-family: var(--font-data, 'DM Sans', sans-serif);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: color 0.15s;
+  transition: color 0.2s;
 }
 
 .link:hover {
@@ -41,11 +47,12 @@
 
 .cta {
   font-size: 13px;
-  font-weight: 600;
-  color: var(--bg-page);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #05040A;
   background: var(--neon-mint);
   text-decoration: none;
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: 8px;
   transition: opacity 0.15s;
 }

@@ -65,6 +65,27 @@
 
 .submitBtn {
   white-space: nowrap;
+  background: var(--neon-mint);
+  color: #05040A;
+  border: none;
+  border-radius: 12px;
+  padding: 0 1.25rem;
+  height: 44px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 /* Result Card */

@@ -898,6 +898,27 @@
 .progressDimUp   { color: var(--neon-mint); }
 .progressDimDown { color: var(--neon-peach, #FFBFA3); }
 
+.shareScoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neon-mint);
+  background: transparent;
+  border: 1px solid rgba(164, 255, 219, 0.2);
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  margin-top: 4px;
+}
+
+.shareScoreBtn:hover {
+  background: rgba(164, 255, 219, 0.06);
+  border-color: rgba(164, 255, 219, 0.4);
+}
+
 @media (max-width: 768px) {
   .dimensionGrid { grid-template-columns: 1fr; }
   .scoreMain { flex-direction: column; gap: 24px; align-items: flex-start; }

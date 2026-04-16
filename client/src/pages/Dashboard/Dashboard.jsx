@@ -4,6 +4,7 @@ import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
 import { HintCallout } from '../../components/ui/HintCallout/HintCallout';
+import { ScoreCardModal } from '../../components/ScoreCard/ScoreCard';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import styles from './Dashboard.module.css';
@@ -230,6 +231,7 @@ export function Dashboard() {
   const [recResponding, setRecResponding] = useState(false);
   const [history, setHistory]           = useState(null);  // { history: [...], status }
   const [progress, setProgress]         = useState(null);  // weekly progress snapshot
+  const [showScoreCard, setShowScoreCard] = useState(false);
   const [showWelcome, setShowWelcome]   = useState(false);
   const [dismissedCelebrations, setDismissedCelebrations] = useState(() => {
     const s = new Set();
@@ -547,7 +549,20 @@ export function Dashboard() {
           )}
 
           <WeeklyProgressSnapshot progress={progress} />
+
+          <button className={styles.shareScoreBtn} onClick={() => setShowScoreCard(true)}>
+            Share your score →
+          </button>
         </div>
+      )}
+
+      {showScoreCard && (
+        <ScoreCardModal
+          score={scoreData?.score}
+          niche={niche?.niche}
+          platform={platforms.find(p => p.platform === 'youtube')?.platform_display_name}
+          onClose={() => setShowScoreCard(false)}
+        />
       )}
 
       {recData && recData.status !== 'no_creator' && (

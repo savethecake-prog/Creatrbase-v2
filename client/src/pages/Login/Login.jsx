@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input/Input';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import { getMe } from '../../lib/auth';
+import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './Login.module.css';
 
 export function Login() {
@@ -34,6 +35,7 @@ export function Login() {
 
   return (
     <AuthLayout title="Welcome back" subtitle="Sign in to your Creatrbase account.">
+      <PageMeta title="Log in" noIndex={true} />
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
 

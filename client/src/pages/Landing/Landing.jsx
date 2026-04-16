@@ -6,6 +6,7 @@ import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import { BrandCheck } from '../../components/landing/BrandCheck/BrandCheck';
 import { ProductMockup } from '../../components/landing/ProductMockup/ProductMockup';
 import { useIntersection } from '../../hooks/useIntersection';
+import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './Landing.module.css';
 
 export function Landing() {
@@ -38,6 +39,11 @@ export function Landing() {
 
   return (
     <div className={styles.container}>
+      <PageMeta
+        title="Commercial Intelligence for Independent Creators"
+        description="Know your Commercial Viability Score. Track your gap to brand deals. Represent yourself directly — without an agency."
+        canonical="https://creatrbase.com"
+      />
       <div className={styles.scrollProgress} style={{ width: `${scrollPercent}%` }} />
       {/* Navigation */}
       <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>

@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Authenticated app pages — no crawl value
+Disallow: /dashboard
+Disallow: /tasks
+Disallow: /negotiations
+Disallow: /outreach
+Disallow: /gap
+Disallow: /connections
+Disallow: /settings
+Disallow: /onboarding
+
+# API endpoints
+Disallow: /api/
+
+Sitemap: https://creatrbase.com/sitemap.xml

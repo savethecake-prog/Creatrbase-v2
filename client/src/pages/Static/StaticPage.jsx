@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button/Button';
 import { LogoWordmark } from '../../components/ui/LogoWordmark';
+import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './StaticPage.module.css';
 
 const CONTENT = {
@@ -164,6 +165,7 @@ export default function StaticPage() {
 
   return (
     <div className={styles.container}>
+      <PageMeta title={page.title} description={page.subtitle} canonical={`https://creatrbase.com/${slug}`} />
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <Link to="/">

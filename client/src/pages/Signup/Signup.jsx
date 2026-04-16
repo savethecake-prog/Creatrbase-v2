@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input/Input';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import { getMe } from '../../lib/auth';
+import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './Signup.module.css';
 
 export function Signup() {
@@ -37,6 +38,7 @@ export function Signup() {
 
   return (
     <AuthLayout title="Start your free trial" subtitle="14 days free. No credit card required.">
+      <PageMeta title="Create your account" noIndex={true} />
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
 

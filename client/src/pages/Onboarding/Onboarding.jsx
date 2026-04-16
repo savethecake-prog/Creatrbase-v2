@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import logoMonogram from '../../assets/logo-monogram.svg';
+import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './Onboarding.module.css';
 
 // ── Progress step definitions ─────────────────────────────────────────────────
@@ -88,6 +89,7 @@ export function Onboarding() {
 
   return (
     <div className={styles.page}>
+      <PageMeta title="Set up your account" noIndex={true} />
       <div className={styles.logoBar}>
         <img src={logoMonogram} alt="Creatrbase" className={styles.logo} />
       </div>

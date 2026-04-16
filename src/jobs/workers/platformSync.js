@@ -253,7 +253,7 @@ function startPlatformSyncWorker() {
     // immediately flows through to dimension scores and milestone statuses.
     const synced = await prisma.creatorPlatformProfile.findUnique({
       where:  { id: platformProfileId },
-      select: { creatorId: true },
+      select: { creatorId: true, platform: true },
     });
     if (synced?.creatorId) {
       await queue.add('analysis:score-creator', {
@@ -264,6 +264,10 @@ function startPlatformSyncWorker() {
       await queue.add('task:seed-templates', { creatorId: synced.creatorId });
       // Run tag detection after every sync
       await queue.add('tags:detect', { creatorId: synced.creatorId });
+      // Auto-complete content_consistency tasks if new uploads detected
+      if (synced.platform === 'youtube') {
+        await queue.add('content:detect-uploads', { creatorId: synced.creatorId });
+      }
     }
   });
 

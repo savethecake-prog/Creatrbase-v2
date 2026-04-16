@@ -15,6 +15,8 @@
 
 const { getPrisma }              = require('../../lib/prisma');
 const { getDataCollectionQueue } = require('../queue');
+const { decrypt }                = require('../../lib/crypto');
+const { getRecentVideoDetails }  = require('../../services/youtube');
 
 // ─── Maintenance task content map ────────────────────────────────────────────
 // Keyed by dimension. Used when generating tasks from maintenance templates.
@@ -232,6 +234,85 @@ function startTaskCadenceWorker() {
 
     // Immediately trigger generation for this creator
     await queue.add('task:generate-due', {});
+  });
+
+  // ── content:detect-uploads ───────────────────────────────────────────────
+  // Runs after every YouTube sync.
+  // Fetches recent uploads and auto-completes any active content_consistency
+  // task where a video was published after the task was created.
+
+  queue.process('content:detect-uploads', async (job) => {
+    const { creatorId } = job.data;
+    if (!creatorId) throw new Error('content:detect-uploads missing creatorId');
+
+    // Get YouTube profile with token + uploads playlist
+    const profile = await prisma.creatorPlatformProfile.findFirst({
+      where:  { creatorId, platform: 'youtube', syncStatus: { not: 'disconnected' } },
+      select: { accessToken: true, uploadsPlaylistId: true },
+    });
+
+    if (!profile?.uploadsPlaylistId) {
+      job.log('No YouTube profile or uploads playlist — skipping upload detection');
+      return;
+    }
+
+    const accessToken = decrypt(profile.accessToken);
+
+    // Fetch recent videos (last 20 is enough for weekly cadence)
+    const videos = await getRecentVideoDetails(accessToken, {
+      uploadsPlaylistId: profile.uploadsPlaylistId,
+      maxVideos: 20,
+    });
+
+    if (videos.length === 0) {
+      job.log('No recent videos found');
+      return;
+    }
+
+    // Find active content_consistency tasks for this creator
+    const activeTasks = await prisma.task.findMany({
+      where: {
+        creatorId,
+        dimension: 'content_consistency',
+        status:    { in: ['active', 'snoozed'] },
+      },
+      select: { id: true, createdAt: true, title: true },
+    });
+
+    if (activeTasks.length === 0) {
+      job.log('No active content_consistency tasks — nothing to auto-complete');
+      return;
+    }
+
+    let completed = 0;
+
+    for (const task of activeTasks) {
+      // Find a video published after this task was created
+      const qualifyingVideo = videos.find(
+        v => v.publishedAt && v.publishedAt > task.createdAt
+      );
+
+      if (!qualifyingVideo) continue;
+
+      await prisma.task.update({
+        where: { id: task.id },
+        data:  {
+          status:       'completed',
+          completedAt:  new Date(),
+          creatorNotes: `Auto-completed: "${qualifyingVideo.title}" was published on ${qualifyingVideo.publishedAt.toDateString()}.`,
+        },
+      });
+
+      completed++;
+      job.log(`Auto-completed task ${task.id} — video "${qualifyingVideo.title}" published after task creation`);
+      console.log(`[uploadDetection] auto-completed content_consistency task for creator=${creatorId}`);
+    }
+
+    if (completed === 0) {
+      job.log(`${videos.length} video(s) checked — none published after task creation`);
+    } else {
+      job.log(`Auto-completed ${completed} content_consistency task(s)`);
+    }
   });
 
   // Register daily job at 06:00 UTC

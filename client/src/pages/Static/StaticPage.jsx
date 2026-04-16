@@ -1,8 +1,7 @@
 import React from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Button } from '../../components/ui/Button/Button';
-import { LogoWordmark } from '../../components/ui/LogoWordmark';
+import { useParams } from 'react-router-dom';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
+import { PublicNav } from '../../components/PublicNav/PublicNav';
 import styles from './StaticPage.module.css';
 
 const CONTENT = {
@@ -155,7 +154,6 @@ const CONTENT = {
 };
 
 export default function StaticPage() {
-  const navigate = useNavigate();
   const { slug } = useParams();
   const page = CONTENT[slug] || { 
     title: "Page Not Found", 
@@ -166,21 +164,7 @@ export default function StaticPage() {
   return (
     <div className={styles.container}>
       <PageMeta title={page.title} description={page.subtitle} canonical={`https://creatrbase.com/${slug}`} />
-      <nav className={styles.nav}>
-        <div className={styles.navInner}>
-          <Link to="/">
-            <LogoWordmark className={styles.logo} />
-          </Link>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <Button variant="outline" size="sm" onClick={() => window.history.back()}>
-              Back
-            </Button>
-            <Button variant="primary" size="sm" onClick={() => navigate('/dashboard')}>
-              Dashboard
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <PublicNav />
 
       <main className={styles.main}>
         <header className={styles.header}>

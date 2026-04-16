@@ -8,6 +8,24 @@
   border-bottom: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
+  transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+}
+
+/* Scroll-effect variant — starts transparent, gains blur on scroll */
+.navTransparent {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: 1px solid transparent;
+}
+
+.scrolled {
+  background: rgba(5, 4, 10, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom-color: var(--glass-border);
 }
 
 .navInner {

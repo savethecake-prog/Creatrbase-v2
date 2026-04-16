@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button/Button';
 import { Card } from '../../components/ui/Card/Card';
-import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import { BrandCheck } from '../../components/landing/BrandCheck/BrandCheck';
 import { ProductMockup } from '../../components/landing/ProductMockup/ProductMockup';
 import { useIntersection } from '../../hooks/useIntersection';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
+import { PublicNav } from '../../components/PublicNav/PublicNav';
 import styles from './Landing.module.css';
 
 export function Landing() {
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
   const [heroRef, heroVisible] = useIntersection({ once: true, threshold: 0.1 });
   const [problemRef, problemVisible] = useIntersection({ once: true, threshold: 0.1 });
   const [aiRef, aiVisible] = useIntersection({ once: true, threshold: 0.1 });
@@ -24,15 +23,13 @@ export function Landing() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-      
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const scrollY = window.scrollY;
       const percent = (scrollY / (documentHeight - windowHeight)) * 100;
       setScrollPercent(percent);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -45,20 +42,7 @@ export function Landing() {
         canonical="https://creatrbase.com"
       />
       <div className={styles.scrollProgress} style={{ width: `${scrollPercent}%` }} />
-      {/* Navigation */}
-      <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
-        <div className={styles.navInner}>
-          <LogoWordmark className={styles.logo} />
-          <div className={styles.navLinks}>
-            <Link to="/scoring-explained" className={styles.navLink}>How it works</Link>
-            <Link to="/blog" className={styles.navLink}>Blog</Link>
-            <Link to="/login" className={styles.navLink}>Login</Link>
-            <Button variant="primary" size="sm" onClick={() => navigate('/signup')}>
-              Sign Up
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <PublicNav scrollEffect />
 
       {/* Hero Section */}
       <header ref={heroRef} className={`${styles.hero} ${heroVisible ? styles.visible : ''}`}>

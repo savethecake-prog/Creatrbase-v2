@@ -25,16 +25,6 @@ const COMING_SOON = [
       </svg>
     ),
   },
-  {
-    key: 'tiktok',
-    label: 'TikTok',
-    description: 'Connect TikTok to surface short-form commercial signal data and brand-fit scores.',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.89a8.18 8.18 0 004.78 1.52V7a4.85 4.85 0 01-1.01-.31z" />
-      </svg>
-    ),
-  },
 ];
 
 function ComingSoonCard({ platform }) {
@@ -100,6 +90,16 @@ const PLATFORMS = [
     connectUrl: '/api/connect/twitch',
     metrics: p => [
       p.avg_concurrent_viewers_30d != null && { label: 'Avg viewers (30d)', value: p.avg_concurrent_viewers_30d.toFixed(0) },
+    ].filter(Boolean),
+  },
+  {
+    key:        'tiktok',
+    label:      'TikTok',
+    connectUrl: '/api/connect/tiktok',
+    metrics: p => [
+      p.subscriber_count   != null && { label: 'Followers',    value: p.subscriber_count.toLocaleString() },
+      p.tiktok_like_count  != null && { label: 'Total likes',  value: Number(p.tiktok_like_count).toLocaleString() },
+      p.tiktok_video_count != null && { label: 'Videos',       value: p.tiktok_video_count.toLocaleString() },
     ].filter(Boolean),
   },
 ];
@@ -472,7 +472,7 @@ export function Connections() {
       window.history.replaceState({}, '', '/connections');
     }
     if (connected) {
-      const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
+      const name = connected === 'youtube' ? 'YouTube' : connected === 'tiktok' ? 'TikTok' : 'Twitch';
       setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
       if (connected === 'twitch') setShowTwitchModal(true);
       window.history.replaceState({}, '', '/connections');

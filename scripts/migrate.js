@@ -33,6 +33,7 @@ const FILES = [
   '016_support_tickets.sql',
   '017_gmail_connections.sql',
   '018_creator_tags.sql',
+  '019_tiktok.sql',
 ];
 
 async function run() {

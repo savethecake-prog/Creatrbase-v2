@@ -252,6 +252,163 @@ async function platformConnectRoutes(app) {
     );
   }
 
+  // ── TikTok ─────────────────────────────────────────────────────────────────
+  // TikTok uses `client_key` (not `client_id`) so we can't use @fastify/oauth2.
+  // We handle the OAuth flow manually with a state cookie for CSRF protection.
+
+  const TIKTOK_ENABLED   = !!(process.env.TIKTOK_CLIENT_KEY && process.env.TIKTOK_CLIENT_SECRET);
+  const TIKTOK_DEMO_MODE = process.env.TIKTOK_DEMO_MODE === 'true';
+  const TIKTOK_SCOPES    = ['user.info.basic', 'user.info.profile', 'user.info.stats', 'video.list'];
+  const TIKTOK_AUTH_URL  = 'https://www.tiktok.com/v2/auth/authorize/';
+  const TIKTOK_CALLBACK  = `${process.env.APP_URL}/api/connect/tiktok/callback`;
+
+  if (TIKTOK_DEMO_MODE) {
+    // ── Demo/mock mode — bypasses real OAuth for recording the review video ──
+    // Remove TIKTOK_DEMO_MODE from .env once real credentials are available.
+
+    app.get('/api/connect/tiktok', { preHandler: authenticate }, async (req, reply) => {
+      // Skip TikTok entirely — go straight to mock callback
+      return reply.redirect(`${process.env.APP_URL}/api/connect/tiktok/callback?demo=1`);
+    });
+
+    app.get('/api/connect/tiktok/callback', { preHandler: authenticate }, async (req, reply) => {
+      if (req.query.demo !== '1') {
+        return reply.redirect('/connections?connect_error=tiktok_denied');
+      }
+
+      // Inject a realistic fake TikTok profile
+      try {
+        const { platformProfileId } = await connectPlatform({
+          userId:              req.user.userId,
+          tenantId:            req.user.tenantId,
+          platform:            'tiktok',
+          platformUserId:      'demo_tiktok_' + req.user.userId,
+          platformUsername:    'creatrbase_demo',
+          platformDisplayName: 'Creatrbase Demo',
+          platformUrl:         'https://www.tiktok.com/@creatrbase_demo',
+          accessToken:         'demo_access_token',
+          refreshToken:        'demo_refresh_token',
+          tokenExpiresAt:      Math.floor((Date.now() + 86400 * 1000) / 1000),
+          scopesGranted:       TIKTOK_SCOPES,
+        });
+
+        // Directly write mock metrics — no real API call needed
+        const prisma = getPrisma();
+        await prisma.creatorPlatformProfile.update({
+          where: { id: platformProfileId },
+          data: {
+            subscriberCount:      24800,
+            tiktokFollowingCount: 312,
+            tiktokLikeCount:      187400,
+            tiktokVideoCount:     94,
+            tiktokVerified:       false,
+            syncStatus:           'active',
+            lastSyncedAt:         new Date(),
+            analyticsLastSyncedAt: new Date(),
+          },
+        });
+      } catch (err) {
+        if (err.statusCode !== 409) throw err;
+        // Already connected — just redirect
+      }
+
+      return reply.redirect('/connections?connected=tiktok');
+    });
+
+  } else if (TIKTOK_ENABLED) {
+    const { randomBytes }        = require('crypto');
+    const { exchangeCodeForToken, getTikTokUserInfo } = require('../../services/tiktok');
+
+    // Start: redirect to TikTok auth with a state cookie for CSRF protection
+    app.get('/api/connect/tiktok', { preHandler: authenticate }, async (req, reply) => {
+      const state = randomBytes(16).toString('hex');
+      reply.setCookie('tt_oauth_state', state, {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge:   600, // 10 minutes
+        path:     '/',
+      });
+
+      const url = new URL(TIKTOK_AUTH_URL);
+      url.searchParams.set('client_key',     process.env.TIKTOK_CLIENT_KEY);
+      url.searchParams.set('scope',          TIKTOK_SCOPES.join(','));
+      url.searchParams.set('response_type',  'code');
+      url.searchParams.set('redirect_uri',   TIKTOK_CALLBACK);
+      url.searchParams.set('state',          state);
+
+      return reply.redirect(url.toString());
+    });
+
+    // Callback: TikTok redirects here after consent
+    app.get('/api/connect/tiktok/callback', { preHandler: authenticate }, async (req, reply) => {
+      const { code, state, error } = req.query;
+
+      if (error) {
+        app.log.warn({ error }, 'TikTok connect denied');
+        return reply.redirect('/connections?connect_error=tiktok_denied');
+      }
+
+      // Verify CSRF state
+      const savedState = req.cookies?.tt_oauth_state;
+      reply.clearCookie('tt_oauth_state', { path: '/' });
+      if (!savedState || savedState !== state) {
+        app.log.warn('TikTok connect: state mismatch');
+        return reply.redirect('/connections?connect_error=tiktok_state_mismatch');
+      }
+
+      let tokenData;
+      try {
+        tokenData = await exchangeCodeForToken(code, TIKTOK_CALLBACK);
+      } catch (err) {
+        app.log.error({ err }, 'TikTok token exchange failed');
+        return reply.redirect('/connections?connect_error=tiktok_token_failed');
+      }
+
+      let userInfo;
+      try {
+        userInfo = await getTikTokUserInfo(tokenData.accessToken, tokenData.openId);
+      } catch (err) {
+        app.log.error({ err }, 'TikTok user info fetch failed');
+        return reply.redirect('/connections?connect_error=tiktok_profile_failed');
+      }
+
+      try {
+        const { platformProfileId } = await connectPlatform({
+          userId:              req.user.userId,
+          tenantId:            req.user.tenantId,
+          platform:            'tiktok',
+          platformUserId:      userInfo.openId,
+          platformUsername:    userInfo.displayName,
+          platformDisplayName: userInfo.displayName,
+          platformUrl:         userInfo.profileDeepLink ?? null,
+          accessToken:         tokenData.accessToken,
+          refreshToken:        tokenData.refreshToken ?? null,
+          tokenExpiresAt:      tokenData.expiresAt
+                                 ? Math.floor(tokenData.expiresAt.getTime() / 1000)
+                                 : null,
+          scopesGranted: TIKTOK_SCOPES,
+        });
+
+        getDataCollectionQueue().add('platform-sync', { platformProfileId });
+      } catch (err) {
+        if (err.statusCode === 409) {
+          return reply.redirect('/connections?connect_error=tiktok_already_claimed');
+        }
+        throw err;
+      }
+
+      return reply.redirect('/connections?connected=tiktok');
+    });
+
+  } else {
+    app.get('/api/connect/tiktok', async (_, reply) =>
+      reply.code(503).send({ error: 'TikTok connection not configured' })
+    );
+    app.get('/api/connect/tiktok/callback', async (_, reply) =>
+      reply.code(503).send({ error: 'TikTok connection not configured' })
+    );
+  }
+
   // ── GET /api/connect/platforms ─────────────────────────────────────────────
   // Returns connected platforms for the authenticated creator — no tokens.
 

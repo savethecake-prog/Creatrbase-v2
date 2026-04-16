@@ -19,6 +19,9 @@ const { refreshAccessToken, getChannelStats,
         getExtendedAnalytics }             = require('../../services/youtube');
 const { refreshTwitchToken,
         getTwitchChannelMetrics }          = require('../../services/twitch');
+const { refreshTikTokToken,
+        getTikTokUserInfo,
+        getTikTokVideoList }              = require('../../services/tiktok');
 const { getDataCollectionQueue }           = require('../queue');
 
 function startPlatformSyncWorker() {
@@ -53,6 +56,8 @@ function startPlatformSyncWorker() {
 
         const refreshed = profile.platform === 'twitch'
           ? await refreshTwitchToken(decrypt(profile.refreshToken))
+          : profile.platform === 'tiktok'
+          ? await refreshTikTokToken(decrypt(profile.refreshToken))
           : await refreshAccessToken(decrypt(profile.refreshToken));
 
         await tx.creatorPlatformProfile.update({
@@ -168,6 +173,38 @@ function startPlatformSyncWorker() {
           `, stream_hours_30d=${metrics.streamHours30d ?? 'n/a'}` +
           `, broadcast_days_30d=${metrics.uniqueBroadcastDays30d ?? 'n/a'}` +
           `, avg_concurrent=${metrics.avgConcurrentViewers30d ?? 'n/a (not live)'}`
+        );
+      } else if (profile.platform === 'tiktok') {
+        const userInfo = await getTikTokUserInfo(accessToken, profile.platformUserId);
+
+        await tx.creatorPlatformProfile.update({
+          where: { id: platformProfileId },
+          data:  {
+            subscriberCount:       userInfo.followerCount,
+            tiktokFollowingCount:  userInfo.followingCount,
+            tiktokLikeCount:       userInfo.likesCount,
+            tiktokVideoCount:      userInfo.videoCount,
+            tiktokVerified:        userInfo.isVerified,
+            analyticsLastSyncedAt: new Date(),
+            syncStatus:            'active',
+            lastSyncedAt:          new Date(),
+          },
+        });
+
+        await tx.platformMetricsSnapshot.create({
+          data: {
+            tenantId:         profile.tenantId,
+            platformProfileId,
+            platform:         'tiktok',
+            subscriberCount:  userInfo.followerCount,
+          },
+        });
+
+        job.log(
+          `TikTok sync complete: ${userInfo.followerCount} followers` +
+          `, likes=${userInfo.likesCount ?? 'n/a'}` +
+          `, videos=${userInfo.videoCount ?? 'n/a'}` +
+          `, verified=${userInfo.isVerified}`
         );
       } else {
         job.log(`Skipping unsupported platform: ${profile.platform}`);

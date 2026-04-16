@@ -150,6 +150,10 @@ async function getConnectedPlatforms(userId, tenantId) {
       publicUploads90d:     true,
       primaryAudienceGeo:   true,
       avgConcurrentViewers30d: true,
+      tiktokFollowingCount:    true,
+      tiktokLikeCount:         true,
+      tiktokVideoCount:        true,
+      tiktokVerified:          true,
     },
   });
 
@@ -174,6 +178,10 @@ async function getConnectedPlatforms(userId, tenantId) {
     primary_audience_geo:     p.primaryAudienceGeo,
     avg_concurrent_viewers_30d: p.avgConcurrentViewers30d !== null
                                   ? Number(p.avgConcurrentViewers30d) : null,
+    tiktok_following_count: p.tiktokFollowingCount,
+    tiktok_like_count:      p.tiktokLikeCount !== null ? Number(p.tiktokLikeCount) : null,
+    tiktok_video_count:     p.tiktokVideoCount,
+    tiktok_verified:        p.tiktokVerified,
   }));
 }
 

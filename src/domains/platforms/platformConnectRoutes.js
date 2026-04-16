@@ -422,7 +422,7 @@ async function platformConnectRoutes(app) {
 
   app.post('/api/connect/:platform/sync', { preHandler: authenticate }, async (req, reply) => {
     const { platform } = req.params;
-    if (!['youtube', 'twitch'].includes(platform)) {
+    if (!['youtube', 'twitch', 'tiktok'].includes(platform)) {
       return reply.code(400).send({ error: 'Unknown platform' });
     }
 
@@ -448,7 +448,7 @@ async function platformConnectRoutes(app) {
 
   app.delete('/api/connect/:platform', { preHandler: authenticate }, async (req, reply) => {
     const { platform } = req.params;
-    if (!['youtube', 'twitch'].includes(platform)) {
+    if (!['youtube', 'twitch', 'tiktok'].includes(platform)) {
       return reply.code(400).send({ error: 'Unknown platform' });
     }
 

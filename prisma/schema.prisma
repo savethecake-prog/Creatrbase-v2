@@ -141,6 +141,7 @@ model CreatorPlatformProfile {
   refreshToken             String?   @map("refresh_token")
   tokenExpiresAt           DateTime? @map("token_expires_at") @db.Timestamptz(6)
   scopesGranted            String[]  @map("scopes_granted")
+  uploadsPlaylistId        String?   @map("uploads_playlist_id")
   subscriberCount          Int?      @map("subscriber_count")
   totalViewCount           BigInt?   @map("total_view_count")
   videoCount               Int?      @map("video_count")

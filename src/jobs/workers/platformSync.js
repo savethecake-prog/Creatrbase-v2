@@ -85,6 +85,7 @@ function startPlatformSyncWorker() {
         await tx.creatorPlatformProfile.update({
           where: { id: platformProfileId },
           data:  {
+            uploadsPlaylistId:     stats.uploadsPlaylistId ?? undefined,
             subscriberCount:       stats.subscriberCount,
             totalViewCount:        stats.totalViewCount,
             videoCount:            stats.videoCount,
@@ -186,6 +187,8 @@ function startPlatformSyncWorker() {
       });
       // Seed default maintenance templates on first sync (no-op if already seeded)
       await queue.add('task:seed-templates', { creatorId: synced.creatorId });
+      // Run tag detection after every sync
+      await queue.add('tags:detect', { creatorId: synced.creatorId });
     }
   });
 

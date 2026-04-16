@@ -282,9 +282,49 @@ async function countUploads(playlistId, cutoffDate, accessToken) {
   return count;
 }
 
+// ─── Recent video tags ────────────────────────────────────────────────────────
+// Fetches the last N videos with their tags, view counts, and publish dates.
+// Used by the tag detection worker.
+
+async function getRecentVideoDetails(accessToken, { uploadsPlaylistId, maxVideos = 50 }) {
+  if (!uploadsPlaylistId) return [];
+
+  // Step 1: get recent video IDs from uploads playlist
+  const playlistRes = await fetch(
+    `${YOUTUBE_API}/playlistItems?part=contentDetails&playlistId=${uploadsPlaylistId}&maxResults=${maxVideos}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  if (!playlistRes.ok) return [];
+  const playlistData = await playlistRes.json();
+
+  const videoIds = (playlistData.items ?? [])
+    .map(i => i.contentDetails?.videoId)
+    .filter(Boolean);
+
+  if (videoIds.length === 0) return [];
+
+  // Step 2: fetch tags + stats for those videos
+  const videosRes = await fetch(
+    `${YOUTUBE_API}/videos?part=snippet,statistics&id=${videoIds.join(',')}&maxResults=${maxVideos}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  if (!videosRes.ok) return [];
+  const videosData = await videosRes.json();
+
+  return (videosData.items ?? []).map(v => ({
+    videoId:     v.id,
+    title:       v.snippet?.title ?? '',
+    publishedAt: v.snippet?.publishedAt ? new Date(v.snippet.publishedAt) : null,
+    tags:        (v.snippet?.tags ?? []).map(t => t.toLowerCase().trim()),
+    viewCount:   parseInt(v.statistics?.viewCount ?? '0', 10),
+    likeCount:   parseInt(v.statistics?.likeCount  ?? '0', 10),
+  }));
+}
+
 module.exports = {
   refreshAccessToken,
   getChannelStats,
   getWatchHours12Months,
   getExtendedAnalytics,
+  getRecentVideoDetails,
 };

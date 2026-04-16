@@ -32,6 +32,7 @@ const FILES = [
   '015_avg_views_momentum.sql',
   '016_support_tickets.sql',
   '017_gmail_connections.sql',
+  '018_creator_tags.sql',
 ];
 
 async function run() {

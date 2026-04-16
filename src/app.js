@@ -60,6 +60,7 @@ require('./jobs/workers/emailDigest').startEmailDigestWorker();
 require('./jobs/workers/gmailSync').startGmailSyncWorker();
 require('./jobs/workers/taskCadence').startTaskCadenceWorker();
 require('./jobs/workers/tagDetection').startTagDetectionWorker();
+require('./jobs/workers/retentionNotifications').startRetentionNotificationsWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

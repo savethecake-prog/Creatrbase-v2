@@ -208,6 +208,21 @@ function startViabilityScoringWorker() {
     if (primaryConstraint) {
       await queue.add('analysis:generate-recommendation', { creatorId });
     }
+
+    // Retention notifications — fire after every scoring run
+    await queue.add('notifications:milestone-alert', { creatorId });
+    await queue.add('notifications:score-change',    { creatorId });
+    // Pass the score before this run so brand-match can check threshold crossings
+    const previousScoreRow = await prisma.dimensionScoreHistory.findFirst({
+      where:   { creatorId },
+      orderBy: { scoredAt: 'desc' },
+      skip:    1,
+      select:  { overallScore: true },
+    });
+    await queue.add('notifications:brand-match', {
+      creatorId,
+      previousScore: previousScoreRow?.overallScore ?? null,
+    });
   });
 
   console.log('[viabilityScoring] worker registered on data-collection queue');

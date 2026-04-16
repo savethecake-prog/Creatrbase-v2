@@ -146,6 +146,66 @@ function MomentumCard({ label, value, compareValue }) {
   );
 }
 
+// ─── Weekly progress snapshot ────────────────────────────────────────────────
+
+const DIM_LABELS = {
+  subscriber_momentum:    'Subscriber momentum',
+  engagement_quality:     'Engagement quality',
+  niche_commercial_value: 'Niche commercial value',
+  audience_geo_alignment: 'Audience geo',
+  content_consistency:    'Content consistency',
+  content_brand_alignment:'Brand alignment',
+};
+
+function WeeklyProgressSnapshot({ progress }) {
+  if (!progress || progress.status !== 'ok') return null;
+
+  const { delta, current_score, previous_score, compared_to, dimension_deltas } = progress;
+  if (delta === 0 && (!dimension_deltas || dimension_deltas.length === 0)) return null;
+
+  const sign      = delta > 0 ? '+' : '';
+  const isUp      = delta > 0;
+  const isDown    = delta < 0;
+  const topDeltas = (dimension_deltas ?? []).slice(0, 3);
+  const comparedDate = compared_to
+    ? new Date(compared_to).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+    : null;
+
+  return (
+    <div className={styles.progressSnapshot}>
+      <div className={styles.progressHeader}>
+        <p className={styles.progressEyebrow}>Since last week</p>
+        <div className={styles.progressScoreRow}>
+          <span className={styles.progressScoreValue}>{current_score}</span>
+          <span className={styles.progressScoreMax}>/100</span>
+          {delta !== 0 && (
+            <span className={`${styles.progressDelta} ${isUp ? styles.progressDeltaUp : isDown ? styles.progressDeltaDown : ''}`}>
+              {sign}{delta}
+            </span>
+          )}
+        </div>
+        {comparedDate && (
+          <p className={styles.progressComparedDate}>vs. {comparedDate}</p>
+        )}
+      </div>
+      {topDeltas.length > 0 && (
+        <div className={styles.progressDims}>
+          {topDeltas.map(d => (
+            <div key={d.dimension} className={styles.progressDimRow}>
+              <span className={styles.progressDimLabel}>
+                {DIM_LABELS[d.dimension] ?? d.dimension.replace(/_/g, ' ')}
+              </span>
+              <span className={`${styles.progressDimDelta} ${d.delta > 0 ? styles.progressDimUp : styles.progressDimDown}`}>
+                {d.delta > 0 ? '+' : ''}{d.delta}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const CONNECT_ERRORS = {
   youtube_denied:         'YouTube access was denied. Please try again.',
   youtube_no_channel:     'No YouTube channel found on that Google account.',
@@ -168,6 +228,7 @@ export function Dashboard() {
   const [recData, setRecData]           = useState(null);  // { recommendation, status }
   const [recResponding, setRecResponding] = useState(false);
   const [history, setHistory]           = useState(null);  // { history: [...], status }
+  const [progress, setProgress]         = useState(null);  // weekly progress snapshot
   const [showWelcome, setShowWelcome]   = useState(false);
   const [dismissedCelebrations, setDismissedCelebrations] = useState(() => {
     const s = new Set();
@@ -185,6 +246,7 @@ export function Dashboard() {
     api.get('/creator/score').then(setScoreData).catch(() => {});
     api.get('/creator/recommendation').then(setRecData).catch(() => {});
     api.get('/creator/score/history').then(setHistory).catch(() => {});
+    api.get('/creator/score/weekly-progress').then(setProgress).catch(() => {});
   }, []);
 
   // Handle ?welcome=1, ?connected=, ?connect_error= params
@@ -475,6 +537,8 @@ export function Dashboard() {
               <ScoreChart history={history.history} />
             </div>
           )}
+
+          <WeeklyProgressSnapshot progress={progress} />
         </div>
       )}
 

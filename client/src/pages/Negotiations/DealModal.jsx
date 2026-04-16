@@ -235,6 +235,29 @@ export function DealModal({ deal, onClose, onUpdated }) {
           {/* ── Update form ── */}
           {tab === 'update' && (
             <form onSubmit={handleSubmit} className={styles.formSection}>
+
+              <div className={styles.stageGuide}>
+                <p className={styles.stageGuideTitle}>What stage are you at?</p>
+                <div className={styles.stageGuideItems}>
+                  <div className={styles.stageGuideItem}>
+                    <span className={styles.stageGuideLabel}>Negotiating</span>
+                    <span className={styles.stageGuideDesc}>You're in active back-and-forth about rates, deliverables, or timeline.</span>
+                  </div>
+                  <div className={styles.stageGuideItem}>
+                    <span className={styles.stageGuideLabel}>Deal completed</span>
+                    <span className={styles.stageGuideDesc}>You've agreed terms and the partnership is confirmed. Log the rate here.</span>
+                  </div>
+                  <div className={styles.stageGuideItem}>
+                    <span className={styles.stageGuideLabel}>Ongoing</span>
+                    <span className={styles.stageGuideDesc}>This brand is a recurring partner — you work together regularly.</span>
+                  </div>
+                  <div className={styles.stageGuideItem}>
+                    <span className={`${styles.stageGuideLabel} ${styles.stageGuideLabelDeclined}`}>Declined</span>
+                    <span className={styles.stageGuideDesc}>They said no, or the conversation went cold. Keeps your pipeline clean.</span>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className={styles.formLabel}>Update stage</label>
                 <div className={styles.stageGrid}>

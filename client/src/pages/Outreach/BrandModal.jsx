@@ -467,15 +467,17 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
                   {copied ? 'Copied!' : 'Copy to clipboard'}
                 </button>
 
-                {!marked && !brand.latest_interaction ? (
+                {!marked && !brand.latest_interaction && !sendSuccess && (
                   <button
                     className={styles.composeBtn}
                     onClick={handleMarkSent}
                     disabled={markingDone}
+                    title="Use this if you sent the email from your own client"
                   >
-                    {markingDone ? 'Logging…' : 'Mark as sent'}
+                    {markingDone ? 'Logging…' : 'Mark as sent manually'}
                   </button>
-                ) : (
+                )}
+                {(marked || brand.latest_interaction || sendSuccess) && (
                   <span className={styles.copyHint}>Outreach logged</span>
                 )}
               </div>
@@ -571,7 +573,6 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
                   <p className={styles.statusLabel}>Update status</p>
                   <div className={styles.statusBtns}>
                     {[
-                      { type: 'outreach_responded',   label: 'They responded' },
                       { type: 'outreach_declined',     label: 'Declined' },
                       { type: 'deal_negotiating',      label: 'Negotiating' },
                       { type: 'deal_completed',        label: 'Deal done' },

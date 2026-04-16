@@ -250,6 +250,16 @@
   padding: var(--space-8) 0;
 }
 
+.timelineHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
 /* ── Update form ─────────────────────────────────────────────────────────────── */
 
 .formSection {

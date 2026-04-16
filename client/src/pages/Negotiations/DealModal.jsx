@@ -15,7 +15,6 @@ const STAGE_META = {
 };
 
 const STAGE_OPTIONS = [
-  { value: 'outreach_responded',   label: 'They responded' },
   { value: 'deal_negotiating',     label: 'Negotiating' },
   { value: 'deal_completed',       label: 'Deal completed' },
   { value: 'relationship_ongoing', label: 'Ongoing' },
@@ -155,7 +154,7 @@ export function DealModal({ deal, onClose, onUpdated }) {
             className={`${styles.tab} ${tab === 'update' ? styles.tabActive : ''}`}
             onClick={() => setTab('update')}
           >
-            Update deal
+            Log update
           </button>
         </div>
 
@@ -165,6 +164,9 @@ export function DealModal({ deal, onClose, onUpdated }) {
           {/* ── Timeline ── */}
           {tab === 'timeline' && (
             <>
+              <p className={styles.timelineHint}>
+                Outreach sent and brand replies are tracked automatically. Log negotiation progress and deal terms below.
+              </p>
               {history === null && (
                 <p className={styles.emptyTimeline}>Loading…</p>
               )}
@@ -234,7 +236,7 @@ export function DealModal({ deal, onClose, onUpdated }) {
           {tab === 'update' && (
             <form onSubmit={handleSubmit} className={styles.formSection}>
               <div>
-                <label className={styles.formLabel}>Move to stage</label>
+                <label className={styles.formLabel}>Update stage</label>
                 <div className={styles.stageGrid}>
                   {STAGE_OPTIONS.map(opt => (
                     <button

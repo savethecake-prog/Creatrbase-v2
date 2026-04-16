@@ -166,8 +166,8 @@ export function Negotiations() {
         <div className={styles.emptyState}>
           <p className={styles.emptyTitle}>No deals in your pipeline yet</p>
           <p className={styles.emptyDesc}>
-            When you send outreach to a brand and mark it as sent, it appears here.
-            Start from the Brand Outreach page.
+            Send outreach to a brand via the Compose tab and it will appear here automatically.
+            Replies are detected and tracked without any manual input.
           </p>
           <Link to="/outreach" className={styles.emptyLink}>Go to Brand Outreach →</Link>
         </div>

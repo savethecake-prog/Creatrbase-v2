@@ -81,8 +81,8 @@ async function ensureLabel(accessToken) {
     labelListVisibility:   'labelShow',
     messageListVisibility: 'show',
     color: {
-      backgroundColor: '#0d3b33',
-      textColor:       '#9effd8',
+      backgroundColor: '#16a765',
+      textColor:       '#ffffff',
     },
   });
   return created.id;

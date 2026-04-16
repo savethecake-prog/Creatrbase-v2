@@ -409,6 +409,106 @@ async function platformConnectRoutes(app) {
     );
   }
 
+  // ── Instagram ──────────────────────────────────────────────────────────────
+  // Instagram Business Login — manual OAuth (no @fastify/oauth2).
+  // Requires a Professional Instagram account.
+
+  const INSTAGRAM_ENABLED  = !!(process.env.INSTAGRAM_CLIENT_ID && process.env.INSTAGRAM_CLIENT_SECRET);
+  const INSTAGRAM_SCOPES   = ['instagram_business_basic', 'instagram_business_manage_insights'];
+  const INSTAGRAM_CALLBACK = `${process.env.APP_URL}/api/connect/instagram/callback`;
+  const INSTAGRAM_AUTH_URL = 'https://www.instagram.com/oauth/authorize';
+
+  if (INSTAGRAM_ENABLED) {
+    const { randomBytes } = require('crypto');
+    const { exchangeCodeForToken, getInstagramProfile } = require('../../services/instagram');
+
+    app.get('/api/connect/instagram', { preHandler: authenticate }, async (req, reply) => {
+      const state = randomBytes(16).toString('hex');
+      reply.setCookie('ig_oauth_state', state, {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge:   600,
+        path:     '/',
+      });
+
+      const url = new URL(INSTAGRAM_AUTH_URL);
+      url.searchParams.set('client_id',     process.env.INSTAGRAM_CLIENT_ID);
+      url.searchParams.set('redirect_uri',  INSTAGRAM_CALLBACK);
+      url.searchParams.set('scope',         INSTAGRAM_SCOPES.join(','));
+      url.searchParams.set('response_type', 'code');
+      url.searchParams.set('state',         state);
+
+      return reply.redirect(url.toString());
+    });
+
+    app.get('/api/connect/instagram/callback', { preHandler: authenticate }, async (req, reply) => {
+      const { code, state, error } = req.query;
+
+      if (error) {
+        app.log.warn({ error }, 'Instagram connect denied');
+        return reply.redirect('/connections?connect_error=instagram_denied');
+      }
+
+      const savedState = req.cookies?.ig_oauth_state;
+      reply.clearCookie('ig_oauth_state', { path: '/' });
+      if (!savedState || savedState !== state) {
+        app.log.warn('Instagram connect: state mismatch');
+        return reply.redirect('/connections?connect_error=instagram_state_mismatch');
+      }
+
+      let tokenData;
+      try {
+        tokenData = await exchangeCodeForToken(code, INSTAGRAM_CALLBACK);
+      } catch (err) {
+        app.log.error({ err }, 'Instagram token exchange failed');
+        return reply.redirect('/connections?connect_error=instagram_token_failed');
+      }
+
+      let profile;
+      try {
+        profile = await getInstagramProfile(tokenData.accessToken, tokenData.userId);
+      } catch (err) {
+        app.log.error({ err }, 'Instagram profile fetch failed');
+        return reply.redirect('/connections?connect_error=instagram_profile_failed');
+      }
+
+      try {
+        const { platformProfileId } = await connectPlatform({
+          userId:              req.user.userId,
+          tenantId:            req.user.tenantId,
+          platform:            'instagram',
+          platformUserId:      profile.userId,
+          platformUsername:    profile.username,
+          platformDisplayName: profile.name ?? profile.username,
+          platformUrl:         profile.username ? `https://www.instagram.com/${profile.username}` : null,
+          accessToken:         tokenData.accessToken,
+          refreshToken:        null, // Instagram long-lived tokens are refreshed in-place
+          tokenExpiresAt:      tokenData.expiresAt
+                                 ? Math.floor(tokenData.expiresAt.getTime() / 1000)
+                                 : null,
+          scopesGranted: INSTAGRAM_SCOPES,
+        });
+
+        getDataCollectionQueue().add('platform-sync', { platformProfileId });
+      } catch (err) {
+        if (err.statusCode === 409) {
+          return reply.redirect('/connections?connect_error=instagram_already_claimed');
+        }
+        throw err;
+      }
+
+      return reply.redirect('/connections?connected=instagram');
+    });
+
+  } else {
+    app.get('/api/connect/instagram', async (_, reply) =>
+      reply.code(503).send({ error: 'Instagram connection not configured' })
+    );
+    app.get('/api/connect/instagram/callback', async (_, reply) =>
+      reply.code(503).send({ error: 'Instagram connection not configured' })
+    );
+  }
+
   // ── GET /api/connect/platforms ─────────────────────────────────────────────
   // Returns connected platforms for the authenticated creator — no tokens.
 
@@ -422,7 +522,7 @@ async function platformConnectRoutes(app) {
 
   app.post('/api/connect/:platform/sync', { preHandler: authenticate }, async (req, reply) => {
     const { platform } = req.params;
-    if (!['youtube', 'twitch', 'tiktok'].includes(platform)) {
+    if (!['youtube', 'twitch', 'tiktok', 'instagram'].includes(platform)) {
       return reply.code(400).send({ error: 'Unknown platform' });
     }
 
@@ -448,7 +548,7 @@ async function platformConnectRoutes(app) {
 
   app.delete('/api/connect/:platform', { preHandler: authenticate }, async (req, reply) => {
     const { platform } = req.params;
-    if (!['youtube', 'twitch', 'tiktok'].includes(platform)) {
+    if (!['youtube', 'twitch', 'tiktok', 'instagram'].includes(platform)) {
       return reply.code(400).send({ error: 'Unknown platform' });
     }
 

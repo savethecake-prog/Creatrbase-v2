@@ -22,6 +22,9 @@ const { refreshTwitchToken,
 const { refreshTikTokToken,
         getTikTokUserInfo,
         getTikTokVideoList }              = require('../../services/tiktok');
+const { refreshInstagramToken,
+        getInstagramProfile,
+        getInstagramInsights }            = require('../../services/instagram');
 const { getDataCollectionQueue }           = require('../queue');
 
 function startPlatformSyncWorker() {
@@ -58,6 +61,8 @@ function startPlatformSyncWorker() {
           ? await refreshTwitchToken(decrypt(profile.refreshToken))
           : profile.platform === 'tiktok'
           ? await refreshTikTokToken(decrypt(profile.refreshToken))
+          : profile.platform === 'instagram'
+          ? await refreshInstagramToken(accessToken) // Instagram refreshes in-place, no refresh token
           : await refreshAccessToken(decrypt(profile.refreshToken));
 
         await tx.creatorPlatformProfile.update({
@@ -205,6 +210,39 @@ function startPlatformSyncWorker() {
           `, likes=${userInfo.likesCount ?? 'n/a'}` +
           `, videos=${userInfo.videoCount ?? 'n/a'}` +
           `, verified=${userInfo.isVerified}`
+        );
+      } else if (profile.platform === 'instagram') {
+        const igProfile  = await getInstagramProfile(accessToken, profile.platformUserId);
+        const insights   = await getInstagramInsights(accessToken, profile.platformUserId);
+
+        await tx.creatorPlatformProfile.update({
+          where: { id: platformProfileId },
+          data:  {
+            subscriberCount:          igProfile.followersCount,
+            instagramMediaCount:      igProfile.mediaCount,
+            instagramReach30d:        insights.reach30d,
+            instagramProfileViews30d: insights.profileViews30d,
+            instagramImpressions30d:  insights.impressions30d,
+            analyticsLastSyncedAt:    new Date(),
+            syncStatus:               'active',
+            lastSyncedAt:             new Date(),
+          },
+        });
+
+        await tx.platformMetricsSnapshot.create({
+          data: {
+            tenantId:        profile.tenantId,
+            platformProfileId,
+            platform:        'instagram',
+            subscriberCount: igProfile.followersCount,
+          },
+        });
+
+        job.log(
+          `Instagram sync complete: ${igProfile.followersCount} followers` +
+          `, media=${igProfile.mediaCount ?? 'n/a'}` +
+          `, reach_30d=${insights.reach30d ?? 'n/a'}` +
+          `, profile_views_30d=${insights.profileViews30d ?? 'n/a'}`
         );
       } else {
         job.log(`Skipping unsupported platform: ${profile.platform}`);

@@ -34,6 +34,7 @@ const FILES = [
   '017_gmail_connections.sql',
   '018_creator_tags.sql',
   '019_tiktok.sql',
+  '020_instagram.sql',
 ];
 
 async function run() {

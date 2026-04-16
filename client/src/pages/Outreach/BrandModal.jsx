@@ -104,6 +104,21 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
   const [aiError,      setAiError]      = useState(null);
   const [draftMeta,    setDraftMeta]    = useState(null); // { toneNotes, keyPositions, draftNotes }
 
+  // Send state
+  const [sendTo,          setSendTo]          = useState(brand.partnership_email ?? '');
+  const [sending,         setSending]         = useState(false);
+  const [sendError,       setSendError]       = useState(null);
+  const [sendSuccess,     setSendSuccess]     = useState(false);
+  const [showWarning,     setShowWarning]     = useState(false);
+  const [warningAcked,    setWarningAcked]    = useState(false);
+  const [gmailStatus,     setGmailStatus]     = useState(null); // null=loading, {connected}
+
+  useEffect(() => {
+    api.get('/gmail/status')
+      .then(setGmailStatus)
+      .catch(() => setGmailStatus({ connected: false }));
+  }, []);
+
   // Pre-fill template when switching to compose
   useEffect(() => {
     if (tab === 'compose' && !template) {
@@ -167,6 +182,41 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
       // best-effort
     } finally {
       setUpdatingStatus(false);
+    }
+  }
+
+  function parseEmailParts(text) {
+    const lines = text.split('\n');
+    if (lines[0].startsWith('Subject: ')) {
+      const subject = lines[0].replace('Subject: ', '').trim();
+      const body = lines.slice(lines[1] === '' ? 2 : 1).join('\n').trim();
+      return { subject, body };
+    }
+    return { subject: `Creator Partnership Inquiry — ${brand.brand_name}`, body: text.trim() };
+  }
+
+  async function handleSend() {
+    const { subject, body } = parseEmailParts(template);
+    if (!sendTo.trim()) {
+      setSendError('Please enter a recipient email address.');
+      return;
+    }
+    setSending(true);
+    setSendError(null);
+    try {
+      await api.post(`/brands/${brand.id}/send-email`, {
+        to:                    sendTo.trim(),
+        subject,
+        body,
+        readinessAcknowledged: true,
+      });
+      setSendSuccess(true);
+      setShowWarning(false);
+      onOutreachLogged(brand.id, 'outreach_sent');
+    } catch (err) {
+      setSendError(err?.data?.error ?? 'Failed to send. Please try again.');
+    } finally {
+      setSending(false);
     }
   }
 
@@ -332,10 +382,7 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
           {tab === 'compose' && (
             <>
               <p className={styles.composeIntro}>
-                Edit the template below, copy it, then send from your own email client.
-                {brand.partnership_email && (
-                  <> Sending to: <strong>{brand.partnership_email}</strong></>
-                )}
+                Edit and send directly from Creatrbase via Gmail, or copy to send manually.
               </p>
 
               {/* AI draft panel */}
@@ -430,6 +477,92 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
                   </button>
                 ) : (
                   <span className={styles.copyHint}>Outreach logged</span>
+                )}
+              </div>
+
+              {/* ── Gmail send section ── */}
+              <div className={styles.gmailSend}>
+                <p className={styles.gmailSendLabel}>Send via Gmail</p>
+
+                {gmailStatus === null && (
+                  <p className={styles.gmailLoading}>Checking Gmail connection…</p>
+                )}
+
+                {gmailStatus !== null && !gmailStatus.connected && (
+                  <div className={styles.gmailNotConnected}>
+                    <p className={styles.gmailNotConnectedMsg}>
+                      Connect your Gmail account to send directly from Creatrbase and auto-detect replies.
+                    </p>
+                    <a href="/connections" className={styles.gmailConnectLink}>
+                      Connect Gmail →
+                    </a>
+                  </div>
+                )}
+
+                {gmailStatus?.connected && !sendSuccess && (
+                  <>
+                    <div className={styles.gmailToRow}>
+                      <label className={styles.gmailToLabel}>To</label>
+                      <input
+                        className={styles.gmailToInput}
+                        type="email"
+                        value={sendTo}
+                        onChange={e => { setSendTo(e.target.value); setSendError(null); }}
+                        placeholder="partnerships@brand.com"
+                      />
+                    </div>
+                    <p className={styles.gmailFromHint}>Sending from {gmailStatus.gmailAddress}</p>
+
+                    {sendError && <p className={styles.gmailError}>{sendError}</p>}
+
+                    {!showWarning ? (
+                      <button
+                        className={styles.gmailSendBtn}
+                        onClick={() => setShowWarning(true)}
+                        disabled={sending}
+                      >
+                        Send via Gmail →
+                      </button>
+                    ) : (
+                      <div className={styles.gmailWarning}>
+                        <p className={styles.gmailWarningTitle}>Before you send</p>
+                        <ul className={styles.gmailWarningList}>
+                          <li>This will send a real email from your Gmail account.</li>
+                          <li>Make sure you're ready to discuss a partnership — brands may respond quickly.</li>
+                          <li>Replies will be automatically detected and surfaced in your History tab.</li>
+                          <li>You cannot unsend this email.</li>
+                        </ul>
+                        <div className={styles.gmailWarningActions}>
+                          <button
+                            className={styles.gmailConfirmBtn}
+                            onClick={handleSend}
+                            disabled={sending}
+                          >
+                            {sending ? 'Sending…' : 'Yes, send it'}
+                          </button>
+                          <button
+                            className={styles.gmailCancelBtn}
+                            onClick={() => { setShowWarning(false); setSendError(null); }}
+                            disabled={sending}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {sendSuccess && (
+                  <div className={styles.gmailSuccess}>
+                    <span className={styles.gmailSuccessIcon}>✓</span>
+                    <div>
+                      <p className={styles.gmailSuccessTitle}>Email sent</p>
+                      <p className={styles.gmailSuccessMsg}>
+                        Sent from {gmailStatus?.gmailAddress}. Replies will be detected automatically.
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
 

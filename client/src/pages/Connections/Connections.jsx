@@ -242,6 +242,67 @@ function PlatformCard({ platform, data, onSync, onDisconnect }) {
   );
 }
 
+function GmailCard() {
+  const [status, setStatus]         = useState(null); // null = loading
+  const [disconnecting, setDisconnecting] = useState(false);
+
+  useEffect(() => {
+    api.get('/gmail/status')
+      .then(setStatus)
+      .catch(() => setStatus({ connected: false }));
+  }, []);
+
+  async function handleDisconnect() {
+    setDisconnecting(true);
+    try {
+      await api.delete('/gmail/disconnect');
+      setStatus({ connected: false });
+    } catch {
+      setDisconnecting(false);
+    }
+  }
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.cardHeader}>
+        <div>
+          <p className={styles.platformName}>Gmail</p>
+          {status?.connected && (
+            <p className={styles.platformHandle}>{status.gmailAddress}</p>
+          )}
+        </div>
+        {status === null ? (
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Loading…</span>
+        ) : status.connected ? (
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--neon-mint)', background: 'rgba(158,255,216,0.08)', border: '1px solid rgba(158,255,216,0.2)', padding: '3px 10px', borderRadius: 999 }}>Connected</span>
+        ) : (
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--glass-border)', padding: '3px 10px', borderRadius: 999 }}>Not connected</span>
+        )}
+      </div>
+
+      {status?.connected ? (
+        <div className={styles.disconnectedState}>
+          <p className={styles.disconnectedMsg}>
+            Outreach emails will be sent directly from your Gmail account and tracked automatically in Creatrbase. Replies are detected hourly.
+          </p>
+          <Button size="sm" variant="ghost" onClick={handleDisconnect} disabled={disconnecting}>
+            {disconnecting ? 'Disconnecting…' : 'Disconnect Gmail'}
+          </Button>
+        </div>
+      ) : (
+        <div className={styles.disconnectedState}>
+          <p className={styles.disconnectedMsg}>
+            Connect Gmail to send outreach directly from Creatrbase and automatically detect when brands reply.
+          </p>
+          <Button size="sm" onClick={() => { window.location.href = '/api/gmail/connect'; }}>
+            Connect Gmail
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Connections() {
   const [platforms, setPlatforms] = useState([]);
   const [connectMsg, setConnectMsg] = useState(null);
@@ -260,6 +321,13 @@ export function Connections() {
     const params    = new URLSearchParams(window.location.search);
     const connected = params.get('connected');
     const error     = params.get('connect_error');
+    if (params.get('gmail_connected')) {
+      setConnectMsg({ type: 'success', text: 'Gmail connected. Outreach emails will now be sent directly from your account.' });
+      window.history.replaceState({}, '', '/connections');
+    } else if (params.get('gmail_error')) {
+      setConnectMsg({ type: 'error', text: 'Gmail connection failed. Please try again.' });
+      window.history.replaceState({}, '', '/connections');
+    }
     if (connected) {
       const name = connected === 'youtube' ? 'YouTube' : 'Twitch';
       setConnectMsg({ type: 'success', text: `${name} connected successfully.` });
@@ -305,6 +373,7 @@ export function Connections() {
             onDisconnect={handleDisconnect}
           />
         ))}
+        <GmailCard />
         {COMING_SOON.map(platform => (
           <ComingSoonCard key={platform.key} platform={platform} />
         ))}

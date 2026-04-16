@@ -41,6 +41,7 @@ model Tenant {
   engineRuns                 EngineRun[]
   recommendations            Recommendation[]
   supportTickets             SupportTicket[]
+  gmailConnections           GmailConnection[]
 
   @@map("tenants")
 }
@@ -555,4 +556,22 @@ model SupportTicket {
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@map("support_tickets")
+}
+
+// ─── Gmail connections ────────────────────────────────────────────────────────
+
+model GmailConnection {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantId       String    @map("tenant_id") @db.Uuid
+  creatorId      String    @unique @map("creator_id") @db.Uuid
+  gmailAddress   String    @map("gmail_address")
+  accessToken    String    @map("access_token")
+  refreshToken   String?   @map("refresh_token")
+  tokenExpiresAt DateTime? @map("token_expires_at") @db.Timestamptz(6)
+  labelId        String?   @map("label_id")
+  connectedAt    DateTime  @default(now()) @map("connected_at") @db.Timestamptz(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("gmail_connections")
 }

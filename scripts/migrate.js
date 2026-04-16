@@ -31,6 +31,7 @@ const FILES = [
   '014_task_metric_baseline.sql',
   '015_avg_views_momentum.sql',
   '016_support_tickets.sql',
+  '017_gmail_connections.sql',
 ];
 
 async function run() {

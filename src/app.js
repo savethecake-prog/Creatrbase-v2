@@ -39,6 +39,7 @@ app.register(webhookRoute);
 
 app.register(require('./domains/platforms/platformConnectRoutes'));
 app.register(require('./domains/support/supportRoutes').supportRoutes);
+app.register(require('./domains/gmail/gmailRoutes').gmailRoutes);
 app.register(require('./domains/gapTracker/gapTrackerRoutes'));
 app.register(require('./domains/creator/nicheRoutes'));
 app.register(require('./domains/creator/scoreRoutes'));
@@ -55,6 +56,7 @@ require('./jobs/workers/contentAnalysis').startContentAnalysisWorker();
 require('./jobs/workers/viabilityScoring').startViabilityScoringWorker();
 require('./jobs/workers/recommendationEngine').startRecommendationEngineWorker();
 require('./jobs/workers/emailDigest').startEmailDigestWorker();
+require('./jobs/workers/gmailSync').startGmailSyncWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

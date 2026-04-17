@@ -1,6 +1,7 @@
 'use strict';
 
-const { prisma } = require('../../lib/prisma');
+const { getPrisma } = require('../../lib/prisma');
+const prisma = getPrisma();
 
 const PAGE_SIZE = 12;
 

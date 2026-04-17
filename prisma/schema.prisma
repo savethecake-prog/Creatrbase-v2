@@ -622,3 +622,39 @@ model BlogPost {
 
   @@map("blog_posts")
 }
+
+model DistributionSignal {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  signalType          String   @map("signal_type")
+  vector              String
+  sourceSurface       String   @map("source_surface")
+  referenceObjectId   String?  @map("reference_object_id") @db.Uuid
+  signalPayload       Json     @default("{}") @map("signal_payload")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("distribution_signals")
+}
+
+model PublicScoreCard {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  platform          String
+  handle            String
+  channelName       String?   @map("channel_name")
+  channelAvatarUrl  String?   @map("channel_avatar_url")
+  calculatedScore   Int?      @map("calculated_score")
+  tierBand          String?   @map("tier_band")
+  topConstraint     String?   @map("top_constraint")
+  confidenceSummary Json      @default("{}") @map("confidence_summary")
+  scoreBreakdown    Json      @default("{}") @map("score_breakdown")
+  whatThisMeans     String?   @map("what_this_means")
+  calculatedAt      DateTime  @default(now()) @map("calculated_at") @db.Timestamptz(6)
+  expiresAt         DateTime  @map("expires_at") @db.Timestamptz(6)
+  viewCount         Int       @default(0) @map("view_count")
+  claimedAt         DateTime? @map("claimed_at") @db.Timestamptz(6)
+  claimedByUserId   String?   @map("claimed_by_user_id") @db.Uuid
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([platform, handle])
+  @@map("public_score_cards")
+}

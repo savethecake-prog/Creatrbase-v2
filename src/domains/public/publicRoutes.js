@@ -1,7 +1,7 @@
 'use strict';
 
 const { resolveChannelId, getPublicChannelStats } = require('../../services/publicYoutube');
-const { prisma } = require('../../lib/prisma');
+const { getPrisma } = require('../../lib/prisma');
 
 const BASE_URL = 'https://creatrbase.com';
 
@@ -23,8 +23,9 @@ function xmlEscape(str) {
 }
 
 async function publicRoutes(app) {
+  const prisma = getPrisma();
 
-  // GET /sitemap.xml — dynamic sitemap combining static pages + published blog posts
+  // GET /sitemap.xml
   app.get('/sitemap.xml', async (_request, reply) => {
     let blogPosts = [];
     try {
@@ -33,9 +34,7 @@ async function publicRoutes(app) {
         orderBy: { publishedAt: 'desc' },
         select:  { slug: true, publishedAt: true, updatedAt: true },
       });
-    } catch (_) {
-      // DB unavailable — still serve static entries
-    }
+    } catch (_) {}
 
     const urls = [
       ...STATIC_PAGES.map(p => ({
@@ -64,26 +63,18 @@ async function publicRoutes(app) {
     return reply.type('application/xml').send(xml);
   });
 
-
   // GET /api/public/youtube-check?url=...
   app.get('/api/public/youtube-check', async (request, reply) => {
     const { url } = request.query;
-
-    if (!url) {
-      return reply.code(400).send({ error: 'URL is required' });
-    }
+    if (!url) return reply.code(400).send({ error: 'URL is required' });
 
     try {
       const apiKey = process.env.YOUTUBE_API_KEY;
-      if (!apiKey) {
-        throw new Error('Server misconfiguration: YOUTUBE_API_KEY missing');
-      }
+      if (!apiKey) throw new Error('Server misconfiguration: YOUTUBE_API_KEY missing');
 
       const channelId = await resolveChannelId(url, apiKey);
       const stats = await getPublicChannelStats(channelId, apiKey);
 
-      // --- Brand Readiness Logic (The Oracle Lite) ---
-      // Milestone Tiers (Simplified for the Hook)
       const tiers = [
         { name: 'Emerging', subs: 500, views: 100 },
         { name: 'Giftable', subs: 2000, views: 500 },
@@ -91,15 +82,11 @@ async function publicRoutes(app) {
         { name: 'Agency Ready', subs: 50000, views: 10000 }
       ];
 
-      // Find the tier they are currently "working towards"
       let targetTier = tiers.find(t => stats.subscriberCount < t.subs || stats.avgViewsLast15 < t.views) || tiers[tiers.length - 1];
-      
-      // Calculate progress percentage to next tier (blend of subs and views)
       const subProgress = Math.min(1, stats.subscriberCount / targetTier.subs);
       const viewProgress = Math.min(1, (stats.avgViewsLast15 || 0) / targetTier.views);
       const overallScore = Math.round(((subProgress + viewProgress) / 2) * 100);
 
-      // Generate the "Hook" insight
       let insight = '';
       if (stats.subscriberCount < targetTier.subs) {
         const diff = targetTier.subs - stats.subscriberCount;
@@ -111,24 +98,45 @@ async function publicRoutes(app) {
 
       return {
         success: true,
-        channel: {
-          title: stats.title,
-          thumbnail: stats.thumbnail,
-          subscribers: stats.subscriberCount,
-          avgViews: stats.avgViewsLast15
-        },
+        channel: { title: stats.title, thumbnail: stats.thumbnail, subscribers: stats.subscriberCount, avgViews: stats.avgViewsLast15 },
         score: overallScore,
         targetTier: targetTier.name,
         insight
       };
-
     } catch (err) {
       request.log.error(err);
-      return reply.code(err.statusCode || 500).send({ 
-        success: false, 
-        error: err.message || 'Failed to analyze channel' 
-      });
+      return reply.code(err.statusCode || 500).send({ success: false, error: err.message || 'Failed to analyze channel' });
     }
+  });
+
+  // POST /api/public/signal — distribution signal logging
+  const signalRateLimit = {};
+  app.post('/api/public/signal', async (request, reply) => {
+    const { signal_type, vector, source_surface, signal_payload } = request.body || {};
+    if (!signal_type || !vector || !source_surface) {
+      return reply.code(400).send({ error: 'signal_type, vector, source_surface required' });
+    }
+
+    const ip = request.headers['x-real-ip'] || request.ip;
+    const now = Date.now();
+    const key = ip + ':signal';
+    if (!signalRateLimit[key]) signalRateLimit[key] = [];
+    signalRateLimit[key] = signalRateLimit[key].filter(t => t > now - 60000);
+    if (signalRateLimit[key].length >= 10) {
+      return reply.code(429).send({ error: 'Rate limited' });
+    }
+    signalRateLimit[key].push(now);
+
+    await prisma.distributionSignal.create({
+      data: {
+        signalType:    signal_type,
+        vector:        vector,
+        sourceSurface: source_surface,
+        signalPayload: signal_payload || {},
+      },
+    });
+
+    return { ok: true };
   });
 }
 

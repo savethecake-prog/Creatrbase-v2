@@ -1,108 +1,99 @@
 import React, { useState } from 'react';
 import styles from './BrandCheck.module.css';
-import { Button } from '../../ui/Button/Button';
-import { Card } from '../../ui/Card/Card';
+
+const YOUTUBE_RE = /youtube\.com|youtu\.be|^@/;
+
+function detectPlatform(input) {
+  if (!input) return 'youtube';
+  if (YOUTUBE_RE.test(input)) return 'youtube';
+  return null; // ambiguous
+}
+
+function extractHandle(input, platform) {
+  let clean = input.trim();
+
+  if (platform === 'youtube') {
+    // Extract from URL patterns
+    if (clean.includes('youtube.com/@')) {
+      clean = clean.split('/@')[1].split(/[/?#]/)[0];
+    } else if (clean.includes('youtube.com/c/')) {
+      clean = clean.split('/c/')[1].split(/[/?#]/)[0];
+    } else if (clean.includes('youtube.com/channel/')) {
+      clean = clean.split('/channel/')[1].split(/[/?#]/)[0];
+    } else {
+      clean = clean.replace(/^@/, '');
+    }
+  } else {
+    // Twitch: strip URL prefix if present
+    if (clean.includes('twitch.tv/')) {
+      clean = clean.split('twitch.tv/')[1].split(/[/?#]/)[0];
+    }
+    clean = clean.replace(/^@/, '');
+  }
+
+  return clean;
+}
 
 export function BrandCheck() {
-  const [url, setUrl] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [input, setInput] = useState('');
+  const [platform, setPlatform] = useState('youtube');
   const [error, setError] = useState(null);
 
-  const handleCheck = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!url) return;
+    if (!input.trim()) return;
 
-    setLoading(true);
     setError(null);
-    setResult(null);
 
-    try {
-      const response = await fetch(`/api/public/youtube-check?url=${encodeURIComponent(url)}`);
-      const data = await response.json();
+    const detected = detectPlatform(input);
+    const activePlatform = detected || platform;
+    const handle = extractHandle(input, activePlatform);
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
-      }
-
-      setResult(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!handle || handle.length < 2) {
+      setError('Enter a valid channel handle or URL');
+      return;
     }
+
+    // Full navigation — score card is server-rendered
+    window.location.href = '/score/' + activePlatform + '/' + encodeURIComponent(handle);
   };
 
   return (
-    <div className={styles.container}>
-      {!result ? (
-        <Card className={styles.checkCard} variant="glass">
-          <form onSubmit={handleCheck} className={styles.form}>
-            <h3 className={styles.formTitle}>How brand-ready are you?</h3>
-            <p className={styles.formSub}>Paste your YouTube URL and get your Commercial Viability Score in seconds — the same measure brands use to evaluate creators.</p>
-
-            <div className={styles.inputWrapper}>
-              <input
-                type="text"
-                placeholder="youtube.com/@yourchannel"
-                className={styles.input}
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                disabled={loading}
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className={styles.submitBtn}
-              >
-                {loading ? 'Scanning…' : 'Get my score'}
-              </button>
-            </div>
-            
-            {error && <p className={styles.errorMessage}>{error}</p>}
-          </form>
-        </Card>
-      ) : (
-        <Card className={styles.resultCard} variant="glass">
-          <div className={styles.resultHeader}>
-            {result.channel.thumbnail && (
-              <img src={result.channel.thumbnail} alt="" className={styles.avatar} />
-            )}
-            <div className={styles.channelInfo}>
-              <span className={styles.channelTitle}>{result.channel.title}</span>
-              <span className={styles.tierBadge}>{result.targetTier} Tier</span>
-            </div>
-            <button className={styles.resetBtn} onClick={() => setResult(null)}>Reset</button>
-          </div>
-
-          <div className={styles.scoreSection}>
-            <div className={styles.gaugeContainer}>
-              <div className={styles.gaugeOuter}>
-                <div 
-                  className={styles.gaugeInner} 
-                  style={{ '--score-width': `${result.score}%` }}
-                />
-              </div>
-              <div className={styles.scoreText}>
-                <span className={styles.scoreNumber}>{result.score}%</span>
-                <span className={styles.scoreLabel}>Brand Ready</span>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.insightBox}>
-            <p className={styles.insightText}>{result.insight}</p>
-          </div>
-
-          <Button 
-            variant="primary" 
-            className={styles.ctaBtn}
-            onClick={() => window.location.href = '/signup'}
+    <div className={styles.container} id="score">
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.platformToggle}>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${platform === 'youtube' ? styles.toggleActive : ''}`}
+            onClick={() => setPlatform('youtube')}
           >
-            Unlock My Full Earnings Report
-          </Button>
-        </Card>
-      )}
+            YouTube
+          </button>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${platform === 'twitch' ? styles.toggleActive : ''}`}
+            onClick={() => setPlatform('twitch')}
+          >
+            Twitch
+          </button>
+        </div>
+
+        <div className={styles.inputWrapper}>
+          <input
+            type="text"
+            placeholder={platform === 'youtube' ? '@yourchannel or youtube.com/@channel' : 'your_twitch_handle'}
+            className={styles.input}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button type="submit" className={styles.submitBtn}>
+            Get my score
+          </button>
+        </div>
+
+        {error && <p className={styles.errorMessage}>{error}</p>}
+        <p className={styles.helperText}>Free. No signup required. Results in seconds.</p>
+      </form>
     </div>
   );
 }

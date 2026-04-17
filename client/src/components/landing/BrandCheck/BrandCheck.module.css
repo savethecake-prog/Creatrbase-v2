@@ -247,3 +247,35 @@
     width: 100%;
   }
 }
+
+/* Platform toggle */
+.platformToggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+  padding: 3px;
+  width: fit-content;
+}
+.toggleBtn {
+  padding: 6px 18px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.toggleActive {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+.helperText {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}

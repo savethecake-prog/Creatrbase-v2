@@ -36,6 +36,8 @@ const FILES = [
   '019_tiktok.sql',
   '020_instagram.sql',
   '021_create_blog.sql',
+  '022_create_distribution_signals.sql',
+  '023_create_public_score_cards.sql',
 ];
 
 async function run() {

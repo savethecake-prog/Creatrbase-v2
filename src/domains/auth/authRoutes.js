@@ -122,7 +122,7 @@ async function authRoutes(app) {
   });
 
   // ── OAuth: Google ───────────────────────────────────────────────────────────
-  const GOOGLE_ENABLED = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+  const GOOGLE_ENABLED = !!(process.env.GOOGLE_LOGIN_CLIENT_ID && process.env.GOOGLE_LOGIN_CLIENT_SECRET);
   const TWITCH_ENABLED = !!(process.env.TWITCH_CLIENT_ID && process.env.TWITCH_CLIENT_SECRET);
 
   if (GOOGLE_ENABLED) {
@@ -132,8 +132,8 @@ async function authRoutes(app) {
       scope:          ['openid', 'email', 'profile'],
       credentials: {
         client: {
-          id:     process.env.GOOGLE_CLIENT_ID,
-          secret: process.env.GOOGLE_CLIENT_SECRET,
+          id:     process.env.GOOGLE_LOGIN_CLIENT_ID,
+          secret: process.env.GOOGLE_LOGIN_CLIENT_SECRET,
         },
         auth: oauthPlugin.GOOGLE_CONFIGURATION,
       },

@@ -7,6 +7,7 @@ import { ProductMockup } from '../../components/landing/ProductMockup/ProductMoc
 import { useIntersection } from '../../hooks/useIntersection';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
+import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import styles from './Landing.module.css';
 
 export function Landing() {

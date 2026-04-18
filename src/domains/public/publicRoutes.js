@@ -68,6 +68,18 @@ async function publicRoutes(app) {
       })),
     ];
 
+    // Programmatic pages
+    try {
+      const nicheRes = await pool.query("SELECT slug, updated_at FROM niche_pages WHERE status = 'published'");
+      nicheRes.rows.forEach(r => urls.push({ loc: `${BASE_URL}/niche/${xmlEscape(r.slug)}`, changefreq: 'monthly', priority: '0.6', lastmod: (r.updated_at || new Date()).toISOString().slice(0, 10) }));
+      const thresholdRes = await pool.query("SELECT slug, updated_at FROM threshold_pages WHERE status = 'published'");
+      thresholdRes.rows.forEach(r => urls.push({ loc: `${BASE_URL}/threshold/${xmlEscape(r.slug)}`, changefreq: 'monthly', priority: '0.6', lastmod: (r.updated_at || new Date()).toISOString().slice(0, 10) }));
+      const researchRes = await pool.query("SELECT slug, updated_at FROM research_reports WHERE status = 'published'");
+      researchRes.rows.forEach(r => urls.push({ loc: `${BASE_URL}/research/${xmlEscape(r.slug)}`, changefreq: 'monthly', priority: '0.8', lastmod: (r.updated_at || new Date()).toISOString().slice(0, 10) }));
+      const rateRes = await pool.query("SELECT country, niche_slug, MAX(updated_at) as updated_at FROM cpm_benchmarks GROUP BY country, niche_slug HAVING COUNT(*) >= 3");
+      rateRes.rows.forEach(r => urls.push({ loc: `${BASE_URL}/rates/${xmlEscape(r.country)}/${xmlEscape(r.niche_slug)}`, changefreq: 'monthly', priority: '0.6', lastmod: (r.updated_at || new Date()).toISOString().slice(0, 10) }));
+    } catch (_) {}
+
     const xml = [
       '<?xml version="1.0" encoding="UTF-8"?>',
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

@@ -32,12 +32,18 @@ async function getDynamicRoutes() {
     const blogResult = await pool.query(
       "SELECT slug FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC"
     );
-    const compareResult = await pool.query(
-      "SELECT slug FROM comparison_pages WHERE status = 'published' ORDER BY published_at DESC"
-    );
+    const compareResult = await pool.query("SELECT slug FROM comparison_pages WHERE status = 'published'");
+    const nicheResult = await pool.query("SELECT slug FROM niche_pages WHERE status = 'published'");
+    const thresholdResult = await pool.query("SELECT slug FROM threshold_pages WHERE status = 'published'");
+    const researchResult = await pool.query("SELECT slug FROM research_reports WHERE status = 'published'");
+    const rateResult = await pool.query("SELECT country, niche_slug FROM cpm_benchmarks GROUP BY country, niche_slug HAVING COUNT(*) >= 3");
     return [
       ...blogResult.rows.map(r => `/blog/${r.slug}`),
       ...compareResult.rows.map(r => `/compare/${r.slug}`),
+      ...nicheResult.rows.map(r => `/niche/${r.slug}`),
+      ...thresholdResult.rows.map(r => `/threshold/${r.slug}`),
+      ...researchResult.rows.map(r => `/research/${r.slug}`),
+      ...rateResult.rows.map(r => `/rates/${r.country}/${r.niche_slug}`),
     ];
   } catch (err) {
     console.error('[prerender] Failed to fetch dynamic routes:', err.message);

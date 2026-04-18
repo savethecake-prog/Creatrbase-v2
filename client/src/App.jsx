@@ -27,6 +27,7 @@ import { VoiceMemory }    from './pages/Admin/VoiceMemory';
 import { Skills }         from './pages/Admin/Skills';
 import { Author }         from './pages/Author/Author';
 import { Compare }        from './pages/Compare/Compare';
+import { NichePage, RatePage, ThresholdPage, ResearchPage } from './pages/Niche/NichePage';
 import { RequireAdmin }   from './lib/RequireAdmin';
 
 export default function App() {
@@ -44,6 +45,10 @@ export default function App() {
           <Route path="/score"       element={<ScoreForm />} />
           <Route path="/author/anthony-saulderson" element={<Author />} />
           <Route path="/compare/:competitor" element={<Compare />} />
+          <Route path="/niche/:slug" element={<NichePage />} />
+          <Route path="/rates/:country/:niche" element={<RatePage />} />
+          <Route path="/threshold/:metric" element={<ThresholdPage />} />
+          <Route path="/research/:slug" element={<ResearchPage />} />
           <Route path="/:slug" element={<StaticPage />} />
           <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
             <Route index element={<AdminDashboard />} />

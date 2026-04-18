@@ -1,6 +1,7 @@
 .container {
   width: 100%;
   max-width: 500px;
+  scroll-margin-top: 100px;
 }
 
 .form {

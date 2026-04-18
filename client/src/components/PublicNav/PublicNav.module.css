@@ -1,3 +1,5 @@
+/* ── V1 (dark glassmorphism — used by Blog, Static, ScoringMethodology) ── */
+
 .nav {
   position: sticky;
   top: 0;
@@ -11,7 +13,6 @@
   transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
 }
 
-/* Scroll-effect variant — starts transparent, gains blur on scroll */
 .navTransparent {
   position: fixed;
   top: 0;
@@ -29,10 +30,10 @@
 }
 
 .navInner {
-  max-width: var(--page-max-width, 1200px);
+  max-width: 1320px;
   margin: 0 auto;
   width: 100%;
-  padding: 0 var(--page-gutter, 24px);
+  padding: 0 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -83,8 +84,105 @@
   .links {
     gap: 14px;
   }
-
   .link:not(:last-of-type) {
+    display: none;
+  }
+}
+
+
+/* ── V2 (cream/sticker — used by Landing page) ── */
+
+.navV2 {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 76px;
+  background: #FAF6EF;
+  border-bottom: 1px solid #F1ECDF;
+  display: flex;
+  align-items: center;
+  transition: box-shadow 0.3s;
+}
+
+.scrolledV2 {
+  box-shadow: 0 2px 12px rgba(27, 16, 64, 0.06);
+}
+
+.logoV2 {
+  height: 40px;
+  display: block;
+}
+
+.linksV2 {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.linkV2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #76688F;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.linkV2:hover {
+  color: #1B1040;
+}
+
+.rightV2 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.loginV2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1B1040;
+  text-decoration: none;
+  padding: 11px 20px;
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+
+.loginV2:hover {
+  background: #F4EFE5;
+}
+
+.ctaV2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #FAF6EF;
+  background: #1B1040;
+  text-decoration: none;
+  padding: 11px 20px;
+  border-radius: 999px;
+  border: 1.5px solid #1B1040;
+  box-shadow: 3px 3px 0 #1B1040;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctaV2:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #1B1040;
+}
+
+@media (max-width: 900px) {
+  .linksV2 {
+    display: none;
+  }
+  .navInner {
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .loginV2 {
     display: none;
   }
 }

@@ -6,14 +6,13 @@ const YOUTUBE_RE = /youtube\.com|youtu\.be|^@/;
 function detectPlatform(input) {
   if (!input) return 'youtube';
   if (YOUTUBE_RE.test(input)) return 'youtube';
-  return null; // ambiguous
+  return null;
 }
 
 function extractHandle(input, platform) {
   let clean = input.trim();
 
   if (platform === 'youtube') {
-    // Extract from URL patterns
     if (clean.includes('youtube.com/@')) {
       clean = clean.split('/@')[1].split(/[/?#]/)[0];
     } else if (clean.includes('youtube.com/c/')) {
@@ -24,7 +23,6 @@ function extractHandle(input, platform) {
       clean = clean.replace(/^@/, '');
     }
   } else {
-    // Twitch: strip URL prefix if present
     if (clean.includes('twitch.tv/')) {
       clean = clean.split('twitch.tv/')[1].split(/[/?#]/)[0];
     }
@@ -54,45 +52,35 @@ export function BrandCheck() {
       return;
     }
 
-    // Full navigation — score card is server-rendered
     window.location.href = '/score/' + activePlatform + '/' + encodeURIComponent(handle);
   };
 
   return (
     <div className={styles.container} id="score">
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.platformToggle}>
-          <button
-            type="button"
-            className={`${styles.toggleBtn} ${platform === 'youtube' ? styles.toggleActive : ''}`}
-            onClick={() => setPlatform('youtube')}
-          >
-            YouTube
-          </button>
-          <button
-            type="button"
-            className={`${styles.toggleBtn} ${platform === 'twitch' ? styles.toggleActive : ''}`}
-            onClick={() => setPlatform('twitch')}
-          >
-            Twitch
-          </button>
-        </div>
-
         <div className={styles.inputWrapper}>
+          <span className={styles.prefix}>
+            {platform === 'youtube' ? 'youtube.com/' : 'twitch.tv/'}
+          </span>
           <input
             type="text"
-            placeholder={platform === 'youtube' ? '@yourchannel or youtube.com/@channel' : 'your_twitch_handle'}
+            placeholder="@yourchannel"
             className={styles.input}
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
           <button type="submit" className={styles.submitBtn}>
-            Get my score
+            Score my channel &rarr;
           </button>
         </div>
 
         {error && <p className={styles.errorMessage}>{error}</p>}
-        <p className={styles.helperText}>Free. No signup required. Results in seconds.</p>
+
+        <div className={styles.formMeta}>
+          <span><span className={styles.tick}>&#10003;</span> No signup</span>
+          <span><span className={styles.tick}>&#10003;</span> ~45 seconds</span>
+          <span><span className={styles.tick}>&#10003;</span> Free forever</span>
+        </div>
       </form>
     </div>
   );

@@ -89,16 +89,18 @@ async function authRoutes(app) {
   // ── GET /api/auth/me ────────────────────────────────────────────────────────
   const { authenticate } = require('../../middleware/authenticate');
   const { getSubscription } = require('../billing/billingService');
+  const { resolveTier } = require('../../services/tierResolver');
 
   app.get('/api/auth/me', { preHandler: authenticate }, async (req) => {
     const prisma = require('../../lib/prisma').getPrisma();
 
-    const [sub, creator] = await Promise.all([
+    const [sub, creator, tierInfo] = await Promise.all([
       getSubscription(req.user.tenantId),
       prisma.creator.findFirst({
         where:  { userId: req.user.userId, tenantId: req.user.tenantId },
         select: { onboardingStep: true },
       }),
+      resolveTier(req.user.tenantId),
     ]);
 
     const trialDaysLeft = sub?.trialEnd
@@ -111,6 +113,7 @@ async function authRoutes(app) {
       email:          req.user.email,
       displayName:    req.user.displayName,
       onboardingStep: creator?.onboardingStep ?? null,
+      tier:           tierInfo.tier,
       subscription: sub ? {
         status:        sub.status,
         planName:      sub.plan?.name ?? null,

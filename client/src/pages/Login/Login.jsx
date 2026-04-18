@@ -34,7 +34,7 @@ export function Login() {
   }
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Sign in to your Creatrbase account.">
+    <AuthLayout title="Sign in." subtitle="Welcome back. Pick up where your score left off.">
       <PageMeta title="Log in" noIndex={true} />
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
@@ -78,12 +78,12 @@ export function Login() {
         />
 
         <Button type="submit" full disabled={loading}>
-          {loading ? 'Signing in…' : 'Sign in'}
+          {loading ? 'Signing in...' : 'Sign in'}
         </Button>
 
         <p className={styles.footer}>
           Don't have an account?{' '}
-          <Link to="/signup" className={styles.link}>Start free trial</Link>
+          <Link to="/signup" className={styles.link}>Start free</Link>
         </p>
       </form>
     </AuthLayout>

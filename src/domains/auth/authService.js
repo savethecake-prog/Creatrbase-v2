@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const { getPrisma } = require('../../lib/prisma');
-const { createStripeCustomer, createTrialSubscription } = require('../billing/billingService');
+const { createFreeSubscription } = require('../billing/billingService');
 
 const BCRYPT_ROUNDS  = 12;
 const SESSION_TTL_DAYS = 7;
@@ -40,12 +40,11 @@ async function signup({ firstName, lastName, email, password, ip, userAgent }) {
     return { userId: user.id, tenantId: tenant.id, sessionId: session.id, displayName: resolvedName };
   });
 
-  // 2. Stripe setup — outside the transaction (external call, non-fatal)
+  // 2. Free subscription — no Stripe call, non-fatal
   try {
-    const stripeCustomerId = await createStripeCustomer(normalEmail, displayName);
-    await createTrialSubscription({ tenantId, stripeCustomerId });
-  } catch (stripeErr) {
-    console.error('Stripe setup failed at signup (non-fatal):', stripeErr.message);
+    await createFreeSubscription({ tenantId });
+  } catch (subErr) {
+    console.error('Free subscription setup failed at signup (non-fatal):', subErr.message);
   }
 
   return { userId, tenantId, sessionId, displayName };
@@ -140,13 +139,12 @@ async function oauthUpsert({ provider, providerId, email, displayName, ip, userA
       return { userId, tenantId, sessionId: session.id, resolvedName, isNew: !existingUser };
     });
 
-  // Stripe setup for brand-new users only — outside transaction, non-fatal
+  // Free subscription for brand-new users — no Stripe call, non-fatal
   if (isNew) {
     try {
-      const stripeCustomerId = await createStripeCustomer(normalEmail, resolvedName);
-      await createTrialSubscription({ tenantId, stripeCustomerId });
-    } catch (stripeErr) {
-      console.error('Stripe setup failed at OAuth signup (non-fatal):', stripeErr.message);
+      await createFreeSubscription({ tenantId });
+    } catch (subErr) {
+      console.error('Free subscription setup failed at OAuth signup (non-fatal):', subErr.message);
     }
   }
 

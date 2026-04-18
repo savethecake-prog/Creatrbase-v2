@@ -37,14 +37,10 @@ export function Signup() {
   }
 
   return (
-    <AuthLayout title="Start your free trial" subtitle="14 days free. No credit card required.">
-      <PageMeta title="Create your account" noIndex={true} />
+    <AuthLayout title="Get your score." subtitle="Sign up to track your Commercial Viability Score over time. Free forever. Upgrade whenever you're ready.">
+      <PageMeta title="Create your free account" noIndex={true} />
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
-
-        <div className={styles.trial}>
-          14-day free trial — full access, cancel any time
-        </div>
 
         <div className={styles.oauthRow}>
           <a className={styles.oauthBtn} href="/api/auth/google">
@@ -109,7 +105,7 @@ export function Signup() {
         />
 
         <Button type="submit" full disabled={loading}>
-          {loading ? 'Creating account…' : 'Create account'}
+          {loading ? 'Creating account...' : 'Create free account'}
         </Button>
 
         <p className={styles.terms}>

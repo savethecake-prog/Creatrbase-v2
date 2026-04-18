@@ -45,6 +45,28 @@ async function createTrialSubscription({ tenantId, stripeCustomerId }, tx) {
   });
 }
 
+// ─── Free subscription ────────────────────────────────────────────────────
+// Called at signup — creates a free-tier subscription with no Stripe involvement.
+
+async function createFreeSubscription({ tenantId }, tx) {
+  const db   = tx ?? getPrisma();
+  const plan = await db.subscriptionPlan.findFirst({
+    where: { name: 'free' },
+  });
+
+  if (!plan) throw new Error('Free plan not found - run migration 024');
+
+  await db.subscription.upsert({
+    where:  { tenantId },
+    update: {},
+    create: {
+      tenantId,
+      planId: plan.id,
+      status: 'active',
+    },
+  });
+}
+
 // ─── Checkout session ─────────────────────────────────────────────────────────
 
 async function createCheckoutSession({ stripeCustomerId, priceId, tenantId, successUrl, cancelUrl }) {
@@ -185,6 +207,7 @@ async function getSubscription(tenantId) {
 module.exports = {
   createStripeCustomer,
   createTrialSubscription,
+  createFreeSubscription,
   createCheckoutSession,
   createPortalSession,
   handleWebhook,

@@ -48,6 +48,7 @@ app.register(require('./domains/creator/taskRoutes'));
 app.register(require('./domains/creator/tagRoutes'));
 app.register(require('./domains/brands/brandsRoutes'));
 app.register(require('./domains/negotiations/negotiationsRoutes'));
+app.register(require('./domains/admin/adminRoutes').adminRoutes);
 app.register(require('./domains/public/publicRoutes'));
 app.register(require('./domains/public/scoreCardRoutes').scoreCardRoutes);
 app.register(require('./domains/public/claimRoutes').claimRoutes);

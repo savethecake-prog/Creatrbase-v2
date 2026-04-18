@@ -18,6 +18,9 @@ import { BlogArticle }  from './pages/Blog/BlogArticle';
 import { Honesty }      from './pages/Honesty/Honesty';
 import { Pricing }      from './pages/Pricing/Pricing';
 import { ScoreForm }    from './pages/Score/ScoreForm';
+import { AdminLayout }    from './pages/Admin/AdminLayout';
+import { AdminDashboard } from './pages/Admin/AdminDashboard';
+import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
 
 export default function App() {
   return (
@@ -33,6 +36,16 @@ export default function App() {
           <Route path="/pricing"     element={<Pricing />} />
           <Route path="/score"       element={<ScoreForm />} />
           <Route path="/:slug" element={<StaticPage />} />
+          <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="editorial" element={<AdminPlaceholder title="Editorial" />} />
+            <Route path="skills" element={<AdminPlaceholder title="Skills" />} />
+            <Route path="subscribers" element={<AdminPlaceholder title="Subscribers" />} />
+            <Route path="creators" element={<AdminPlaceholder title="Creators" />} />
+            <Route path="agents" element={<AdminPlaceholder title="Agents" />} />
+            <Route path="system" element={<AdminPlaceholder title="System" />} />
+            <Route path="revenue" element={<AdminPlaceholder title="Revenue" />} />
+          </Route>
           <Route path="/onboarding" element={
             <RequireAuth><Onboarding /></RequireAuth>
           } />

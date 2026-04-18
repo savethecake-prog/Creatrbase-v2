@@ -55,6 +55,7 @@ model User {
   passwordHash     String?   @map("password_hash")
   emailVerified    Boolean   @default(false) @map("email_verified")
   emailVerifiedAt  DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  cfoAccessLevel   Int       @default(0) @map("cfo_access_level")
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 

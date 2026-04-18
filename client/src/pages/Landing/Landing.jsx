@@ -5,6 +5,7 @@ import { MarketingFooter } from '../../components/MarketingFooter/MarketingFoote
 import { useIntersection } from '../../hooks/useIntersection';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
+import { NewsletterSignup } from '../../components/NewsletterSignup/NewsletterSignup';
 import styles from './Landing.module.css';
 
 function logSignal(signalType, payload) {
@@ -593,6 +594,13 @@ export function Landing() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Newsletter signup */}
+      <section className={`${styles.section} ${styles.sectionAlt}`}>
+        <div className={styles.container}>
+          <NewsletterSignup source="landing" variant="block" />
         </div>
       </section>
 

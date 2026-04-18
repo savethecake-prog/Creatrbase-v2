@@ -4,6 +4,7 @@ import { api } from '../../lib/api';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
 import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
+import { NewsletterSignup } from '../../components/NewsletterSignup/NewsletterSignup';
 import styles from './BlogArticle.module.css';
 
 function fmtDate(d) {
@@ -121,6 +122,15 @@ export function BlogArticle() {
             <a href="/#score" className={styles.midCtaBtn}>Get my score &rarr;</a>
           </div>
         </article>
+
+        <div style={{ margin: '40px 0' }}>
+          <NewsletterSignup
+            source="blog"
+            sourceDetail={slug}
+            variant="block"
+            copy={{ eyebrow: 'Keep reading', title: 'Subscribe to the Creatrbase newsletter.', body: 'Commercial intelligence for independent creators. Three sends per week, opt out of any segment.', cta: 'Subscribe' }}
+          />
+        </div>
 
         <div className={styles.articleFooter}>
           <Link to="/blog" className={styles.backLink}>&larr; Back to blog</Link>

@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input/Input';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import { getMe } from '../../lib/auth';
+import { NewsletterSignup } from '../../components/NewsletterSignup/NewsletterSignup';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './Signup.module.css';
 
@@ -18,6 +19,7 @@ export function Signup() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [claimInfo, setClaimInfo] = useState(null);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
 
   useEffect(() => {
     if (!claimId) return;
@@ -38,6 +40,13 @@ export function Signup() {
       await api.post('/auth/signup', form);
       const me = await getMe();
       setUser(me);
+      // Subscribe to newsletter if opted in (non-blocking)
+      if (newsletterOptIn) {
+        api.post('/newsletter/subscribe', {
+          email: form.email, source: 'product_signup',
+          segments: ['creator-economy', 'ai-for-creators', 'editorial'],
+        }).catch(() => {});
+      }
       // Claim the score if we have a claim param
       if (claimId) {
         try { await api.post('/public/claim', { scoreCardId: claimId }); } catch (_) {}
@@ -126,6 +135,8 @@ export function Signup() {
           autoComplete="new-password"
           minLength={8}
         />
+
+        <NewsletterSignup source="product_signup" variant="checkbox" onSubscribe={setNewsletterOptIn} />
 
         <Button type="submit" full disabled={loading}>
           {loading ? 'Creating account...' : 'Create free account'}

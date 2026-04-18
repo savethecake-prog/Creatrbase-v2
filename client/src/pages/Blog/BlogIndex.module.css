@@ -152,7 +152,15 @@
 .cardImgFallback {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #F0E4FF, #D5FAE8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fallbackEmoji {
+  font-size: 48px;
+  opacity: 0.7;
+  filter: grayscale(0.2);
 }
 
 .cardBody {

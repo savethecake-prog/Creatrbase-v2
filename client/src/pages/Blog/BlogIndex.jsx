@@ -6,19 +6,42 @@ import { MarketingFooter } from '../../components/MarketingFooter/MarketingFoote
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './BlogIndex.module.css';
 
+const CATEGORY_EMOJI = {
+  'scoring-explained': '📊',
+  'brand-deals': '🤝',
+  'creator-growth': '🚀',
+  'pricing-rates': '💰',
+  'platform-updates': '⚡',
+};
+const FALLBACK_GRADIENTS = [
+  'linear-gradient(135deg, #F0E4FF, #D5FAE8)',
+  'linear-gradient(135deg, #FFE8DC, #F0E4FF)',
+  'linear-gradient(135deg, #D5FAE8, #F0E4FF)',
+  'linear-gradient(135deg, #F0E4FF, #FFE8DC)',
+];
+
+function getCardFallback(post) {
+  const emoji = (post.category && CATEGORY_EMOJI[post.category.slug]) || '✦';
+  const hash = (post.title || '').length % FALLBACK_GRADIENTS.length;
+  return { emoji, gradient: FALLBACK_GRADIENTS[hash] };
+}
+
 function fmtDate(d) {
   if (!d) return '';
   return new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function PostCard({ post, featured = false }) {
+  const fb = getCardFallback(post);
   return (
     <Link to={`/blog/${post.slug}`} className={[styles.card, featured ? styles.cardFeatured : ''].filter(Boolean).join(' ')}>
       <div className={styles.cardImg}>
         {post.coverImageUrl ? (
           <img src={post.coverImageUrl} alt={post.title} loading="lazy" />
         ) : (
-          <div className={styles.cardImgFallback} />
+          <div className={styles.cardImgFallback} style={{ background: fb.gradient }}>
+            <span className={styles.fallbackEmoji}>{fb.emoji}</span>
+          </div>
         )}
       </div>
       <div className={styles.cardBody}>

@@ -21,6 +21,7 @@ import { ScoreForm }    from './pages/Score/ScoreForm';
 import { AdminLayout }    from './pages/Admin/AdminLayout';
 import { AdminDashboard } from './pages/Admin/AdminDashboard';
 import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
+import { RequireAdmin }   from './lib/RequireAdmin';
 
 export default function App() {
   return (
@@ -36,7 +37,7 @@ export default function App() {
           <Route path="/pricing"     element={<Pricing />} />
           <Route path="/score"       element={<ScoreForm />} />
           <Route path="/:slug" element={<StaticPage />} />
-          <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
+          <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
             <Route index element={<AdminDashboard />} />
             <Route path="editorial" element={<AdminPlaceholder title="Editorial" />} />
             <Route path="skills" element={<AdminPlaceholder title="Skills" />} />

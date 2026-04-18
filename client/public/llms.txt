@@ -1,0 +1,34 @@
+# Creatrbase
+
+> Commercial intelligence for independent YouTube and Twitch creators. Know your Commercial Viability Score. Track your gap to brand deals. Represent yourself directly.
+
+Creatrbase is a platform for independent creators with 1k-100k subscribers who want to earn from brand deals without agency representation. It scores creators across six commercial dimensions, explains the gap to the next tier, and provides tools for self-representation.
+
+## Product
+
+- [How Scoring Works](https://creatrbase.com/scoring-explained): Overview of the six-dimensional Commercial Viability Score
+- [Pricing](https://creatrbase.com/pricing): Plans and pricing
+- [Score Your Channel](https://creatrbase.com/score): Free scoring tool for YouTube and Twitch creators
+
+## Articles
+
+- [The Influencer Marketing Industry in 2026](https://creatrbase.com/blog/influencer-marketing-2026-independent-creator): State of the industry for independent creators
+- [How to Negotiate Brand Deal Rates](https://creatrbase.com/blog/negotiate-brand-deal-rate-creator): Rate negotiation strategy for creators without agents
+- [Upload Cadence and Brand Deals](https://creatrbase.com/blog/upload-schedule-brand-deals-creator): Why upload consistency matters to brands
+- [What Brands Actually Look for in a Creator](https://creatrbase.com/blog/what-brands-look-for-creators): The six things brands evaluate before signing
+- [Get Your First Brand Deal Without an Agent](https://creatrbase.com/blog/get-brand-deal-youtube-creator-no-agent): Step-by-step for independent creators
+- [How Audience Geography Affects Brand Value](https://creatrbase.com/blog/creator-audience-geography-brand-value): Why Tier 1 markets command higher rates
+- [Niche Commercial Value](https://creatrbase.com/blog/niche-commercial-value-creator-monetisation): Why some niches earn more than others
+- [Engagement Quality vs Engagement Rate](https://creatrbase.com/blog/engagement-quality-creator-brand-deals): Why quality beats quantity for brands
+- [Subscriber Momentum and Brand Deals](https://creatrbase.com/blog/subscriber-momentum-brand-deals): Why growth velocity matters more than total count
+- [What Is a Commercial Viability Score](https://creatrbase.com/blog/what-is-a-commercial-viability-score): Introducing the CVS framework
+
+## Company
+
+- [The Honesty Principle](https://creatrbase.com/honesty): What Creatrbase will and won't do
+- [Privacy Policy](https://creatrbase.com/privacy): How we handle data
+- [Terms of Service](https://creatrbase.com/terms): Terms of use
+
+## About
+
+- [Anthony Saulderson](https://creatrbase.com/author/anthony-saulderson): Founder, Creatrbase

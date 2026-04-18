@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  listmonk:
+    image: listmonk/listmonk:latest
+    container_name: listmonk
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - TZ=Europe/London
+    volumes:
+      - ./listmonk/config.toml:/listmonk/config.toml
+    depends_on:
+      - listmonk-db
+
+  listmonk-db:
+    image: postgres:16-alpine
+    container_name: listmonk-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: listmonk
+      POSTGRES_USER: listmonk
+      POSTGRES_PASSWORD: ${LISTMONK_DB_PASSWORD:-listmonk_secret}
+    volumes:
+      - listmonk_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+volumes:
+  listmonk_data:

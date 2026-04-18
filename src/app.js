@@ -49,6 +49,7 @@ app.register(require('./domains/creator/tagRoutes'));
 app.register(require('./domains/brands/brandsRoutes'));
 app.register(require('./domains/negotiations/negotiationsRoutes'));
 app.register(require('./domains/admin/adminRoutes').adminRoutes);
+app.register(require('./domains/newsletter/newsletterRoutes').newsletterRoutes);
 app.register(require('./domains/public/publicRoutes'));
 app.register(require('./domains/public/scoreCardRoutes').scoreCardRoutes);
 app.register(require('./domains/public/claimRoutes').claimRoutes);
@@ -66,6 +67,7 @@ require('./jobs/workers/gmailSync').startGmailSyncWorker();
 require('./jobs/workers/taskCadence').startTaskCadenceWorker();
 require('./jobs/workers/tagDetection').startTagDetectionWorker();
 require('./jobs/workers/retentionNotifications').startRetentionNotificationsWorker();
+require('./jobs/workers/ingestionFetcher').startIngestionFetcherWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

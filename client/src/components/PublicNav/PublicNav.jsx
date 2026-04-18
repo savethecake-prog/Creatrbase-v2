@@ -36,7 +36,7 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
           </div>
           <div className={styles.rightV2}>
             <Link to="/login" className={styles.loginV2}>Log in</Link>
-            <NavLink hash="#score" to="/#score" className={styles.ctaV2}>Get your score</NavLink>
+            <NavLink hash="#score" to="/score" className={styles.ctaV2}>Get your score</NavLink>
           </div>
         </div>
       </nav>

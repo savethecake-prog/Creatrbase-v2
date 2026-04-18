@@ -13,6 +13,18 @@ const { renderScoreCardHTML }  = require('../../templates/scoreCard');
 const YOUTUBE_HANDLE_RE = /^@?[a-zA-Z0-9_.-]{1,100}$/;
 const TWITCH_HANDLE_RE  = /^[a-zA-Z0-9_]{4,25}$/;
 
+// Rate limiting: 5 scores per IP per hour
+const scoreRateLimit = {};
+function checkScoreRateLimit(ip) {
+  const now = Date.now();
+  const key = ip + ':score';
+  if (!scoreRateLimit[key]) scoreRateLimit[key] = [];
+  scoreRateLimit[key] = scoreRateLimit[key].filter(t => t > now - 3600000);
+  if (scoreRateLimit[key].length >= 5) return false;
+  scoreRateLimit[key].push(now);
+  return true;
+}
+
 async function scoreCardRoutes(app) {
   const prisma = getPrisma();
 
@@ -33,23 +45,37 @@ async function scoreCardRoutes(app) {
       return reply.code(400).send({ error: 'Invalid Twitch handle format.' });
     }
 
+    const forceRescore = request.query.rescore === '1';
+
     try {
-      // Check cache (24h)
+      // Check cache — serve if score exists and is less than 24h old
       let cached = await prisma.publicScoreCard.findFirst({
         where: {
           platform,
           handle: cleanHandle.toLowerCase(),
-          expiresAt: { gt: new Date() },
         },
       });
 
-      if (cached) {
-        // Increment view count
+      const cacheStale = cached && cached.expiresAt < new Date();
+      const needsScore = !cached || cacheStale || forceRescore;
+
+      if (!needsScore) {
+        // Serve from cache, increment view count
         await prisma.publicScoreCard.update({
           where: { id: cached.id },
           data:  { viewCount: { increment: 1 } },
         });
       } else {
+        // Rate limit new scoring requests
+        const ip = request.headers['x-real-ip'] || request.ip;
+        if (!cached && !checkScoreRateLimit(ip)) {
+          return reply.code(429).type('text/html').send(
+            '<html><body style="background:#FAF6EF;color:#1B1040;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh">' +
+            '<div style="text-align:center"><h1>Too many requests</h1><p style="color:#76688F">Too many scoring attempts. Try again in a few minutes.</p>' +
+            '<a href="/" style="color:#1B1040;margin-top:16px;display:inline-block">Back to home</a></div></body></html>'
+          );
+        }
+
         // Fetch public data and score
         let channelData = {};
         let channelName = cleanHandle;
@@ -106,7 +132,7 @@ async function scoreCardRoutes(app) {
           );
         }
 
-        // Insert into cache
+        // Insert/update cache — 24h re-score window, but row persists for 365 days
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         cached = await prisma.publicScoreCard.upsert({

@@ -1,0 +1,223 @@
+.page {
+  min-height: 100vh;
+  background: #FAF6EF;
+  color: #1B1040;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 64px 0 40px;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #9EFFD8;
+  border: 1px solid #1B1040;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1B1040;
+  box-shadow: 2px 2px 0 #1B1040;
+  margin-bottom: 28px;
+}
+
+.eyebrowDot { width: 6px; height: 6px; border-radius: 50%; background: #1B1040; }
+
+.heroTitle {
+  font-family: 'Lilita One', cursive;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 400;
+  margin: 0 0 16px;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: #1B1040;
+}
+
+.heroDesc {
+  font-size: 17px;
+  color: #76688F;
+  margin: 0 auto;
+  max-width: 560px;
+  line-height: 1.65;
+}
+
+/* ── Form card ── */
+.formCard {
+  background: #FFFDF9;
+  border: 1.5px solid #1B1040;
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: 6px 6px 0 #1B1040;
+  margin-bottom: 56px;
+}
+
+.platformTabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  background: #F4EFE5;
+  border: 1.5px solid #1B1040;
+  border-radius: 999px;
+  padding: 3px;
+  width: fit-content;
+}
+
+.platformTab {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #76688F;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.platformTabActive {
+  background: #1B1040;
+  color: #FAF6EF;
+}
+
+.form { margin-bottom: 16px; }
+
+.inputRow {
+  display: flex;
+  gap: 10px;
+}
+
+.input {
+  flex: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 14px 18px;
+  border: 1.5px solid #E8E1D4;
+  border-radius: 12px;
+  background: #FAF6EF;
+  color: #1B1040;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus { border-color: #9EFFD8; }
+.input::placeholder { color: #A69BB8; }
+.input:disabled { opacity: 0.6; }
+
+.submitBtn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 1.5px solid #1B1040;
+  background: #9EFFD8;
+  color: #1B1040;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #1B1040;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #1B1040;
+}
+
+.submitBtn:disabled { opacity: 0.5; cursor: default; }
+
+.error {
+  font-size: 13px;
+  color: #E04848;
+  margin: 10px 0 0;
+}
+
+.progress {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #76688F;
+  margin: 12px 0 0;
+  letter-spacing: 0.02em;
+}
+
+.formMeta {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: #76688F;
+}
+
+.formMeta span::before {
+  content: '\2713  ';
+  color: #6EDDB1;
+  font-weight: 700;
+}
+
+/* ── Steps ── */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.step {
+  background: #FFFDF9;
+  border: 1.5px solid #1B1040;
+  border-radius: 14px;
+  padding: 24px 20px;
+  box-shadow: 3px 3px 0 #1B1040;
+}
+
+.step p {
+  font-size: 13px;
+  color: #76688F;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.stepNum {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #1B1040;
+  background: #C8AAFF;
+  border: 1px solid #1B1040;
+  border-radius: 999px;
+  padding: 4px 12px;
+  display: inline-block;
+  margin-bottom: 14px;
+  box-shadow: 2px 2px 0 #1B1040;
+}
+
+.stepNumPeach { background: #FFBFA3; }
+.stepNumMint { background: #9EFFD8; }
+
+.stepTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1B1040;
+  margin: 0 0 8px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .inputRow { flex-direction: column; }
+  .steps { grid-template-columns: 1fr; }
+  .formCard { padding: 24px; }
+}

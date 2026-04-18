@@ -4,6 +4,7 @@ const fs        = require('fs');
 const path      = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const { authenticate }  = require('../../middleware/authenticate');
+const { requireTier }   = require('../../middleware/requireTier');
 const { getBrands, logOutreach, updateOutreachStatus, getOutreachHistory } = require('./brandsService');
 const { getPrisma }     = require('../../lib/prisma');
 const { getPool }       = require('../../db/pool');
@@ -45,7 +46,7 @@ async function brandsRoutes(app) {
   // Returns brand registry with niche-matched tier profiles and outreach status.
   // Query params: category (optional)
 
-  app.get('/api/brands', { preHandler: authenticate }, async (req) => {
+  app.get('/api/brands', { preHandler: [authenticate, requireTier('pro')] }, async (req) => {
     const { category = null } = req.query;
     let creatorId = null;
     let niche     = null;
@@ -68,7 +69,7 @@ async function brandsRoutes(app) {
   // Logs that the creator sent outreach to a brand.
   // Body: { notes? }
 
-  app.post('/api/brands/:brandId/outreach', { preHandler: authenticate }, async (req, reply) => {
+  app.post('/api/brands/:brandId/outreach', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
     const { brandId } = req.params;
     const { notes = null } = req.body ?? {};
 
@@ -91,7 +92,7 @@ async function brandsRoutes(app) {
   // Logs a follow-on status update (responded, declined, deal started).
   // Body: { interactionType, notes? }
 
-  app.post('/api/brands/:brandId/outreach/status', { preHandler: authenticate }, async (req, reply) => {
+  app.post('/api/brands/:brandId/outreach/status', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
     const { brandId } = req.params;
     const { interactionType, notes = null } = req.body ?? {};
 
@@ -122,7 +123,7 @@ async function brandsRoutes(app) {
   // ── GET /api/brands/:brandId/outreach ───────────────────────────────────────
   // Full outreach history for this creator + brand.
 
-  app.get('/api/brands/:brandId/outreach', { preHandler: authenticate }, async (req, reply) => {
+  app.get('/api/brands/:brandId/outreach', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
     const { brandId } = req.params;
 
     const resolved = await resolveCreator(req.user.userId, req.user.tenantId);
@@ -137,7 +138,7 @@ async function brandsRoutes(app) {
   // Body: { negotiationContext, deliverableType?, deliverableDetails?,
   //         brandOfferAmount?, brandOfferTerms?, contractFlagsJson? }
 
-  app.post('/api/brands/:brandId/draft-pitch', { preHandler: authenticate }, async (req, reply) => {
+  app.post('/api/brands/:brandId/draft-pitch', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
     const { brandId } = req.params;
     const {
       negotiationContext = 'opening_position',

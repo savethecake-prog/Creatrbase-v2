@@ -1,6 +1,7 @@
 'use strict';
 
 const { authenticate } = require('../../middleware/authenticate');
+const { requireTier }  = require('../../middleware/requireTier');
 const { getPrisma }    = require('../../lib/prisma');
 const { getPipeline, getDealHistory, logDealUpdate } = require('./negotiationsService');
 
@@ -23,7 +24,7 @@ async function negotiationsRoutes(app) {
   // ── GET /api/negotiations ───────────────────────────────────────────────────
   // Returns the creator's full deal pipeline — one entry per brand, latest stage.
 
-  app.get('/api/negotiations', { preHandler: authenticate }, async (req, reply) => {
+  app.get('/api/negotiations', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
     const resolved = await resolveCreator(req.user.userId, req.user.tenantId);
     if (!resolved) return reply.code(404).send({ error: 'Creator profile not found' });
     const deals = await getPipeline({ creatorId: resolved.creatorId });
@@ -33,7 +34,7 @@ async function negotiationsRoutes(app) {
   // ── GET /api/negotiations/:brandId/history ──────────────────────────────────
   // Full interaction history for one brand deal.
 
-  app.get('/api/negotiations/:brandId/history', { preHandler: authenticate }, async (req, reply) => {
+  app.get('/api/negotiations/:brandId/history', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
     const { brandId } = req.params;
     const resolved = await resolveCreator(req.user.userId, req.user.tenantId);
     if (!resolved) return reply.code(404).send({ error: 'Creator profile not found' });
@@ -45,7 +46,7 @@ async function negotiationsRoutes(app) {
   // Logs a stage change or rate update for a deal.
   // Body: { interactionType, agreedRate?, offeredRate?, rateCurrency?, deliverableType?, notes? }
 
-  app.post('/api/negotiations/:brandId/update', { preHandler: authenticate }, async (req, reply) => {
+  app.post('/api/negotiations/:brandId/update', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
     const { brandId } = req.params;
     const {
       interactionType,

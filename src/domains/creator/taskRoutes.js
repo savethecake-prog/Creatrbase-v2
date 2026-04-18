@@ -11,6 +11,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const { authenticate } = require('../../middleware/authenticate');
+const { requireTier }  = require('../../middleware/requireTier');
 const { getPrisma }    = require('../../lib/prisma');
 
 const TASK_SELECT = {
@@ -51,7 +52,7 @@ async function taskRoutes(app) {
 
   // ── GET /api/creator/tasks ────────────────────────────────────────────────────
 
-  app.get('/api/creator/tasks', { preHandler: authenticate }, async (req) => {
+  app.get('/api/creator/tasks', { preHandler: [authenticate, requireTier('core')] }, async (req) => {
     const prisma = getPrisma();
 
     const creator = await prisma.creator.findFirst({
@@ -104,7 +105,7 @@ async function taskRoutes(app) {
 
   // ── PATCH /api/creator/tasks/:id ─────────────────────────────────────────────
 
-  app.patch('/api/creator/tasks/:id', { preHandler: authenticate }, async (req, reply) => {
+  app.patch('/api/creator/tasks/:id', { preHandler: [authenticate, requireTier('core')] }, async (req, reply) => {
     const prisma = getPrisma();
     const { id } = req.params;
     const { action, feedback, note } = req.body ?? {};

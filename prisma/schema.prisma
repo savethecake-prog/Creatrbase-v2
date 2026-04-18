@@ -235,7 +235,7 @@ model Subscription {
   tenantId             String    @unique @map("tenant_id") @db.Uuid
   planId               String    @map("plan_id") @db.Uuid
   stripeSubscriptionId String?   @map("stripe_subscription_id")
-  stripeCustomerId     String    @map("stripe_customer_id")
+  stripeCustomerId     String?   @map("stripe_customer_id")
   status               String    @default("trialling")
   billingInterval      String    @default("month") @map("billing_interval")
   trialStart           DateTime? @map("trial_start") @db.Timestamptz(6)

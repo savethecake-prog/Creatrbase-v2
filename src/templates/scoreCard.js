@@ -59,7 +59,7 @@ function renderScoreCardHTML({
   const displayName   = channelName || handle;
 
   const pageUrl = 'https://creatrbase.com/score/' + esc(platform) + '/' + esc(handle);
-  const ogImageUrl = 'https://creatrbase.com/api/og?type=score&handle=' + encodeURIComponent(handle) + '&platform=' + encodeURIComponent(platform) + '&score=' + scoreNum + '&tier=' + encodeURIComponent(tierBand) + '&channel=' + encodeURIComponent(channelName || handle);
+  const ogImageUrl = 'https://creatrbase.com/api/score/' + scoreCardId + '/share.png';
 
   const utmBase = 'utm_source=score_card&utm_medium=share&utm_campaign=v1_public&utm_content=' + scoreCardId;
   const shareText = encodeURIComponent('My channel scored ' + scoreNum + '/100 on Creatrbase (' + tierLabel + ' tier). See yours:');

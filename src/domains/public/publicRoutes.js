@@ -32,12 +32,19 @@ async function publicRoutes(app) {
   // GET /sitemap.xml
   app.get('/sitemap.xml', async (_request, reply) => {
     let blogPosts = [];
+    let comparisons = [];
     try {
       blogPosts = await prisma.blogPost.findMany({
         where:   { status: 'published' },
         orderBy: { publishedAt: 'desc' },
         select:  { slug: true, publishedAt: true, updatedAt: true },
       });
+    } catch (_) {}
+    try {
+      const { getPool } = require('../../db/pool');
+      const pool = getPool();
+      const result = await pool.query("SELECT slug, updated_at FROM comparison_pages WHERE status = 'published'");
+      comparisons = result.rows;
     } catch (_) {}
 
     const urls = [
@@ -52,6 +59,12 @@ async function publicRoutes(app) {
         changefreq: 'monthly',
         priority:   '0.7',
         lastmod:    (p.updatedAt || p.publishedAt || new Date()).toISOString().slice(0, 10),
+      })),
+      ...comparisons.map(c => ({
+        loc:        `${BASE_URL}/compare/${xmlEscape(c.slug)}`,
+        changefreq: 'monthly',
+        priority:   '0.8',
+        lastmod:    (c.updated_at || new Date()).toISOString().slice(0, 10),
       })),
     ];
 

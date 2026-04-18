@@ -26,15 +26,21 @@ const STATIC_ROUTES = [
   '/score',
 ];
 
-async function getBlogSlugs() {
+async function getDynamicRoutes() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   try {
-    const { rows } = await pool.query(
+    const blogResult = await pool.query(
       "SELECT slug FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC"
     );
-    return rows.map(r => `/blog/${r.slug}`);
+    const compareResult = await pool.query(
+      "SELECT slug FROM comparison_pages WHERE status = 'published' ORDER BY published_at DESC"
+    );
+    return [
+      ...blogResult.rows.map(r => `/blog/${r.slug}`),
+      ...compareResult.rows.map(r => `/compare/${r.slug}`),
+    ];
   } catch (err) {
-    console.error('[prerender] Failed to fetch blog slugs:', err.message);
+    console.error('[prerender] Failed to fetch dynamic routes:', err.message);
     return [];
   } finally {
     await pool.end();
@@ -42,8 +48,8 @@ async function getBlogSlugs() {
 }
 
 async function prerender() {
-  const blogRoutes = await getBlogSlugs();
-  const allRoutes = [...STATIC_ROUTES, ...blogRoutes];
+  const dynamicRoutes = await getDynamicRoutes();
+  const allRoutes = [...STATIC_ROUTES, ...dynamicRoutes];
 
   console.log(`[prerender] Pre-rendering ${allRoutes.length} routes against ${BASE_URL}`);
 

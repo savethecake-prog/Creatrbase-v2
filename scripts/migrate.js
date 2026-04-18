@@ -43,6 +43,7 @@ const FILES = [
   '026_newsletter_subscribers.sql',
   '027_ingestion.sql',
   '028_voice_memory_agent_run.sql',
+  '029_comparison_pages.sql',
 ];
 
 async function run() {

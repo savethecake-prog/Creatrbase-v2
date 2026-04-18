@@ -1,144 +1,143 @@
 import { Link } from 'react-router-dom';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
+import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './ScoringMethodology.module.css';
 
+const DIM_COLOURS = ['', 'peach', 'mint', '', 'peach', 'mint'];
+
 const DIMENSIONS = [
   {
-    name: 'Audience Momentum',
+    name: 'Subscriber momentum',
+    eyebrow: 'Growth signal',
     weight: 25,
     description:
-      'Growth velocity over the last 30 and 90 days. Brands pay a premium for creators on an upward trajectory — a growing audience signals untapped reach that a static one does not.',
+      'Velocity beats volume. A channel growing 200/day is worth more to a brand than a flat channel with twice the subs. We measure both the rate and the consistency.',
+    whyBrands: 'Brands pay a premium for creators on an upward trajectory — a growing audience signals untapped reach that a static one does not.',
+    howCalc: 'Subscriber growth rate over 30 and 90 days, normalised against channel size. A 10k-sub channel growing at 2%/week scores higher than a 100k channel growing at 0.1%.',
     signals: ['Subscriber / follower growth rate', '30-day vs 90-day growth delta', 'Recent upload cadence vs historical average'],
   },
   {
-    name: 'Engagement Quality',
+    name: 'Engagement quality',
+    eyebrow: 'Audience signal',
     weight: 20,
     description:
-      'Engagement rate adjusted for audience size. Raw engagement inflates for small accounts; we normalise against channel size to surface whether your audience is genuinely active.',
+      'Raw engagement rate is a vanity metric. We look at view-to-subscriber ratio, comment-to-like balance, and whether the audience actually shows up.',
+    whyBrands: 'Brands want proof that an audience is active, not just subscribed. High engagement signals real influence and conversion potential.',
+    howCalc: 'Engagement rate adjusted for audience size, combined with comment-to-view ratio and average watch time where available.',
     signals: ['Engagement rate (30-day average)', 'Comment-to-view ratio', 'Average watch time where available'],
   },
   {
-    name: 'Niche Clarity',
+    name: 'Niche commercial value',
+    eyebrow: 'Commercial signal',
     weight: 20,
     description:
-      'How well your content maps to a commercially recognised category. Brands need to know exactly who they are reaching. Unfocused content is harder to monetise regardless of reach.',
+      'Not every niche is worth the same. Gaming hardware, beauty, finance, and fitness command different CPMs and different brand budgets.',
+    whyBrands: 'Brand budgets are allocated by category. A creator in finance or beauty is worth more per impression than one in a low-CPM niche.',
+    howCalc: 'Category classification confidence score multiplied by the niche\'s weighted CPM index, calibrated quarterly against live brand-spend data.',
     signals: ['Primary content category confidence', 'Topic consistency across recent uploads', 'Cross-platform niche alignment'],
   },
   {
-    name: 'Geographic Fit',
+    name: 'Audience geo alignment',
+    eyebrow: 'Audience signal',
     weight: 15,
     description:
-      'Audience location relative to your primary commercial market. Most direct-to-consumer brands target specific regions; audiences concentrated in high-CPM markets carry more commercial value.',
+      'A UK-and-US audience is worth more to most brand briefs than a global spread. We score your Tier 1 geography mix against what brands are actually buying.',
+    whyBrands: 'Most DTC brands target specific regions. Audiences concentrated in high-CPM markets (UK, US, CA, AU) carry significantly more commercial value.',
+    howCalc: 'Percentage of audience in Tier 1 markets weighted by the brand-spend distribution for your niche.',
     signals: ['Primary audience country', 'Concentration in Tier-1 markets (UK, US, CA, AU)', 'Secondary market spread'],
   },
   {
-    name: 'Posting Consistency',
+    name: 'Content consistency',
+    eyebrow: 'Production signal',
     weight: 10,
     description:
-      'How reliably you publish against your own historical cadence. Brands want creators who will deliver on contracted timelines — irregular posting is a risk signal.',
+      'Brands check your upload cadence before they check anything else. We score frequency, reliability, and whether you can hit a campaign window.',
+    whyBrands: 'Irregular posting is a risk signal. Brands need confidence that a creator will deliver on contracted timelines.',
+    howCalc: 'Uploads per week compared against your own 90-day average. Consistency of gaps between uploads, penalising long silences.',
     signals: ['Uploads per week vs 90-day average', 'Gap between last three uploads', 'Consistency across connected platforms'],
   },
   {
-    name: 'Brand Alignment',
+    name: 'Content brand alignment',
+    eyebrow: 'Readiness signal',
     weight: 10,
     description:
-      'Compatibility between your content categories and brand-friendly verticals. Some niches attract significantly more brand spend; alignment to those verticals increases commercial viability.',
+      'Have you integrated brand mentions before without it feeling forced? Do you already run affiliate links, product mentions, clean deliverables?',
+    whyBrands: 'Creators who have done brand work before are lower-risk. This dimension measures brand-readiness, not just audience quality.',
+    howCalc: 'Presence of prior brand integrations, affiliate links, sponsored content markers, and production quality signals across recent uploads.',
     signals: ['Category fit to high-spend verticals', 'Absence of brand-risk content patterns', 'Existing partnership history'],
   },
 ];
 
 const TIERS = [
-  {
-    id: 'pre_commercial',
-    label: 'Pre-Commercial',
-    range: '0–39',
-    color: 'var(--text-tertiary)',
-    description:
-      'Foundation-building phase. The score reflects gaps in reach, consistency, or niche clarity. Tasks at this tier focus on closing those gaps before brand conversations are likely to convert.',
-  },
-  {
-    id: 'emerging',
-    label: 'Emerging',
-    range: '40–59',
-    color: 'var(--neon-peach, #E8874C)',
-    description:
-      'You have traction but inconsistencies remain. Brands may gift at this tier but paid deals require more proof points. Tasks focus on sharpening engagement and stabilising momentum.',
-  },
-  {
-    id: 'viable',
-    label: 'Viable',
-    range: '60–79',
-    color: 'var(--neon-lavender, #D1B9FF)',
-    description:
-      'Commercially competitive. Paid sponsorships are realistic at this tier. Outreach to mid-market brands is likely to receive genuine responses. Gap tracking becomes the primary focus.',
-  },
-  {
-    id: 'established',
-    label: 'Established',
-    range: '80–100',
-    color: 'var(--neon-mint)',
-    description:
-      'Fully commercial. You have the audience quality, consistency, and niche authority that agencies are built around. Outreach at this tier should focus on deal terms, not qualification.',
-  },
-];
-
-const MILESTONES = [
-  { label: 'First Sync', description: 'Platform connected and analysed. Baseline score set.' },
-  { label: 'Score 40+', description: 'Reached the Emerging tier. Gifting opportunities open.' },
-  { label: 'Score 60+', description: 'Reached the Viable tier. Paid sponsorships become realistic.' },
-  { label: 'First Deal Logged', description: 'A brand conversation has been tracked in your pipeline.' },
-  { label: 'Score 80+', description: 'Reached the Established tier. Full commercial viability confirmed.' },
+  { range: '0 – 24', name: 'Pre-Commercial', desc: 'Too early for most paid brand work. The focus is foundation: audience, niche clarity, cadence. Gifting partnerships are in play.', fill: 20, color: 'peach-shade' },
+  { range: '25 – 49', name: 'Emerging', desc: "You'll close paid deals with small and mid-market brands who value niche fit over scale. Rates 30–50% below tier average.", fill: 40, color: 'peach-deep' },
+  { range: '50 – 74', name: 'Viable', desc: 'Brand-ready. Agencies will engage, direct inbound is possible. Sustained rates start here. This is where most paid work gets signed.', fill: 66, color: 'mint-deep' },
+  { range: '75 – 100', name: 'Established', desc: 'Premium-rate territory. Agencies compete for you. Long-term ambassadorships and retainers become the category, not one-offs.', fill: 92, color: 'mint-shade' },
 ];
 
 export function ScoringMethodology() {
   return (
     <div className={styles.page}>
       <PageMeta
-        title="How Your Score Is Calculated"
-        description="The Commercial Viability Score measures six dimensions of brand-readiness across momentum, engagement, niche, geography, consistency, and brand alignment."
+        title="Scoring methodology — Creatrbase"
+        description="Every dimension, every weighting, every calibration. The full Creatrbase scoring methodology, in plain English. No black box."
         canonical="https://creatrbase.com/scoring-explained"
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'WebPage',
+        name: 'Scoring Methodology', url: 'https://creatrbase.com/scoring-explained',
+        description: 'The full Creatrbase scoring methodology, in plain English.',
+        breadcrumb: { '@type': 'BreadcrumbList', itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://creatrbase.com' },
+          { '@type': 'ListItem', position: 2, name: 'Scoring Methodology', item: 'https://creatrbase.com/scoring-explained' },
+        ] },
+      }) }} />
 
-      <PublicNav />
+      <PublicNav variant="v2" />
 
       <main className={styles.main}>
-
-        {/* Hero */}
         <header className={styles.hero}>
-          <p className={styles.eyebrow}>Methodology</p>
-          <h1 className={styles.heroTitle}>How your score is calculated</h1>
+          <span className={styles.eyebrow}><span className={styles.eyebrowDot} /> Methodology</span>
+          <h1 className={styles.heroTitle}>How we score channels.</h1>
           <p className={styles.heroDesc}>
-            The Commercial Viability Score (CVS) is a single number that summarises how
-            brand-ready your channel is right now. It is derived from six weighted dimensions,
-            each targeting a factor that brands and agencies evaluate when making partnership decisions.
+            The Commercial Viability Score is a single number that summarises how brand-ready your channel is right now. It is derived from six weighted dimensions, each targeting a factor that brands and agencies evaluate when making partnership decisions. Every dimension, every weighting, every calibration — in plain English.
           </p>
         </header>
 
-        {/* Score overview */}
+        {/* Six dimensions */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>The six dimensions</h2>
+          <span className={`${styles.eyebrow} ${styles.eyebrowLav}`}><span className={styles.eyebrowDot} /> The six dimensions</span>
+          <h2 className={styles.sectionTitle}>What brands actually evaluate.</h2>
           <p className={styles.sectionIntro}>
-            Each dimension is scored independently and then combined into your overall CVS using the
-            weights below. The total always sums to 100.
+            Each dimension is scored independently and then combined into your overall CVS using the weights below. The total always sums to 100.
           </p>
 
-          <div className={styles.dimensionGrid}>
-            {DIMENSIONS.map(dim => (
-              <div key={dim.name} className={styles.dimensionCard}>
-                <div className={styles.dimensionHeader}>
-                  <span className={styles.dimensionName}>{dim.name}</span>
-                  <span className={styles.dimensionWeight}>{dim.weight}%</span>
+          <div className={styles.dimsGrid}>
+            {DIMENSIONS.map((dim, i) => (
+              <div key={dim.name} className={styles.dimCard}>
+                <div className={`${styles.dimCardEyebrow} ${DIM_COLOURS[i] ? styles['dimEyebrow' + DIM_COLOURS[i].charAt(0).toUpperCase() + DIM_COLOURS[i].slice(1)] : ''}`}>{dim.eyebrow}</div>
+                <h3 className={styles.dimCardTitle}>{dim.name}</h3>
+                <p className={styles.dimCardDesc}>{dim.description}</p>
+
+                <div className={styles.dimDetail}>
+                  <h4 className={styles.dimDetailLabel}>Why brands care</h4>
+                  <p>{dim.whyBrands}</p>
                 </div>
-                <div className={styles.dimensionBar}>
-                  <div className={styles.dimensionBarFill} style={{ width: `${dim.weight * 4}%` }} />
+                <div className={styles.dimDetail}>
+                  <h4 className={styles.dimDetailLabel}>How we calculate it</h4>
+                  <p>{dim.howCalc}</p>
                 </div>
-                <p className={styles.dimensionDesc}>{dim.description}</p>
-                <ul className={styles.signalList}>
-                  {dim.signals.map(s => (
-                    <li key={s} className={styles.signalItem}>{s}</li>
-                  ))}
-                </ul>
+
+                <div className={styles.dimPanel}>
+                  <div className={styles.dimPanelHead}>
+                    <span>Signals</span>
+                    <span className={styles.dimPanelWeight}>{dim.weight}%</span>
+                  </div>
+                  <ul className={styles.signalList}>
+                    {dim.signals.map(s => <li key={s}>{s}</li>)}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
@@ -146,82 +145,52 @@ export function ScoringMethodology() {
 
         {/* Tiers */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Score tiers</h2>
+          <span className={`${styles.eyebrow} ${styles.eyebrowPeach}`}><span className={styles.eyebrowDot} /> Score tiers</span>
+          <h2 className={styles.sectionTitle}>Four tiers. Each with a different next step.</h2>
           <p className={styles.sectionIntro}>
-            Your overall CVS maps to one of four tiers. Each tier represents a distinct stage of
-            commercial readiness and determines which features and recommendations are active for you.
+            Your overall CVS maps to one of four tiers. Each tier represents a distinct stage of commercial readiness.
           </p>
 
-          <div className={styles.tierList}>
-            {TIERS.map(tier => (
-              <div key={tier.id} className={styles.tierRow}>
-                <div className={styles.tierLeft}>
-                  <span className={styles.tierLabel} style={{ color: tier.color }}>{tier.label}</span>
-                  <span className={styles.tierRange}>{tier.range}</span>
-                </div>
-                <p className={styles.tierDesc}>{tier.description}</p>
+          <div className={styles.tiersGrid}>
+            {TIERS.map((t, i) => (
+              <div key={i} className={styles.tierCard}>
+                <div className={styles.tierRange}>{t.range}</div>
+                <h3 className={styles.tierName}>{t.name}</h3>
+                <p>{t.desc}</p>
+                <div className={styles.tierStrip}><div className={styles.tierStripFill} style={{ width: t.fill + '%', background: `var(--lp-${t.color})` }} /></div>
+                <div className={styles.tierLabel}><span>0</span><span>100</span></div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Milestones */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Milestones</h2>
-          <p className={styles.sectionIntro}>
-            Five milestones mark key progress points on your commercial journey. Reaching a milestone
-            unlocks new recommendations and triggers a notification.
-          </p>
-
-          <ol className={styles.milestoneList}>
-            {MILESTONES.map((m, i) => (
-              <li key={m.label} className={styles.milestoneItem}>
-                <span className={styles.milestoneNum}>{i + 1}</span>
-                <div>
-                  <p className={styles.milestoneLabel}>{m.label}</p>
-                  <p className={styles.milestoneDesc}>{m.description}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
         {/* How it updates */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>How your score updates</h2>
+          <span className={styles.eyebrow}><span className={styles.eyebrowDot} /> How it updates</span>
+          <h2 className={styles.sectionTitle}>Your score recalculates automatically.</h2>
           <div className={styles.updateFlow}>
             {['Platform sync runs', 'Raw metrics collected', 'Six dimensions scored', 'CVS recalculated', 'Tasks regenerated'].map((step, i, arr) => (
               <div key={step} className={styles.flowStep}>
                 <span className={styles.flowDot} />
                 <span className={styles.flowLabel}>{step}</span>
-                {i < arr.length - 1 && <span className={styles.flowArrow}>→</span>}
+                {i < arr.length - 1 && <span className={styles.flowArrow}>&rarr;</span>}
               </div>
             ))}
           </div>
           <p className={styles.updateNote}>
-            Your score recalculates automatically after every platform sync. Syncs run on the schedule
-            you configured, or you can trigger a manual sync from the Dashboard. Score history is retained
-            so you can track progress week-over-week.
+            Syncs run on the schedule you configured, or you can trigger a manual sync from the Dashboard. Score history is retained so you can track progress week-over-week.
           </p>
         </section>
 
         {/* CTA */}
-        <section className={styles.ctaSection}>
-          <p className={styles.ctaTitle}>See your score now</p>
-          <p className={styles.ctaDesc}>Connect your channels and get your Commercial Viability Score in under two minutes.</p>
-          <Link to="/signup" className={styles.ctaBtn}>Get started free</Link>
-        </section>
-
+        <div className={styles.ctaSection}>
+          <h2 className={styles.ctaTitle}>Score your channel now</h2>
+          <p className={styles.ctaDesc}>Connect your channels and get your Commercial Viability Score in under sixty seconds.</p>
+          <a href="/#score" className={styles.ctaBtn}>Get my score &rarr;</a>
+        </div>
       </main>
 
-      <footer className={styles.footer}>
-        <p className={styles.footerText}>
-          &copy; {new Date().getFullYear()} Creatrbase &mdash;{' '}
-          <Link to="/privacy" className={styles.footerLink}>Privacy</Link>{' '}
-          &middot;{' '}
-          <Link to="/terms" className={styles.footerLink}>Terms</Link>
-        </p>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

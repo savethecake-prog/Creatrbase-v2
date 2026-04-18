@@ -1,0 +1,15 @@
+.footer { background: #1B1040; color: #FAF6EF; padding: 64px 56px 36px; }
+.grid { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 48px; }
+.logo { height: 36px; width: auto; }
+.tag { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 300px; line-height: 1.6; margin-top: 16px; }
+.colTitle { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #FAF6EF; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px; }
+.links { list-style: none; padding: 0; margin: 0; }
+.links li { margin-bottom: 10px; }
+.links a { font-size: 14px; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s; }
+.links a:hover { color: #9EFFD8; }
+.bottom { max-width: 1320px; margin: 48px auto 0; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
+
+@media (max-width: 768px) {
+  .footer { padding: 48px 24px 24px; }
+  .grid { grid-template-columns: 1fr; gap: 32px; }
+}

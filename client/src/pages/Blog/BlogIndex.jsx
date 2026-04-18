@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
+import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './BlogIndex.module.css';
 
@@ -13,11 +14,13 @@ function fmtDate(d) {
 function PostCard({ post, featured = false }) {
   return (
     <Link to={`/blog/${post.slug}`} className={[styles.card, featured ? styles.cardFeatured : ''].filter(Boolean).join(' ')}>
-      {post.coverImageUrl && (
-        <div className={styles.cardImg}>
+      <div className={styles.cardImg}>
+        {post.coverImageUrl ? (
           <img src={post.coverImageUrl} alt={post.title} loading="lazy" />
-        </div>
-      )}
+        ) : (
+          <div className={styles.cardImgFallback} />
+        )}
+      </div>
       <div className={styles.cardBody}>
         {post.category && (
           <span className={styles.cardCategory}>{post.category.name}</span>
@@ -25,17 +28,11 @@ function PostCard({ post, featured = false }) {
         <h2 className={styles.cardTitle}>{post.title}</h2>
         {post.excerpt && <p className={styles.cardExcerpt}>{post.excerpt}</p>}
         <div className={styles.cardMeta}>
-          <span>{post.authorName}</span>
+          {post.readingTimeMin && <span>{post.readingTimeMin} min read</span>}
           {post.publishedAt && (
             <>
-              <span className={styles.dot}>·</span>
+              <span className={styles.dot}>&middot;</span>
               <span>{fmtDate(post.publishedAt)}</span>
-            </>
-          )}
-          {post.readingTimeMin && (
-            <>
-              <span className={styles.dot}>·</span>
-              <span>{post.readingTimeMin} min read</span>
             </>
           )}
         </div>
@@ -80,30 +77,28 @@ export function BlogIndex() {
   return (
     <div className={styles.page}>
       <PageMeta
-        title="Blog"
-        description="Creator economy insights, brand deal tactics, platform guides, and growth strategies from the Creatrbase team."
+        title="The Creatrbase Blog — Commercial intelligence for independent creators"
+        description="Scoring guides, brand deal strategy, and creator economy insight for independent creators on YouTube and Twitch."
         canonical="https://creatrbase.com/blog"
+        ogImage="/brand/og-image-with-tagline.png"
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'Blog',
+        name: 'The Creatrbase Blog', url: 'https://creatrbase.com/blog',
+        description: 'Scoring guides, brand deal strategy, and creator economy insight for independent creators on YouTube and Twitch.',
+        publisher: { '@type': 'Organization', name: 'Creatrbase', url: 'https://creatrbase.com' },
+      }) }} />
 
-      <PublicNav />
+      <PublicNav variant="v2" />
 
       <main className={styles.main}>
         <header className={styles.hero}>
-          <p className={styles.eyebrow}>Creatrbase Blog</p>
-          <h1 className={styles.heroTitle}>Creator economy intelligence</h1>
+          <span className={styles.eyebrow}><span className={styles.eyebrowDot} /> Blog</span>
+          <h1 className={styles.heroTitle}>The Creatrbase Blog</h1>
           <p className={styles.heroDesc}>
-            Brand deal tactics, growth strategies, platform guides, and data on the creator economy.
+            Commercial intelligence for independent creators
           </p>
         </header>
-
-        {/* Featured */}
-        {!activecat && featured.length > 0 && (
-          <section className={styles.featuredSection}>
-            <div className={styles.featuredGrid}>
-              {featured.map(p => <PostCard key={p.id} post={p} featured />)}
-            </div>
-          </section>
-        )}
 
         {/* Category filter */}
         {categories.length > 0 && (
@@ -126,11 +121,18 @@ export function BlogIndex() {
           </div>
         )}
 
+        {/* Featured */}
+        {!activecat && featured.length > 0 && (
+          <section className={styles.featuredSection}>
+            {featured.map(p => <PostCard key={p.id} post={p} featured />)}
+          </section>
+        )}
+
         {/* Post grid */}
         {loading ? (
-          <p className={styles.loading}>Loading…</p>
+          <p className={styles.loading}>Loading&hellip;</p>
         ) : posts.length === 0 ? (
-          <p className={styles.empty}>No posts yet — check back soon.</p>
+          <p className={styles.empty}>No posts in this category yet. Check back soon.</p>
         ) : (
           <div className={styles.grid}>
             {posts.map(p => <PostCard key={p.id} post={p} />)}
@@ -145,28 +147,21 @@ export function BlogIndex() {
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
             >
-              ← Previous
+              &larr; Previous
             </button>
-            <span className={styles.pageInfo}>{page} / {totalPages}</span>
+            <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
             <button
               className={styles.pageBtn}
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
             >
-              Next →
+              Next &rarr;
             </button>
           </div>
         )}
       </main>
 
-      <footer className={styles.footer}>
-        <p className={styles.footerText}>
-          &copy; {new Date().getFullYear()} Creatrbase &mdash;{' '}
-          <Link to="/privacy" className={styles.footerLink}>Privacy</Link>{' '}
-          &middot;{' '}
-          <Link to="/terms" className={styles.footerLink}>Terms</Link>
-        </p>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

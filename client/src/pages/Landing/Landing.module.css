@@ -404,17 +404,6 @@
 .finalStickers .stickerChip:nth-child(2) { transform: rotate(3deg); }
 .finalStickers .stickerChip:nth-child(3) { transform: rotate(-2deg); }
 
-/* ── FOOTER ── */
-.footer { background: var(--lp-navy); color: var(--lp-cream); padding: 64px 56px 36px; }
-.footerGrid { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 48px; }
-.footerLogo { height: 36px; width: auto; }
-.footerTag { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 300px; line-height: 1.6; margin-top: 16px; }
-.footerColTitle { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--lp-cream); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px; }
-.footerLinks { list-style: none; padding: 0; margin: 0; }
-.footerLinks li { margin-bottom: 10px; }
-.footerLinks a { font-size: 14px; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s; }
-.footerLinks a:hover { color: var(--lp-mint); }
-.footerBottom { max-width: 1320px; margin: 48px auto 0; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
@@ -442,8 +431,6 @@
   .honesty { padding: 80px 24px; }
   .finalCta { padding: 80px 24px; }
   .finalTitle { font-size: 48px; }
-  .footer { padding: 48px 24px 24px; }
-  .footerGrid { grid-template-columns: 1fr; gap: 32px; }
   .priceCardFeatured { transform: none; }
   .proofRow { flex-direction: column; align-items: flex-start; gap: 12px; }
   .statNum { font-size: 64px; }

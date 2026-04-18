@@ -1,73 +1,81 @@
 .container {
   min-height: 100vh;
-  background-color: var(--bg-page);
-  color: var(--text-primary);
+  background: #FAF6EF;
+  color: #1B1040;
+  font-family: 'DM Sans', sans-serif;
   display: flex;
   flex-direction: column;
 }
 
-.nav {
-  height: 80px;
-  border-bottom: 1px solid var(--glass-border);
-  display: flex;
-  align-items: center;
-}
-
-.navInner {
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 0 var(--page-gutter);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .main {
   flex: 1;
-  max-width: 800px;
+  max-width: 720px;
   margin: 0 auto;
   width: 100%;
-  padding: 80px var(--page-gutter);
+  padding: 0 24px 80px;
 }
 
 .header {
-  margin-bottom: 60px;
-  border-bottom: 1px solid var(--glass-border);
-  padding-bottom: 40px;
+  padding: 64px 0 36px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #E8E1D4;
 }
 
 .title {
-  font-family: var(--font-display);
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: #fff;
+  font-family: 'Lilita One', cursive;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 400;
+  color: #1B1040;
+  margin: 0 0 12px;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
 }
 
 .subtitle {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
+  font-size: 15px;
+  color: #76688F;
+  margin: 0;
 }
 
 .content {
-  line-height: 1.8;
-  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.75;
+  color: #3D2E5C;
 }
 
 .content h3 {
-  color: #fff;
-  font-family: var(--font-heading);
-  margin: 2.5rem 0 1rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1B1040;
+  margin: 36px 0 12px;
+  border-left: 4px solid #9EFFD8;
+  padding-left: 16px;
 }
 
 .content p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 16px;
 }
 
-.footer {
-  padding: 60px var(--page-gutter);
-  border-top: 1px solid var(--glass-border);
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+.content ul, .content ol {
+  padding-left: 24px;
+  margin: 0 0 16px;
+}
+
+.content li {
+  margin-bottom: 6px;
+}
+
+.content strong {
+  color: #1B1040;
+  font-weight: 700;
+}
+
+.content a {
+  color: #1B1040;
+  text-decoration: none;
+}
+
+.content a:hover {
+  text-decoration: underline;
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
+import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import styles from './StaticPage.module.css';
 
 const CONTENT = {
@@ -142,9 +143,9 @@ const CONTENT = {
     content: (
       <>
         <p>Whether you're just starting or managing a full roster, we have a plan built for you.</p>
-        <h3>Free - $0/mo</h3>
+        <h3>Free - £0/mo</h3>
         <p>Perfect for new creators. Track your basic stats and run manual brand-readiness checks.</p>
-        <h3>Pro - $29/mo</h3>
+        <h3>Pro - £29/mo</h3>
         <p>The standard for professional creators. Automated gap tracking, direct "Oracle" mapping, and full outreach kits.</p>
         <h3>Agency - Custom</h3>
         <p>For organizations managing multiple creators. Multi-user dashboard, aggregated analytics, and white-labeled reports.</p>
@@ -155,16 +156,16 @@ const CONTENT = {
 
 export default function StaticPage() {
   const { slug } = useParams();
-  const page = CONTENT[slug] || { 
-    title: "Page Not Found", 
-    subtitle: "We're building the future, but hasn't reached this corner yet.",
+  const page = CONTENT[slug] || {
+    title: "Page Not Found",
+    subtitle: "We're building the future, but haven't reached this corner yet.",
     content: <p>Check back soon as we expand the Creatrbase universe.</p>
   };
 
   return (
     <div className={styles.container}>
       <PageMeta title={page.title} description={page.subtitle} canonical={`https://creatrbase.com/${slug}`} />
-      <PublicNav />
+      <PublicNav variant="v2" />
 
       <main className={styles.main}>
         <header className={styles.header}>
@@ -177,9 +178,7 @@ export default function StaticPage() {
         </section>
       </main>
 
-      <footer className={styles.footer}>
-        <p>© 2026 Creatrbase. Building for the independent creator.</p>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

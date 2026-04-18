@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { BrandCheck } from '../../components/landing/BrandCheck/BrandCheck';
+import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { useIntersection } from '../../hooks/useIntersection';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
@@ -613,31 +614,7 @@ export function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.footerGrid}>
-          <div className={styles.footerBrand}>
-            <Link to="/"><img src="/brand/wordmark-light.png" alt="Creatrbase" className={styles.footerLogo} /></Link>
-            <p className={styles.footerTag}>Commercial intelligence for independent creators on YouTube and Twitch. Built in the UK.</p>
-          </div>
-          <div>
-            <h5 className={styles.footerColTitle}>Product</h5>
-            <ul className={styles.footerLinks}><li><a href="#score">Score</a></li><li><a href="#how-it-works">How it works</a></li><li><a href="#dimensions">The six dimensions</a></li><li><a href="#pricing">Pricing</a></li></ul>
-          </div>
-          <div>
-            <h5 className={styles.footerColTitle}>Learn</h5>
-            <ul className={styles.footerLinks}><li><Link to="/blog">Blog</Link></li><li><Link to="/scoring-explained">Scoring methodology</Link></li></ul>
-          </div>
-          <div>
-            <h5 className={styles.footerColTitle}>Company</h5>
-            <ul className={styles.footerLinks}><li><Link to="/privacy">Privacy</Link></li><li><Link to="/terms">Terms</Link></li></ul>
-          </div>
-        </div>
-        <div className={styles.footerBottom}>
-          <span>&copy; 2026 Creatrbase &middot; Built with honesty</span>
-          <span>v1.0 &middot; April 2026</span>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

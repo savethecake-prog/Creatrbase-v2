@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
+import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './BlogArticle.module.css';
 
@@ -12,7 +13,6 @@ function fmtDate(d) {
 
 export function BlogArticle() {
   const { slug }     = useParams();
-  const navigate     = useNavigate();
   const [post,  setPost]  = useState(null);
   const [error, setError] = useState(false);
 
@@ -28,13 +28,14 @@ export function BlogArticle() {
     return (
       <div className={styles.page}>
         <PageMeta title="Post not found" noIndex={true} />
-        <PublicNav />
+        <PublicNav variant="v2" />
         <main className={styles.main}>
           <div className={styles.notFound}>
             <p className={styles.notFoundTitle}>Post not found</p>
-            <Link to="/blog" className={styles.backLink}>← Back to blog</Link>
+            <Link to="/blog" className={styles.backLink}>&larr; Back to blog</Link>
           </div>
         </main>
+        <MarketingFooter />
       </div>
     );
   }
@@ -42,9 +43,9 @@ export function BlogArticle() {
   if (!post) {
     return (
       <div className={styles.page}>
-        <PublicNav />
+        <PublicNav variant="v2" />
         <main className={styles.main}>
-          <p className={styles.loading}>Loading…</p>
+          <p className={styles.loading}>Loading&hellip;</p>
         </main>
       </div>
     );
@@ -54,20 +55,31 @@ export function BlogArticle() {
     <div className={styles.page}>
       <PageMeta
         title={post.title}
-        description={post.excerpt}
+        description={post.excerpt || post.meta_description}
         canonical={`https://creatrbase.com/blog/${post.slug}`}
-        ogImage={post.coverImageUrl}
+        ogImage={post.coverImageUrl || '/brand/og-image-with-tagline.png'}
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'Article',
+        headline: post.title,
+        description: post.excerpt || post.meta_description || '',
+        author: { '@type': 'Organization', name: 'Creatrbase' },
+        publisher: { '@type': 'Organization', name: 'Creatrbase', url: 'https://creatrbase.com', logo: { '@type': 'ImageObject', url: 'https://creatrbase.com/brand/og-image.png' } },
+        datePublished: post.publishedAt,
+        dateModified: post.updatedAt || post.publishedAt,
+        url: `https://creatrbase.com/blog/${post.slug}`,
+        image: post.coverImageUrl || 'https://creatrbase.com/brand/og-image-with-tagline.png',
+      }) }} />
 
-      <PublicNav />
+      <PublicNav variant="v2" />
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>
           <Link to="/blog" className={styles.breadLink}>Blog</Link>
           {post.category && (
             <>
-              <span className={styles.breadSep}>›</span>
-              <Link to={`/blog?category=${post.category.slug}`} className={styles.breadLink}>{post.category.name}</Link>
+              <span className={styles.breadSep}>&rsaquo;</span>
+              <span className={styles.breadCurrent}>{post.category.name}</span>
             </>
           )}
         </div>
@@ -78,9 +90,6 @@ export function BlogArticle() {
               <span className={styles.category}>{post.category.name}</span>
             )}
             <h1 className={styles.title}>{post.title}</h1>
-            {post.excerpt && (
-              <p className={styles.excerpt}>{post.excerpt}</p>
-            )}
             <div className={styles.meta}>
               {post.authorAvatar && (
                 <img src={post.authorAvatar} alt={post.authorName} className={styles.avatar} />
@@ -105,24 +114,21 @@ export function BlogArticle() {
             className={styles.body}
             dangerouslySetInnerHTML={{ __html: post.bodyHtml || '<p>Content coming soon.</p>' }}
           />
+
+          {/* Mid-article CTA */}
+          <div className={styles.midCta}>
+            <h3 className={styles.midCtaTitle}>Score your channel in under a minute</h3>
+            <a href="/#score" className={styles.midCtaBtn}>Get my score &rarr;</a>
+          </div>
         </article>
 
-        <div className={styles.footer}>
-          <Link to="/blog" className={styles.backLink}>← Back to blog</Link>
-          <Link to="/signup" className={styles.footerCta}>
-            Try Creatrbase free →
-          </Link>
+        <div className={styles.articleFooter}>
+          <Link to="/blog" className={styles.backLink}>&larr; Back to blog</Link>
+          <a href="/#score" className={styles.footerCta}>Score my channel &rarr;</a>
         </div>
       </main>
 
-      <footer className={styles.pageFooter}>
-        <p className={styles.footerText}>
-          &copy; {new Date().getFullYear()} Creatrbase &mdash;{' '}
-          <Link to="/privacy" className={styles.footerLink}>Privacy</Link>{' '}
-          &middot;{' '}
-          <Link to="/terms" className={styles.footerLink}>Terms</Link>
-        </p>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

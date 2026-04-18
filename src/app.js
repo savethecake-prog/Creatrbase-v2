@@ -77,6 +77,25 @@ require('./jobs/workers/newsletterDigests').startNewsletterDigestWorkers();
 
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '..', 'dist', 'client');
+  const prerenderedDir = path.join(clientDist, '_prerendered');
+
+  // Pre-rendered HTML hook: check before static files are served
+  app.addHook('onRequest', async (req, reply) => {
+    // Only intercept GET requests for HTML pages (not assets, API, etc.)
+    if (req.method !== 'GET') return;
+    if (req.url.startsWith('/api/')) return;
+    if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|map|txt|xml)(\?|$)/i.test(req.url)) return;
+
+    const cleanPath = req.url.split('?')[0].split('#')[0];
+    const prerenderedPath = cleanPath === '/'
+      ? path.join(prerenderedDir, 'index.html')
+      : path.join(prerenderedDir, cleanPath, 'index.html');
+
+    if (fs.existsSync(prerenderedPath)) {
+      const html = fs.readFileSync(prerenderedPath, 'utf8');
+      reply.type('text/html').send(html);
+    }
+  });
 
   app.register(require('@fastify/static'), {
     root:   clientDist,
@@ -87,23 +106,10 @@ if (process.env.NODE_ENV === 'production') {
     if (req.url.startsWith('/api/')) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
     }
-    // Block common credential-scanning paths — return 404, never serve index.html
     const blocked = /\.(env|git|aws|pem|key|crt|p12|pfx|htpasswd|bash_history|ssh)(\/|$)|wp-(admin|login|includes)|xmlrpc\.php/i;
     if (blocked.test(req.url)) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
     }
-
-    // Serve pre-rendered HTML if available (for SEO crawlers and initial page load)
-    const cleanPath = req.url.split('?')[0].split('#')[0];
-    const prerenderedPath = cleanPath === '/'
-      ? path.join(clientDist, '_prerendered', 'index.html')
-      : path.join(clientDist, '_prerendered', cleanPath, 'index.html');
-
-    if (fs.existsSync(prerenderedPath)) {
-      const html = fs.readFileSync(prerenderedPath, 'utf8');
-      return reply.type('text/html').send(html);
-    }
-
     return reply.sendFile('index.html');
   });
 }

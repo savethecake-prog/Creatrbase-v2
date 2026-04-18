@@ -11,15 +11,25 @@ export function MarketingFooter() {
         </div>
         <div>
           <h5 className={styles.colTitle}>Product</h5>
-          <ul className={styles.links}><li><Link to="/#score">Score</Link></li><li><Link to="/#how-it-works">How it works</Link></li><li><Link to="/#dimensions">The six dimensions</Link></li><li><Link to="/pricing">Pricing</Link></li></ul>
+          <ul className={styles.links}>
+            <li><Link to="/scoring-explained">How it works</Link></li>
+            <li><Link to="/pricing">Pricing</Link></li>
+            <li><Link to="/honesty">Honesty</Link></li>
+          </ul>
         </div>
         <div>
           <h5 className={styles.colTitle}>Learn</h5>
-          <ul className={styles.links}><li><Link to="/blog">Blog</Link></li><li><Link to="/scoring-explained">Scoring methodology</Link></li></ul>
+          <ul className={styles.links}>
+            <li><Link to="/blog">Blog</Link></li>
+            <li><Link to="/scoring-explained">Scoring methodology</Link></li>
+          </ul>
         </div>
         <div>
           <h5 className={styles.colTitle}>Company</h5>
-          <ul className={styles.links}><li><Link to="/privacy">Privacy</Link></li><li><Link to="/terms">Terms</Link></li></ul>
+          <ul className={styles.links}>
+            <li><Link to="/privacy">Privacy</Link></li>
+            <li><Link to="/terms">Terms</Link></li>
+          </ul>
         </div>
       </div>
       <div className={styles.bottom}>

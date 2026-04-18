@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LogoWordmark } from '../ui/LogoWordmark';
 import styles from './PublicNav.module.css';
+
+function NavLink({ hash, to, className, children }) {
+  const { pathname } = useLocation();
+  if (hash && pathname === '/') {
+    return <a href={hash} className={className}>{children}</a>;
+  }
+  return <Link to={to || `/${hash}`} className={className}>{children}</Link>;
+}
 
 export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
   const [scrolled, setScrolled] = useState(false);
@@ -21,15 +29,14 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
             <LogoWordmark variant="v2" dark />
           </Link>
           <div className={styles.linksV2}>
-            <a href="#score" className={styles.linkV2}>Score</a>
-            <a href="#how-it-works" className={styles.linkV2}>How it works</a>
-            <a href="#dimensions" className={styles.linkV2}>The six dimensions</a>
-            <a href="#pricing" className={styles.linkV2}>Pricing</a>
+            <NavLink hash="#how-it-works" to="/scoring-explained" className={styles.linkV2}>How it works</NavLink>
+            <Link to="/pricing" className={styles.linkV2}>Pricing</Link>
             <Link to="/blog" className={styles.linkV2}>Blog</Link>
+            <Link to="/honesty" className={styles.linkV2}>Honesty</Link>
           </div>
           <div className={styles.rightV2}>
             <Link to="/login" className={styles.loginV2}>Log in</Link>
-            <a href="#score" className={styles.ctaV2}>Get your score</a>
+            <NavLink hash="#score" to="/#score" className={styles.ctaV2}>Get your score</NavLink>
           </div>
         </div>
       </nav>

@@ -9,6 +9,9 @@ const STATIC_PAGES = [
   { url: '/',                  changefreq: 'weekly',  priority: '1.0' },
   { url: '/scoring-explained', changefreq: 'monthly', priority: '0.8' },
   { url: '/blog',              changefreq: 'daily',   priority: '0.9' },
+  { url: '/pricing',           changefreq: 'monthly', priority: '0.8' },
+  { url: '/honesty',           changefreq: 'monthly', priority: '0.6' },
+  { url: '/score',             changefreq: 'monthly', priority: '0.8' },
   { url: '/privacy',           changefreq: 'yearly',  priority: '0.3' },
   { url: '/terms',             changefreq: 'yearly',  priority: '0.3' },
 ];

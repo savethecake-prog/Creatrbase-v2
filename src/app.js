@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 const path = require('path');
+const fs   = require('fs');
 const Fastify = require('fastify');
 
 const app = Fastify({ logger: true });
@@ -89,6 +90,18 @@ if (process.env.NODE_ENV === 'production') {
     if (blocked.test(req.url)) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
     }
+
+    // Serve pre-rendered HTML if available (for SEO crawlers and initial page load)
+    const cleanPath = req.url.split('?')[0].split('#')[0];
+    const prerenderedPath = cleanPath === '/'
+      ? path.join(clientDist, '_prerendered', 'index.html')
+      : path.join(clientDist, '_prerendered', cleanPath, 'index.html');
+
+    if (fs.existsSync(prerenderedPath)) {
+      const html = fs.readFileSync(prerenderedPath, 'utf8');
+      return reply.type('text/html').send(html);
+    }
+
     return reply.sendFile('index.html');
   });
 }

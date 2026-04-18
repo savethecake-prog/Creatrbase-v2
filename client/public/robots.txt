@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Authenticated app pages — no crawl value
+# Authenticated app pages - no crawl value
 Disallow: /dashboard
 Disallow: /tasks
 Disallow: /negotiations
@@ -10,8 +10,41 @@ Disallow: /gap
 Disallow: /connections
 Disallow: /settings
 Disallow: /onboarding
+Disallow: /admin
 
 # API endpoints
 Disallow: /api/
+
+# AI training and search crawlers - explicit allow
+# Policy: permit AI search visibility; accept training as a cost
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
 
 Sitemap: https://creatrbase.com/sitemap.xml

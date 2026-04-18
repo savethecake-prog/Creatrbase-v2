@@ -13,5 +13,11 @@ git push origin main
 echo "==> Deploying to VPS..."
 ssh "$VPS" "cd $APP_DIR && git checkout -- . && git clean -fd && git pull && npm install --production && cd client && npm install && npm run build && cd .. && pm2 restart creatrbase"
 
+echo "==> Waiting for server to start..."
+sleep 3
+
+echo "==> Pre-rendering public pages..."
+ssh "$VPS" "cd $APP_DIR && node scripts/prerender.js"
+
 echo ""
-echo "✓ Deployed to https://creatrbase.com"
+echo "✓ Deployed and pre-rendered at https://creatrbase.com"

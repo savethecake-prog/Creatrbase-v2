@@ -114,7 +114,17 @@ export function Landing() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         '@context': 'https://schema.org', '@type': 'Organization',
         name: 'Creatrbase', url: 'https://creatrbase.com',
-        description: 'The commercial intelligence platform for independent YouTube and Twitch creators.',
+        logo: 'https://creatrbase.com/brand/og-image.png',
+        description: 'Commercial intelligence for independent creators. Know your Commercial Viability Score. Track your gap to brand deals. Represent yourself directly.',
+        founder: { '@type': 'Person', name: 'Anthony Saulderson' },
+        sameAs: ['https://www.linkedin.com/company/creatrbase/'],
+      }) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'SoftwareApplication',
+        name: 'Creatrbase', applicationCategory: 'BusinessApplication',
+        operatingSystem: 'Web',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+        description: 'Commercial intelligence platform for independent YouTube and Twitch creators. Score your channel across six dimensions brands evaluate.',
       }) }} />
 
       <PublicNav scrollEffect variant="v2" />

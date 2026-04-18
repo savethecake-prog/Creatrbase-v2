@@ -64,12 +64,19 @@ export function BlogArticle() {
         '@context': 'https://schema.org', '@type': 'Article',
         headline: post.title,
         description: post.excerpt || post.meta_description || '',
-        author: { '@type': 'Organization', name: 'Creatrbase' },
+        author: {
+          '@type': 'Person',
+          name: 'Anthony Saulderson',
+          url: 'https://creatrbase.com/author/anthony-saulderson',
+          jobTitle: 'Founder, Creatrbase',
+          sameAs: ['https://www.linkedin.com/in/anthonysaulderson/'],
+        },
         publisher: { '@type': 'Organization', name: 'Creatrbase', url: 'https://creatrbase.com', logo: { '@type': 'ImageObject', url: 'https://creatrbase.com/brand/og-image.png' } },
         datePublished: post.publishedAt,
         dateModified: post.updatedAt || post.publishedAt,
         url: `https://creatrbase.com/blog/${post.slug}`,
         image: post.coverImageUrl || 'https://creatrbase.com/brand/og-image-with-tagline.png',
+        mainEntityOfPage: { '@type': 'WebPage', '@id': `https://creatrbase.com/blog/${post.slug}` },
       }) }} />
 
       <PublicNav variant="v2" />

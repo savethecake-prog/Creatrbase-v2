@@ -22,6 +22,7 @@ const STATIC_ROUTES = [
   '/blog',
   '/privacy',
   '/terms',
+  '/author/anthony-saulderson',
   '/score',
 ];
 

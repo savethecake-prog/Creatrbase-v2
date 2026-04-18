@@ -25,6 +25,7 @@ import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
 import { VoiceMemory }    from './pages/Admin/VoiceMemory';
 import { Skills }         from './pages/Admin/Skills';
+import { Author }         from './pages/Author/Author';
 import { RequireAdmin }   from './lib/RequireAdmin';
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/honesty"     element={<Honesty />} />
           <Route path="/pricing"     element={<Pricing />} />
           <Route path="/score"       element={<ScoreForm />} />
+          <Route path="/author/anthony-saulderson" element={<Author />} />
           <Route path="/:slug" element={<StaticPage />} />
           <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
             <Route index element={<AdminDashboard />} />

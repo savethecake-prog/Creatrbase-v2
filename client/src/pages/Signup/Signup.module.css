@@ -1,31 +1,32 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--s4);
+  gap: 16px;
 }
 
 .nameRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--s3);
+  gap: 12px;
 }
 
 .divider {
   display: flex;
   align-items: center;
-  gap: var(--s4);
-  margin: var(--s2) 0;
+  gap: 16px;
+  margin: 4px 0;
 }
 
 .dividerLine {
   flex: 1;
   height: 1px;
-  background: var(--glass-border);
+  background: #E8E1D4;
 }
 
 .dividerText {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #76688F;
   flex-shrink: 0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -34,86 +35,30 @@
 .oauthRow {
   display: flex;
   flex-direction: column;
-  gap: var(--s3);
+  gap: 10px;
 }
 
 .oauthBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--s3);
-  padding: 13px var(--s5);
-  border-radius: var(--r-pill);
-  border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-primary);
-  font-size: 14px;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: 1.5px solid #1B1040;
+  background: #FFFDF9;
+  color: #1B1040;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
   font-weight: 600;
-  font-family: var(--font-body);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s;
   width: 100%;
   text-decoration: none;
 }
 
 .oauthBtn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.trial {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  padding: var(--s3) var(--s4);
-  background: rgba(164, 255, 219, 0.06);
-  border: 1px solid rgba(164, 255, 219, 0.2);
-  border-radius: var(--r-md);
-  font-size: 13px;
-  color: var(--neon-mint);
-  font-weight: 500;
-}
-
-.trial::before {
-  content: '✓';
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.terms {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-align: center;
-  line-height: 1.5;
-}
-
-.link {
-  color: var(--neon-mint);
-  font-weight: 600;
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-
-.link:hover {
-  opacity: 0.75;
-}
-
-.footer {
-  margin-top: var(--s2);
-  text-align: center;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.footerLink {
-  color: var(--neon-mint);
-  font-weight: 600;
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-
-.footerLink:hover {
-  opacity: 0.75;
+  background: #F4EFE5;
 }
 
 .claimBanner {
@@ -121,12 +66,12 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: rgba(158, 255, 216, 0.08);
+  background: rgba(158, 255, 216, 0.12);
   border-left: 4px solid #9EFFD8;
   border-radius: 8px;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--text-primary);
+  color: #1B1040;
 }
 
 .claimAvatar {
@@ -137,11 +82,66 @@
   flex-shrink: 0;
 }
 
-.error {
-  padding: var(--s3) var(--s4);
-  background: var(--error-muted);
-  border: 1px solid var(--error-border);
-  border-radius: var(--r-md);
+.terms {
+  font-size: 12px;
+  color: #76688F;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.link {
+  color: #1B1040;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover { text-decoration: underline; }
+
+.footer {
+  margin-top: 4px;
+  text-align: center;
   font-size: 13px;
-  color: var(--error);
+  color: #76688F;
+}
+
+.footerLink {
+  color: #1B1040;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footerLink:hover { text-decoration: underline; }
+
+/* Auth-specific overrides for shared Button + Input components */
+.form button[type="submit"] {
+  background: #1B1040 !important;
+  color: #FAF6EF !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  font-size: 15px !important;
+  padding: 14px 24px !important;
+}
+.form button[type="submit"]:hover { background: #2A1D5C !important; }
+
+.form input[type="text"],
+.form input[type="email"],
+.form input[type="password"] {
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8E1D4 !important;
+  border-radius: 10px !important;
+  color: #1B1040 !important;
+  font-size: 15px !important;
+  padding: 14px 16px !important;
+}
+.form input:focus { border-color: #9EFFD8 !important; }
+.form input::placeholder { color: #A69BB8 !important; }
+.form label { color: #1B1040 !important; font-size: 13px !important; }
+
+.error {
+  padding: 12px 16px;
+  background: rgba(224, 72, 72, 0.08);
+  border: 1px solid rgba(224, 72, 72, 0.3);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #C43030;
 }

@@ -1,8 +1,7 @@
 .layout {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: var(--bg-page);
+  grid-template-columns: 3fr 2fr;
 }
 
 .panel {
@@ -13,88 +12,117 @@
   padding: 48px 40px;
 }
 
-/* ── Form Panel ── */
+/* ── Form Panel (left, cream) ── */
 .formPanel {
-  background: var(--bg-page);
+  background: #FAF6EF;
 }
 
-/* ── Brand Panel (right side) ── */
+.formWrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.logoLink { display: block; margin-bottom: 48px; }
+.logo { height: 36px; width: auto; display: block; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #9EFFD8;
+  border: 1px solid #1B1040;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1B1040;
+  margin-bottom: 20px;
+}
+
+.formTitle {
+  font-family: 'Lilita One', cursive;
+  font-size: 36px;
+  font-weight: 400;
+  color: #1B1040;
+  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+
+.formSub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #76688F;
+  margin-bottom: 32px;
+  line-height: 1.55;
+}
+
+/* ── Brand Panel (right, navy) ── */
 .brandPanel {
-  background: #0A0910;
+  background: #1B1040;
   position: relative;
   overflow: hidden;
-  border-left: 1px solid var(--glass-border);
 }
 
-/* Deep ambient glow */
-.brandPanel::before {
-  content: '';
+.brandGlow {
   position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 65% 35%, rgba(164, 255, 219, 0.08) 0%, transparent 55%),
-    radial-gradient(circle at 30% 70%, rgba(209, 185, 255, 0.07) 0%, transparent 50%);
+  top: 20%;
+  left: 30%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(158,255,216,0.15), transparent 65%);
   pointer-events: none;
-}
-
-/* Grain texture */
-.brandPanel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.04;
-  pointer-events: none;
-}
-
-/* Glowing horizontal line accent */
-.brandPanel .brandAccentLine {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(164, 255, 219, 0.3), transparent);
-  transform: translateY(-80px);
 }
 
 .brandContent {
   position: relative;
-  max-width: 420px;
-  text-align: left;
-  z-index: 10;
+  max-width: 360px;
+  z-index: 1;
+}
+
+.brandEyebrow {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9EFFD8;
+  margin-bottom: 24px;
 }
 
 .brandTagline {
-  font-family: var(--font-display);
-  font-size: clamp(36px, 4.5vw, 58px);
-  line-height: 0.95;
-  color: var(--text-primary);
-  margin-bottom: var(--space-8);
-  letter-spacing: -0.03em;
-  font-weight: 900;
-}
-
-.brandTagline em {
-  font-style: normal;
-  background: linear-gradient(135deg, var(--neon-mint) 0%, var(--neon-purple) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-family: 'Lilita One', cursive;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.1;
+  color: #FAF6EF;
+  margin-bottom: 20px;
+  letter-spacing: -0.015em;
+  font-weight: 400;
 }
 
 .brandSub {
-  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
   line-height: 1.65;
-  color: var(--text-secondary);
-  max-width: 360px;
-  margin-bottom: var(--space-10);
+  color: rgba(250, 246, 239, 0.7);
+  margin-bottom: 0;
+}
+
+.brandDivider {
+  width: 48px;
+  height: 2px;
+  background: #9EFFD8;
+  margin: 32px 0;
 }
 
 .brandStats {
   display: flex;
-  gap: 2.5rem;
-  border-top: 1px solid var(--glass-border);
-  padding-top: 2rem;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .brandStat {
@@ -104,52 +132,33 @@
 }
 
 .brandStatNum {
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 900;
-  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #9EFFD8;
   letter-spacing: -0.02em;
 }
 
 .brandStatLabel {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(250, 246, 239, 0.5);
 }
 
-/* ── Form Wrap ── */
-.formWrap {
-  width: 100%;
-  max-width: 400px;
+.brandAttribution {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(250, 246, 239, 0.35);
+  margin-top: 40px;
 }
 
-.logoWordmark {
-  margin-bottom: var(--space-12);
-  display: block;
-}
-
-.formTitle {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: var(--space-2);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-
-.formSub {
-  font-size: 15px;
-  color: var(--text-muted);
-  margin-bottom: var(--space-10);
-  line-height: 1.5;
-}
-
-@media (max-width: 768px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-  .brandPanel {
-    display: none;
-  }
+@media (max-width: 1024px) {
+  .layout { grid-template-columns: 1fr; }
+  .brandPanel { display: none; }
+  .formPanel { padding: 32px 24px; }
 }

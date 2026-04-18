@@ -51,7 +51,7 @@ export function Signup() {
   }
 
   return (
-    <AuthLayout title="Get your score." subtitle="Sign up to track your Commercial Viability Score over time. Free forever. Upgrade whenever you're ready.">
+    <AuthLayout title="Get your score." subtitle="Sign up to track your Commercial Viability Score over time. Free forever. Upgrade whenever you're ready." eyebrow="FREE TO START · NO CARD">
       <PageMeta title="Create your free account" noIndex={true} />
       <form className={styles.form} onSubmit={handleSubmit}>
         {claimInfo && (
@@ -68,11 +68,11 @@ export function Signup() {
         <div className={styles.oauthRow}>
           <a className={styles.oauthBtn} href="/api/auth/google">
             <GoogleIcon />
-            Sign up with Google
+            Continue with Google
           </a>
           <a className={styles.oauthBtn} href="/api/auth/twitch">
             <TwitchIcon />
-            Sign up with Twitch
+            Continue with Twitch
           </a>
         </div>
 

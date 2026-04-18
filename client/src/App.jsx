@@ -15,6 +15,8 @@ import StaticPage from './pages/Static/StaticPage';
 import { ScoringMethodology } from './pages/ScoringMethodology/ScoringMethodology';
 import { BlogIndex }    from './pages/Blog/BlogIndex';
 import { BlogArticle }  from './pages/Blog/BlogArticle';
+import { Honesty }      from './pages/Honesty/Honesty';
+import { Pricing }      from './pages/Pricing/Pricing';
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
           <Route path="/scoring-explained" element={<ScoringMethodology />} />
           <Route path="/blog"        element={<BlogIndex />} />
           <Route path="/blog/:slug"  element={<BlogArticle />} />
+          <Route path="/honesty"     element={<Honesty />} />
+          <Route path="/pricing"     element={<Pricing />} />
           <Route path="/:slug" element={<StaticPage />} />
           <Route path="/onboarding" element={
             <RequireAuth><Onboarding /></RequireAuth>

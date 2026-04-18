@@ -42,6 +42,7 @@ const FILES = [
   '025_admin_access_level.sql',
   '026_newsletter_subscribers.sql',
   '027_ingestion.sql',
+  '028_voice_memory_agent_run.sql',
 ];
 
 async function run() {

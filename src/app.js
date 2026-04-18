@@ -68,6 +68,7 @@ require('./jobs/workers/taskCadence').startTaskCadenceWorker();
 require('./jobs/workers/tagDetection').startTagDetectionWorker();
 require('./jobs/workers/retentionNotifications').startRetentionNotificationsWorker();
 require('./jobs/workers/ingestionFetcher').startIngestionFetcherWorker();
+require('./jobs/workers/newsletterDigests').startNewsletterDigestWorkers();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

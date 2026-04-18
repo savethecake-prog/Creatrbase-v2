@@ -3,10 +3,13 @@
 const {
   createCheckoutSession,
   createPortalSession,
+  createStripeCustomer,
+  createTrialSubscription,
   handleWebhook,
   getSubscription,
 } = require('./billingService');
 const { authenticate } = require('../../middleware/authenticate');
+const { resolveTier }  = require('../../services/tierResolver');
 
 const APP_URL = process.env.APP_URL || 'https://creatrbase.com';
 
@@ -30,8 +33,14 @@ async function billingRoutes(app) {
       return reply.code(404).send({ error: 'No subscription found.' });
     }
 
+    // Create Stripe customer if free-tier user upgrading directly
+    let stripeCustomerId = sub.stripeCustomerId;
+    if (!stripeCustomerId) {
+      stripeCustomerId = await createStripeCustomer(req.user.email, req.user.displayName);
+    }
+
     const url = await createCheckoutSession({
-      stripeCustomerId: sub.stripeCustomerId,
+      stripeCustomerId,
       priceId,
       tenantId:    req.user.tenantId,
       successUrl:  `${APP_URL}/dashboard?upgraded=1`,
@@ -54,6 +63,28 @@ async function billingRoutes(app) {
     });
 
     return { url };
+  });
+
+  // ── POST /api/billing/start-trial ────────────────────────────────────────────
+  // For free-tier users to start a 14-day trial on core plan.
+  // Creates Stripe customer if needed, then creates trial subscription.
+  app.post('/api/billing/start-trial', { preHandler: authenticate }, async (req, reply) => {
+    const { tier } = await resolveTier(req.user.tenantId);
+    if (tier !== 'free') {
+      return reply.code(409).send({ error: 'You already have an active subscription.' });
+    }
+
+    const sub = await getSubscription(req.user.tenantId);
+    let stripeCustomerId = sub?.stripeCustomerId;
+
+    // Create Stripe customer if this user doesn't have one
+    if (!stripeCustomerId) {
+      stripeCustomerId = await createStripeCustomer(req.user.email, req.user.displayName);
+    }
+
+    await createTrialSubscription({ tenantId: req.user.tenantId, stripeCustomerId });
+
+    return { success: true, tier: 'core', trialDays: 14 };
   });
 
   // ── GET /api/billing/subscription ───────────────────────────────────────────

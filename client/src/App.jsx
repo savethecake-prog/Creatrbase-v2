@@ -21,6 +21,10 @@ import { ScoreForm }    from './pages/Score/ScoreForm';
 import { AdminLayout }    from './pages/Admin/AdminLayout';
 import { AdminDashboard } from './pages/Admin/AdminDashboard';
 import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
+import { EditorialHome }  from './pages/Admin/EditorialHome';
+import { EditorialSession } from './pages/Admin/EditorialSession';
+import { VoiceMemory }    from './pages/Admin/VoiceMemory';
+import { Skills }         from './pages/Admin/Skills';
 import { RequireAdmin }   from './lib/RequireAdmin';
 
 export default function App() {
@@ -39,8 +43,10 @@ export default function App() {
           <Route path="/:slug" element={<StaticPage />} />
           <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
             <Route index element={<AdminDashboard />} />
-            <Route path="editorial" element={<AdminPlaceholder title="Editorial" />} />
-            <Route path="skills" element={<AdminPlaceholder title="Skills" />} />
+            <Route path="editorial" element={<EditorialHome />} />
+            <Route path="editorial/session" element={<EditorialSession />} />
+            <Route path="editorial/voice-memory" element={<VoiceMemory />} />
+            <Route path="skills" element={<Skills />} />
             <Route path="subscribers" element={<AdminPlaceholder title="Subscribers" />} />
             <Route path="creators" element={<AdminPlaceholder title="Creators" />} />
             <Route path="agents" element={<AdminPlaceholder title="Agents" />} />

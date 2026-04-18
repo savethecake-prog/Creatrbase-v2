@@ -6,6 +6,7 @@ const { getPrisma }    = require('../../lib/prisma');
 const { getPool }      = require('../../db/pool');
 const { handleSessionMessage, endSession } = require('../../agents/newsletter/editorial-composer');
 const { v4: uuidv4 }  = require('uuid');
+const { listSkills }   = require('../../agents/newsletter/skills-loader');
 
 async function adminRoutes(app) {
   const preHandler = [authenticate, requireAdmin];
@@ -138,6 +139,14 @@ async function adminRoutes(app) {
     const pool = getPool();
     const { rows } = await pool.query('SELECT * FROM agent_run WHERE id = $1', [req.params.id]);
     return { run: rows[0] || null };
+  });
+
+  // ── Skills ──
+
+  // GET /api/admin/skills
+  app.get('/api/admin/skills', { preHandler }, async () => {
+    const skills = listSkills();
+    return { skills };
   });
 }
 

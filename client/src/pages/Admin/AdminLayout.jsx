@@ -7,8 +7,8 @@ import styles from './AdminLayout.module.css';
 const NAV = [
   { group: 'Overview', items: [{ label: 'Dashboard', to: '/admin' }] },
   { group: 'Content', items: [
-    { label: 'Editorial', to: '/admin/editorial', soon: true },
-    { label: 'Skills', to: '/admin/skills', soon: true },
+    { label: 'Editorial', to: '/admin/editorial' },
+    { label: 'Skills', to: '/admin/skills' },
   ] },
   { group: 'People', items: [
     { label: 'Subscribers', to: '/admin/subscribers', soon: true },

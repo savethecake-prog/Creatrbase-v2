@@ -48,5 +48,3 @@ ON CONFLICT DO NOTHING;
 -- 3. Allow null stripe_customer_id for free-tier subscriptions
 ALTER TABLE subscriptions
   ALTER COLUMN stripe_customer_id DROP NOT NULL;
-
-INSERT INTO schema_migrations (version) VALUES ('024');

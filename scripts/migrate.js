@@ -38,6 +38,7 @@ const FILES = [
   '021_create_blog.sql',
   '022_create_distribution_signals.sql',
   '023_create_public_score_cards.sql',
+  '024_add_free_plan.sql',
 ];
 
 async function run() {

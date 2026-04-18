@@ -10,13 +10,13 @@
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 900;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1.05;
 }
 
 .countBadge {
   background: var(--neon-purple);
-  color: #05040A;
+  color: var(--bg-page);
   font-size: 11px;
   font-weight: 800;
   padding: 4px 12px;
@@ -58,7 +58,7 @@
 }
 
 .card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--border);
   transform: translateY(-2px);
 }
 
@@ -82,7 +82,7 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 12px;
   letter-spacing: -0.01em;
 }
@@ -97,7 +97,7 @@
 
 /* Why/Impact */
 .cardWhy {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-surface);
   border: 1px solid var(--glass-border);
   padding: 16px 20px;
   border-radius: 12px;
@@ -168,7 +168,7 @@
 .metricCurrentVal {
   font-size: 20px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .metricDelta {
@@ -190,7 +190,7 @@
 .feedbackRow {
   margin-top: 32px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-surface);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
 }
@@ -198,7 +198,7 @@
 .feedbackPrompt {
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -210,7 +210,7 @@
 }
 
 .feedbackBtn {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-surface);
   border: 1px solid var(--glass-border);
   color: var(--text-secondary);
   padding: 6px 14px;
@@ -221,14 +221,14 @@
 }
 
 .feedbackBtn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-hover);
+  border-color: var(--border);
 }
 
 .feedbackBtnActive {
   background: var(--neon-mint);
   border-color: var(--neon-mint);
-  color: #05040A;
+  color: var(--bg-page);
   font-weight: 600;
 }
 
@@ -245,7 +245,7 @@
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 12px;
 }
 

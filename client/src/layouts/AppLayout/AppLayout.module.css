@@ -83,8 +83,9 @@
 }
 
 .topbarLogo {
-  scale: 0.75;
-  transform-origin: left center;
+  height: 28px;
+  width: auto;
+  display: block;
 }
 
 .topbarRight {

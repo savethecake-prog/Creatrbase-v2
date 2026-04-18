@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
 import { api } from '../../lib/api';
-import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import { SupportChat } from '../../components/ui/SupportChat/SupportChat';
 import { OnboardingWizard } from '../../components/OnboardingWizard/OnboardingWizard';
 import styles from './AppLayout.module.css';
@@ -98,7 +97,7 @@ export function AppLayout({ children }) {
       )}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
-          <LogoWordmark className={styles.topbarLogo} />
+          <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={styles.topbarLogo} />
         </div>
         
         <div className={styles.topbarRight}>

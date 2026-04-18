@@ -7,7 +7,7 @@
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 900;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1.05;
   margin-bottom: var(--s2);
 }
@@ -39,7 +39,7 @@
   border: 1px solid var(--glass-border);
 }
 
-.bannerNeutral { background: #0A0910; }
+.bannerNeutral { background: var(--bg-surface); }
 .bannerWarning { background: rgba(255, 158, 122, 0.05); border-color: rgba(255, 158, 122, 0.1); }
 .bannerGifting { background: rgba(209, 185, 255, 0.05); border-color: rgba(209, 185, 255, 0.1); }
 .bannerReady   { background: rgba(164, 255, 219, 0.05); border-color: rgba(164, 255, 219, 0.1); }
@@ -69,7 +69,7 @@
 }
 
 .momentumPill {
-  background: #111019;
+  background: var(--bg-surface);
   border: 1px solid var(--glass-border);
   padding: 12px 20px;
   border-radius: 999px;
@@ -79,7 +79,7 @@
 }
 
 .momentumPillLabel { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.momentumPillValue { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: #fff; }
+.momentumPillValue { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--text-primary); }
 
 /* Filter Bar */
 .filterBar {
@@ -102,8 +102,8 @@
   transition: all 0.2s ease;
 }
 
-.filterChip:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
-.filterChipActive { background: #fff; color: #05040A; border-color: #fff; }
+.filterChip:hover { background: var(--bg-hover); color: var(--text-primary); }
+.filterChipActive { background: #fff; color: var(--bg-page); border-color: var(--text-primary); }
 .filterChipReady { border-color: var(--neon-mint); color: var(--neon-mint); }
 
 /* Grid */
@@ -126,7 +126,7 @@
   gap: 20px;
 }
 
-.card:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-4px); }
+.card:hover { border-color: var(--border); transform: translateY(-4px); }
 
 .cardHead {
   display: flex;
@@ -138,7 +138,7 @@
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
@@ -156,13 +156,13 @@
 
 .stripReady { background: rgba(164, 255, 219, 0.08); color: var(--neon-mint); }
 .stripGifting { background: rgba(209, 185, 255, 0.08); color: var(--neon-purple); }
-.stripApproaching { background: rgba(255, 255, 255, 0.03); color: var(--text-secondary); }
+.stripApproaching { background: var(--bg-surface); color: var(--text-secondary); }
 
 .meta { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
 .metaDivider { width: 4px; height: 4px; border-radius: 50%; background: var(--text-disabled); }
 
 .rateRow {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-surface);
   padding: 12px 16px;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
@@ -172,7 +172,7 @@
 }
 
 .rateLabel { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-.rateValue { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: #fff; }
+.rateValue { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text-primary); }
 .rateTier { font-size: 12px; color: var(--text-tertiary); font-weight: 500; margin-left: auto; }
 
 .geoRow { display: flex; flex-wrap: wrap; gap: 6px; }

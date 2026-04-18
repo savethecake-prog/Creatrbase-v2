@@ -7,7 +7,7 @@
   font-size: clamp(32px, 5vw, 48px);
   font-weight: 900;
   letter-spacing: -0.04em;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: var(--s2);
   line-height: 1.0;
 }
@@ -53,7 +53,7 @@
 }
 
 .kpiCard:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--border);
   transform: translateY(-2px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
@@ -69,7 +69,7 @@
   font-family: var(--font-display);
   font-size: 32px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1;
   margin-bottom: 12px;
 }
@@ -115,7 +115,7 @@
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
@@ -188,7 +188,7 @@
   font-family: var(--font-display);
   font-size: 48px;
   font-weight: 900;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -209,7 +209,7 @@
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -250,7 +250,7 @@
 .dimBar {
   flex: 1;
   height: 6px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -304,7 +304,7 @@
 }
 
 .milestoneCrossed { opacity: 1; }
-.milestoneCrossed .milestoneDot { background: var(--neon-mint); box-shadow: 0 0 10px var(--neon-mint); }
+.milestoneCrossed .milestoneDot { background: var(--neon-mint);  }
 .milestoneCrossed .milestoneLabel { color: var(--text-primary); }
 
 .milestoneApproaching { opacity: 0.8; }
@@ -338,7 +338,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
@@ -351,7 +351,7 @@
 
 /* Banners */
 .welcomeBanner {
-  background: linear-gradient(90deg, #111019 0%, #1a1926 100%);
+  background: linear-gradient(90deg, var(--bg-surface) 0%, #1a1926 100%);
   border: 1px solid var(--glass-border);
   border-left: 4px solid var(--neon-mint);
   padding: 32px;
@@ -377,7 +377,7 @@
 .milestoneInProgress .milestoneDot {
   background: transparent;
   border: 2px solid var(--neon-mint);
-  box-shadow: 0 0 6px var(--neon-mint);
+  
 }
 
 /* ── Section wrappers ──────────────────────────────────────────── */
@@ -429,7 +429,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 8px;
   letter-spacing: -0.01em;
 }
@@ -468,7 +468,7 @@
   height: 7px;
   border-radius: 50%;
   background: var(--neon-mint);
-  box-shadow: 0 0 6px var(--neon-mint);
+  
   flex-shrink: 0;
 }
 
@@ -532,7 +532,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 8px;
   letter-spacing: -0.01em;
 }
@@ -612,7 +612,7 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 900;
-  color: #fff;
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin-bottom: 8px;
@@ -734,7 +734,7 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
   text-transform: capitalize;
   margin-bottom: 4px;
@@ -842,7 +842,7 @@
   font-family: var(--font-display);
   font-size: 36px;
   font-weight: 900;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .progressScoreMax {

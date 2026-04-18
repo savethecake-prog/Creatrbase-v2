@@ -11,13 +11,8 @@
   border: none;
   outline: none;
   text-decoration: none;
-  transition: transform var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+  transition: background var(--t-fast), opacity var(--t-fast);
   white-space: nowrap;
-}
-
-.btn:active {
-  transform: translate(3px, 3px); /* Collapsing most of the 4px shadow */
-  box-shadow: 1px 1px 0px var(--bg-page) !important;
 }
 
 .btn:disabled {
@@ -26,71 +21,57 @@
   pointer-events: none;
 }
 
-/* Variants */
+/* Variants — product UI uses soft styling, not sticker */
 .primary {
-  background: var(--cb-mint);
-  color: var(--cb-navy);
+  background: var(--cb-navy);
+  color: #FAF6EF;
   padding: 12px 24px;
-  border-radius: var(--r-pill);
-  box-shadow: var(--shadow-sticker);
+  border-radius: var(--r-md);
 }
-.primary:hover { background: #6FCFAD; }
+.primary:hover { opacity: 0.88; }
 
 .secondary {
-  background: transparent;
-  color: var(--success);
+  background: var(--bg-surface);
+  color: var(--text-primary);
   padding: 11px 23px;
-  border-radius: var(--r-pill);
-  border: 2px solid var(--success);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
 }
-.secondary:hover { background: var(--success-glow); }
+.secondary:hover { background: var(--bg-hover); }
 
 .ghost {
-  background: var(--surface-2);
+  background: var(--bg-surface-2);
   color: var(--text-primary);
   padding: 12px 24px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-md);
 }
-.ghost:hover { background: var(--surface-3); }
+.ghost:hover { background: var(--bg-hover); }
 
 .outline {
   background: transparent;
   color: var(--text-primary);
   padding: 11px 23px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
 }
-.outline:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.25);
-}
+.outline:hover { background: var(--bg-hover); }
 
 .peach {
-  background: var(--warning); /* Using the new vibrant peach */
+  background: var(--cb-peach-deep);
   color: var(--cb-navy);
   padding: 12px 24px;
-  border-radius: var(--r-pill);
-  box-shadow: var(--shadow-sticker);
+  border-radius: var(--r-md);
 }
-.peach:hover {
-  background: var(--warning-subtle);
-  color: var(--warning);
-  box-shadow: 0 0 20px var(--warning-glow);
-}
+.peach:hover { opacity: 0.88; }
 
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   color: var(--text-primary);
   padding: 12px 24px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-md);
 }
-.glass:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-}
+.glass:hover { background: var(--bg-hover); }
 
 /* Sizes */
 .sm { font-size: 12px; padding: 8px 16px; }

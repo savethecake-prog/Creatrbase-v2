@@ -496,7 +496,7 @@
   border-color: rgba(158, 255, 216, 0.4);
 }
 .aiSelect option {
-  background: #111019;
+  background: var(--bg-surface);
 }
 
 .aiGenerateBtn {

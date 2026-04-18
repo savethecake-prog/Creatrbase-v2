@@ -6,13 +6,13 @@
 
 .label {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .input {
-  background: var(--surface-2);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 12px var(--s4);
@@ -25,11 +25,11 @@
 }
 
 .input::placeholder {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .input:focus {
-  border-color: var(--accent);
+  border-color: var(--cb-mint-shade);
 }
 
 .input.error {

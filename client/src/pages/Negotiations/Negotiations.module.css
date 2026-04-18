@@ -7,7 +7,7 @@
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 900;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1.05;
   margin-bottom: var(--s2);
 }
@@ -44,7 +44,7 @@
 .sectionCount {
   font-size: 11px;
   font-weight: 800;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
   padding: 2px 8px;
   border-radius: 4px;
   color: var(--text-muted);
@@ -73,8 +73,8 @@
 }
 
 .card:hover {
-  background: #111019;
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-surface);
+  border-color: var(--border);
   transform: translateX(4px);
 }
 
@@ -93,7 +93,7 @@
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .cardMeta {
@@ -134,9 +134,9 @@
   flex-shrink: 0;
 }
 
-.dotActive { background: var(--neon-peach); box-shadow: 0 0 10px var(--neon-peach); }
-.dotNegotiating { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
-.dotWon { background: var(--neon-mint); box-shadow: 0 0 10px var(--neon-mint); }
+.dotActive { background: var(--neon-peach);  }
+.dotNegotiating { background: var(--neon-purple);  }
+.dotWon { background: var(--neon-mint);  }
 .dotLost { background: var(--error); }
 
 /* Rate Display */
@@ -181,7 +181,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 

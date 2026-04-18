@@ -117,9 +117,32 @@ export function AppLayout({ children }) {
 
           {dropdownOpen && (
             <div className={styles.dropdown}>
-              <button 
+              <div className={styles.dropdownItem}>
+                <span className={styles.dropdownLabel}>Theme</span>
+                <select
+                  className={styles.themeSelect}
+                  value={localStorage.getItem('cb-theme') || 'system'}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'system') {
+                      localStorage.removeItem('cb-theme');
+                      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+                    } else {
+                      localStorage.setItem('cb-theme', val);
+                      document.documentElement.setAttribute('data-theme', val);
+                    }
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
+              <button
                 type="button"
-                className={styles.dropdownItem} 
+                className={styles.dropdownItem}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleLogout();

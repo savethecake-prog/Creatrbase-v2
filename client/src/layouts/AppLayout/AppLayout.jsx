@@ -97,7 +97,8 @@ export function AppLayout({ children }) {
       )}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
-          <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={styles.topbarLogo} />
+          <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.topbarLogo} ${styles.logoLight}`} />
+          <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.topbarLogo} ${styles.logoDark}`} />
         </div>
         
         <div className={styles.topbarRight}>

@@ -156,31 +156,31 @@
 
 /* ── Dark mode ── */
 [data-theme="dark"] {
-  --bg-page:             #05040A;
-  --bg-surface:          #0A0910;
-  --bg-surface-2:        #111019;
-  --bg-elevated:         #111019;
-  --bg-hover:            rgba(255, 255, 255, 0.05);
-  --bg-active:           rgba(255, 255, 255, 0.08);
+  --bg-page:             #141024;
+  --bg-surface:          #1B1538;
+  --bg-surface-2:        #221A45;
+  --bg-elevated:         #221A45;
+  --bg-hover:            rgba(255, 255, 255, 0.06);
+  --bg-active:           rgba(255, 255, 255, 0.1);
 
-  --glass-bg:            rgba(255, 255, 255, 0.03);
-  --glass-border:        rgba(255, 255, 255, 0.08);
+  --glass-bg:            rgba(255, 255, 255, 0.04);
+  --glass-border:        rgba(255, 255, 255, 0.1);
   --glass-blur:          blur(20px);
-  --glass-surface:       rgba(255, 255, 255, 0.02);
-  --glass-stroke:        rgba(255, 255, 255, 0.1);
+  --glass-surface:       rgba(255, 255, 255, 0.03);
+  --glass-stroke:        rgba(255, 255, 255, 0.12);
   --glass-glow-mint:     0 0 40px rgba(164, 255, 219, 0.1);
   --glass-glow-purple:   0 0 40px rgba(209, 185, 255, 0.1);
 
-  --text-primary:        #EDEDE8;
-  --text-secondary:      #888D9B;
-  --text-tertiary:       #555A66;
-  --text-disabled:       #3A3F4A;
+  --text-primary:        #F0EDE6;
+  --text-secondary:      #9A95A8;
+  --text-tertiary:       #6B6580;
+  --text-disabled:       #4A4560;
 
-  --border:              #252A35;
-  --border-subtle:       #1A1E27;
-  --border-strong:       #EDEDE8;
+  --border:              #302852;
+  --border-subtle:       #251E42;
+  --border-strong:       #F0EDE6;
 
-  --cb-navy:             #05040A;
+  --cb-navy:             #141024;
 
   --neon-mint:           #A4FFDB;
   --neon-purple:         #D1B9FF;

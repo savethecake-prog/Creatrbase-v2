@@ -176,7 +176,7 @@
 .rateTier { font-size: 12px; color: var(--text-tertiary); font-weight: 500; margin-left: auto; }
 
 .geoRow { display: flex; flex-wrap: wrap; gap: 6px; }
-.geoChip { font-size: 10px; font-weight: 700; padding: 2px 8px; background: rgba(255,255,255,0.05); border-radius: 4px; color: var(--text-secondary); }
+.geoChip { font-size: 10px; font-weight: 700; padding: 2px 8px; background: var(--bg-hover); border-radius: 4px; color: var(--text-secondary); }
 
 .notesWrap { position: relative; }
 .notes { font-size: 13px; color: var(--text-secondary); line-height: 1.5; height: 3.0em; overflow: hidden; }

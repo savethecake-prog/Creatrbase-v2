@@ -37,10 +37,10 @@
   --cb-lavender-deep:    #A284E0;
   --cb-lavender-shade:   #7A5CBF;
 
-  /* ── Neon aliases (backward compat) ── */
-  --neon-mint:           var(--cb-mint);
-  --neon-purple:         var(--cb-lavender);
-  --neon-peach:          var(--cb-peach);
+  /* ── Neon aliases (backward compat — darkened for light mode readability) ── */
+  --neon-mint:           var(--cb-mint-shade);
+  --neon-purple:         var(--cb-lavender-shade);
+  --neon-peach:          var(--cb-peach-shade);
 
   /* ── Text ── */
   --text-primary:        #1B1040;
@@ -62,15 +62,15 @@
   --accent-muted:        rgba(200, 170, 255, 0.08);
   --accent-glow:         rgba(200, 170, 255, 0.06);
 
-  /* ── Semantic — success (Mint) ── */
-  --success:             var(--cb-mint-deep);
+  /* ── Semantic — success (Mint — darkened for text contrast on cream) ── */
+  --success:             var(--cb-mint-shade);
   --success-subtle:      rgba(158, 255, 216, 0.12);
   --success-border:      rgba(158, 255, 216, 0.25);
   --success-muted:       rgba(158, 255, 216, 0.08);
   --success-glow:        rgba(158, 255, 216, 0.06);
 
-  /* ── Semantic — warning (Peach) ── */
-  --warning:             var(--cb-peach-deep);
+  /* ── Semantic — warning (Peach — darkened for text contrast on cream) ── */
+  --warning:             var(--cb-peach-shade);
   --warning-subtle:      rgba(255, 191, 163, 0.12);
   --warning-border:      rgba(255, 191, 163, 0.25);
   --warning-muted:       rgba(255, 191, 163, 0.08);
@@ -181,6 +181,10 @@
   --border-strong:       #EDEDE8;
 
   --cb-navy:             #05040A;
+
+  --neon-mint:           #A4FFDB;
+  --neon-purple:         #D1B9FF;
+  --neon-peach:          #FF9E7A;
 
   --success:             #A4FFDB;
   --warning:             #FF9E7A;

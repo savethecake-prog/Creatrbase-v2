@@ -28,7 +28,7 @@
 
 .trialStripDays {
   font-weight: 700;
-  color: var(--success);
+  color: var(--cb-mint-shade);
 }
 
 .trialStripActions {

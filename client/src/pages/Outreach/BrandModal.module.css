@@ -479,7 +479,7 @@
 
 .aiSelect,
 .aiInput {
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-surface-2);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 8px 10px;
@@ -641,7 +641,7 @@
 
 .gmailToInput {
   flex: 1;
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-surface-2);
   border: 1px solid var(--glass-border);
   border-radius: 8px;
   padding: 8px 10px;

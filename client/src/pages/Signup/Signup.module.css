@@ -116,6 +116,27 @@
   opacity: 0.75;
 }
 
+.claimBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(158, 255, 216, 0.08);
+  border-left: 4px solid #9EFFD8;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.claimAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .error {
   padding: var(--s3) var(--s4);
   background: var(--error-muted);

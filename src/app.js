@@ -50,6 +50,7 @@ app.register(require('./domains/brands/brandsRoutes'));
 app.register(require('./domains/negotiations/negotiationsRoutes'));
 app.register(require('./domains/public/publicRoutes'));
 app.register(require('./domains/public/scoreCardRoutes').scoreCardRoutes);
+app.register(require('./domains/public/claimRoutes').claimRoutes);
 app.register(require('./domains/public/ogImage').ogImageRoutes);
 app.register(require('./domains/blog/blogRoutes'));
 

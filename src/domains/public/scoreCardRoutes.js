@@ -203,6 +203,7 @@ async function scoreCardRoutes(app) {
         confidenceSummary: cached.confidenceSummary,
         scoreBreakdown:   cached.scoreBreakdown,
         whatThisMeans:    cached.whatThisMeans,
+        claimedAt:        cached.claimedAt,
       });
 
       return reply.type('text/html').send(html);

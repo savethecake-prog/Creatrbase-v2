@@ -17,6 +17,8 @@ const TIER_LABELS = {
   established:    'Established',
 };
 
+const { getDimensionLevel } = require('../lib/dimensionLevels');
+
 const DIMENSION_LABELS = {
   subscriber_momentum:     'Subscriber Momentum',
   engagement_quality:      'Engagement Quality',
@@ -46,6 +48,7 @@ function renderScoreCardHTML({
   confidenceSummary,
   scoreBreakdown,
   whatThisMeans,
+  claimedAt,
 }) {
   const tierColor = TIER_COLORS[tierBand] ?? '#A4FFDB';
   const tierLabel = TIER_LABELS[tierBand] ?? tierBand ?? 'Unknown';
@@ -73,16 +76,17 @@ function renderScoreCardHTML({
       const dimConf  = dim?.confidence ?? 'insufficient_data';
       const label    = DIMENSION_LABELS[key] ?? key;
       const barWidth = dimScore != null ? dimScore : 0;
-      const barOpacity = dimConf === 'insufficient_data' ? '0.15' : '0.7';
+      const dimLevel = getDimensionLevel(dimScore);
+      const barOpacity = dimConf === 'insufficient_data' ? '0.3' : '1';
       const confLabel  = dimConf === 'insufficient_data' ? 'No data' : dimConf;
 
       dimensionBarsHtml += '<div style="margin-bottom:12px">' +
         '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
         '<span style="font-size:13px;color:#888D9B">' + esc(label) + '</span>' +
-        '<span style="font-size:13px;color:' + (dimScore != null ? '#EDEDE8' : '#555A66') + '">' + (dimScore != null ? dimScore : '\u2014') + ' <span style="font-size:11px;color:#555A66">' + esc(confLabel) + '</span></span>' +
+        '<span style="font-size:13px;color:' + (dimScore != null ? '#EDEDE8' : '#555A66') + '">' + (dimScore != null ? dimScore : '\u2014') + ' <span style="font-size:11px;color:' + dimLevel.color + '">' + esc(dimLevel.label) + '</span></span>' +
         '</div>' +
         '<div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">' +
-        '<div style="height:100%;width:' + barWidth + '%;background:' + tierColor + ';opacity:' + barOpacity + ';border-radius:3px"></div>' +
+        '<div style="height:100%;width:' + barWidth + '%;background:' + dimLevel.color + ';opacity:' + barOpacity + ';border-radius:3px"></div>' +
         '</div></div>';
     }
   }
@@ -201,9 +205,12 @@ function renderScoreCardHTML({
 '    </div>\n' +
 '\n' +
 '    <div class="cta-section">\n' +
-'      <a class="btn-primary" href="/signup?claim=' + scoreCardId + '&platform=' + esc(platform) + '&handle=' + encodeURIComponent(handle) + '&' + utmBase + '">Claim this score</a>\n' +
-'      <a class="btn-secondary" href="/?' + utmBase + '#score">Score your channel</a>\n' +
-'      <p style="font-size:13px;color:#555A66;margin-top:16px">Own this channel? Connect via OAuth to get a full-confidence score with analytics data.</p>\n' +
+    (claimedAt
+      ? '      <div style="display:inline-block;padding:8px 20px;border-radius:999px;background:rgba(164,255,219,0.15);border:1px solid rgba(164,255,219,0.3);color:#A4FFDB;font-weight:600;font-size:14px;margin-bottom:12px">&#10003; Score claimed</div>\n' +
+        '      <p style="font-size:13px;color:#555A66;margin-top:8px">This score has been saved to an account.</p>\n'
+      : '      <a class="btn-primary" href="/signup?claim=' + scoreCardId + '&platform=' + esc(platform) + '&handle=' + encodeURIComponent(handle) + '&' + utmBase + '">Save this score</a>\n' +
+        '      <a class="btn-secondary" href="/score?' + utmBase + '">Score your channel</a>\n' +
+        '      <p style="font-size:13px;color:#555A66;margin-top:16px">Own this channel? Sign up to connect via OAuth and get a full-confidence score.</p>\n') +
 '    </div>\n' +
 '\n' +
 '    <div class="share-section">\n' +

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../../layouts/AuthLayout/AuthLayout';
 import { Button } from '../../components/ui/Button/Button';
 import { Input } from '../../components/ui/Input/Input';
@@ -11,10 +11,20 @@ import styles from './Signup.module.css';
 
 export function Signup() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const claimId = searchParams.get('claim');
   const { setUser } = useAuth();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [claimInfo, setClaimInfo] = useState(null);
+
+  useEffect(() => {
+    if (!claimId) return;
+    api.get('/public/claim/' + claimId)
+      .then(info => { if (!info.isClaimed) setClaimInfo(info); })
+      .catch(() => {});
+  }, [claimId]);
 
   function set(field) {
     return e => setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -28,6 +38,10 @@ export function Signup() {
       await api.post('/auth/signup', form);
       const me = await getMe();
       setUser(me);
+      // Claim the score if we have a claim param
+      if (claimId) {
+        try { await api.post('/public/claim', { scoreCardId: claimId }); } catch (_) {}
+      }
       navigate('/onboarding');
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -40,6 +54,15 @@ export function Signup() {
     <AuthLayout title="Get your score." subtitle="Sign up to track your Commercial Viability Score over time. Free forever. Upgrade whenever you're ready.">
       <PageMeta title="Create your free account" noIndex={true} />
       <form className={styles.form} onSubmit={handleSubmit}>
+        {claimInfo && (
+          <div className={styles.claimBanner}>
+            {claimInfo.channelAvatarUrl && <img src={claimInfo.channelAvatarUrl} alt="" className={styles.claimAvatar} />}
+            <div>
+              <strong>You're saving {claimInfo.channelName}'s score.</strong><br/>
+              Connect your channel after signup to unlock the full analytics.
+            </div>
+          </div>
+        )}
         {error && <div className={styles.error}>{error}</div>}
 
         <div className={styles.oauthRow}>

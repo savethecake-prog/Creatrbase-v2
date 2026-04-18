@@ -115,8 +115,8 @@ export function Landing() {
         '@context': 'https://schema.org', '@type': 'Organization',
         name: 'Creatrbase', url: 'https://creatrbase.com',
         logo: 'https://creatrbase.com/brand/og-image.png',
-        description: 'Commercial intelligence for independent creators. Know your Commercial Viability Score. Track your gap to brand deals. Represent yourself directly.',
-        founder: { '@type': 'Person', name: 'Anthony Saulderson' },
+        description: 'Commercial intelligence for independent creators. Know your Commercial Viability Score, track your gap to brand deals, represent yourself directly without an agency.',
+        founder: { '@type': 'Person', name: 'Anthony Saulderson', url: 'https://creatrbase.com/author/anthony-saulderson' },
         sameAs: ['https://www.linkedin.com/company/creatrbase/'],
       }) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({

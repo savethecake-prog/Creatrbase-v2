@@ -106,6 +106,18 @@ export function Pricing() {
           { '@type': 'ListItem', position: 2, name: 'Pricing', item: 'https://creatrbase.com/pricing' },
         ] },
       }) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'SoftwareApplication',
+        name: 'Creatrbase', applicationCategory: 'BusinessApplication',
+        operatingSystem: 'Web', url: 'https://creatrbase.com',
+        description: 'Commercial intelligence platform for independent YouTube and Twitch creators. Know your Commercial Viability Score, track your gap to brand deals, and represent yourself directly without an agency.',
+        offers: [
+          { '@type': 'Offer', name: 'Free', price: '0', priceCurrency: 'GBP', description: 'Free forever. Full Commercial Viability Score, all six dimensions, weekly refresh.' },
+          { '@type': 'Offer', name: 'Core', price: '9.99', priceCurrency: 'GBP', description: 'Gap tracker. Task engine, projections, peer benchmarking, milestone alerts.', priceValidUntil: '2027-04-18' },
+          { '@type': 'Offer', name: 'Pro', price: '19.99', priceCurrency: 'GBP', description: 'Full stack. Brand outreach agent, pitch drafts, rate intelligence, contract review.', priceValidUntil: '2027-04-18' },
+        ],
+        publisher: { '@type': 'Organization', name: 'Creatrbase', url: 'https://creatrbase.com' },
+      }) }} />
 
       <PublicNav variant="v2" />
 

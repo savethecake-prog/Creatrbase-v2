@@ -498,3 +498,16 @@
   color: var(--success);
   align-self: center;
 }
+
+@media (max-width: 600px) {
+  .modal { max-height: 94vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .overlay { align-items: flex-end; padding: 0; }
+  .header { padding: var(--space-4); }
+  .body { padding: var(--space-4); }
+  .stageGrid { grid-template-columns: 1fr 1fr; }
+  .rateGrid { grid-template-columns: 1fr 1fr; }
+  .rateGrid > :last-child { grid-column: 1 / -1; }
+  .tabs { overflow-x: auto; }
+  .tab { flex-shrink: 0; padding: var(--space-3) var(--space-4); }
+  .formActions { flex-wrap: wrap; }
+}

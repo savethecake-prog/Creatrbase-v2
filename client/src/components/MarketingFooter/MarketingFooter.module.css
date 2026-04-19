@@ -1,5 +1,5 @@
 .footer { background: #1B1040; color: #FAF6EF; padding: 64px 56px 36px; }
-.grid { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 48px; }
+.grid { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 36px; }
 .logo { height: 36px; width: auto; }
 .tag { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 300px; line-height: 1.6; margin-top: 16px; }
 .colTitle { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #FAF6EF; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 18px; }

@@ -615,7 +615,7 @@ export function Landing() {
       </section>
 
       {/* 11 — Final CTA */}
-      <section ref={ctaRef} className={`${styles.finalCta} ${ctaVisible ? styles.visible : ''}`}>
+      <section ref={ctaRef} id="score" className={`${styles.finalCta} ${ctaVisible ? styles.visible : ''}`}>
         <div className={styles.finalGrid}>
           <div>
             <h2 className={styles.finalTitle}>Know where you stand.<br/><em>For free.</em><br/>In under a minute.</h2>

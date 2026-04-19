@@ -12,6 +12,7 @@ export function MarketingFooter() {
         <div>
           <h5 className={styles.colTitle}>Product</h5>
           <ul className={styles.links}>
+            <li><Link to="/score">Get your score</Link></li>
             <li><Link to="/scoring-explained">How it works</Link></li>
             <li><Link to="/pricing">Pricing</Link></li>
             <li><Link to="/honesty">Honesty</Link></li>
@@ -22,6 +23,16 @@ export function MarketingFooter() {
           <ul className={styles.links}>
             <li><Link to="/blog">Blog</Link></li>
             <li><Link to="/scoring-explained">Scoring methodology</Link></li>
+            <li><Link to="/niche/gaming">Gaming creator rates</Link></li>
+            <li><Link to="/niche/finance">Finance creator rates</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h5 className={styles.colTitle}>Compare</h5>
+          <ul className={styles.links}>
+            <li><Link to="/compare/vidiq">Creatrbase vs VidIQ</Link></li>
+            <li><Link to="/compare/tubebuddy">Creatrbase vs TubeBuddy</Link></li>
+            <li><Link to="/compare/social-blade">Creatrbase vs Social Blade</Link></li>
           </ul>
         </div>
         <div>

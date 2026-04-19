@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
 import { HintCallout } from '../../components/ui/HintCallout/HintCallout';
 import { ScoreCardModal } from '../../components/ScoreCard/ScoreCard';
+import { SignalFeed } from '../../components/SignalFeed/SignalFeed';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
 import styles from './Dashboard.module.css';
@@ -677,6 +678,8 @@ export function Dashboard() {
           )}
         </div>
       )}
+
+      <SignalFeed limit={3} />
 
       {niche && niche.status !== 'no_youtube' && niche.status !== 'no_creator' && (
         <div className={styles.nicheSection}>

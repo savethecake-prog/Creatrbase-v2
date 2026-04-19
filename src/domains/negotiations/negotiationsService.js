@@ -1,6 +1,7 @@
 'use strict';
 
-const { getPool } = require('../../db/pool');
+const { getPool }                = require('../../db/pool');
+const { getDataCollectionQueue } = require('../../jobs/queue');
 
 // ── getPipeline ───────────────────────────────────────────────────────────────
 // Returns one row per brand the creator has interacted with.
@@ -90,7 +91,7 @@ async function logDealUpdate({
   deliverableType, notes,
 }) {
   const pool = getPool();
-  await pool.query(
+  const { rows } = await pool.query(
     `
     INSERT INTO brand_creator_interactions
       (brand_id, creator_id, tenant_id, niche, geo, interaction_type,
@@ -100,6 +101,7 @@ async function logDealUpdate({
       ($1, $2, $3, $4, 'global', $5,
        CURRENT_DATE, $6, $7, $8,
        $9, $10, 'user_reported', 'high', FALSE, $11)
+    RETURNING id
     `,
     [
       brandId, creatorId, tenantId, niche || 'general', interactionType,
@@ -111,6 +113,15 @@ async function logDealUpdate({
       userId,
     ]
   );
+
+  if (interactionType === 'deal_completed') {
+    await getDataCollectionQueue().add('signals:ingest', {
+      signalType:           'deal_closed',
+      sourceInteractionId:  rows[0].id,
+      creatorId,
+      tenantId,
+    });
+  }
 }
 
 module.exports = { getPipeline, getDealHistory, logDealUpdate };

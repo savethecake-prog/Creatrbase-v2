@@ -49,6 +49,7 @@ app.register(require('./domains/creator/taskRoutes'));
 app.register(require('./domains/creator/tagRoutes'));
 app.register(require('./domains/brands/brandsRoutes'));
 app.register(require('./domains/negotiations/negotiationsRoutes'));
+app.register(require('./domains/signals/signalRoutes'));
 app.register(require('./domains/admin/adminRoutes').adminRoutes);
 app.register(require('./domains/newsletter/newsletterRoutes').newsletterRoutes);
 app.register(require('./domains/compare/compareRoutes').compareRoutes);
@@ -74,6 +75,7 @@ require('./jobs/workers/tagDetection').startTagDetectionWorker();
 require('./jobs/workers/retentionNotifications').startRetentionNotificationsWorker();
 require('./jobs/workers/ingestionFetcher').startIngestionFetcherWorker();
 require('./jobs/workers/newsletterDigests').startNewsletterDigestWorkers();
+require('./jobs/workers/signalProcessor').startSignalProcessorWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

@@ -257,3 +257,16 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .card { padding: 20px; }
+  .cardTop { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .cardActions { flex-wrap: wrap; }
+  .metricTrackerRow { flex-wrap: wrap; }
+}
+
+@media (max-width: 430px) {
+  .card { padding: 16px; }
+  .feedbackRow { padding: 16px; }
+}

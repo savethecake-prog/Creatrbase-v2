@@ -709,3 +709,18 @@
   color: var(--text-tertiary);
   font-size: 13px;
 }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .tableWrap { overflow-x: auto; }
+  .table { min-width: 560px; }
+  .toolbar { flex-wrap: wrap; }
+  .searchWrap { max-width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .drawer { width: 100%; }
+  .drawerBody { padding: var(--space-4); }
+  .drawerHeader { padding: var(--space-4); }
+  .infoGrid { grid-template-columns: 1fr; }
+}

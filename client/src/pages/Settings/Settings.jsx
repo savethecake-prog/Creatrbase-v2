@@ -23,7 +23,7 @@ function ApiKeySection() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    api.get('/api/apikey').then(r => setKeys(r.keys || [])).catch(() => {});
+    api.get('/apikey').then(r => setKeys(r.keys || [])).catch(() => {});
   }, []);
 
   const anthropicKey = keys.find(k => k.provider === 'anthropic');
@@ -34,7 +34,7 @@ function ApiKeySection() {
     if (!input.trim()) return;
     setSaving(true);
     try {
-      const res = await api.post('/api/apikey', { provider: 'anthropic', apiKey: input.trim() });
+      const res = await api.post('/apikey', { provider: 'anthropic', apiKey: input.trim() });
       setKeys(prev => {
         const next = prev.filter(k => k.provider !== 'anthropic');
         return [...next, { provider: 'anthropic', verified_at: new Date().toISOString() }];
@@ -42,7 +42,7 @@ function ApiKeySection() {
       setInput('');
       setSuccess(`Key saved — ${res.masked}`);
       // Refresh user context so isPowerUser badge appears
-      const me = await api.get('/api/auth/me');
+      const me = await api.get('/auth/me');
       setUser(me);
     } catch (err) {
       setError(err?.error || 'Validation failed. Check the key and try again.');
@@ -56,10 +56,10 @@ function ApiKeySection() {
     setSuccess('');
     setRemoving(true);
     try {
-      await api.delete('/api/apikey/anthropic');
+      await api.delete('/apikey/anthropic');
       setKeys(prev => prev.filter(k => k.provider !== 'anthropic'));
       setSuccess('Key removed.');
-      const me = await api.get('/api/auth/me');
+      const me = await api.get('/auth/me');
       setUser(me);
     } catch {
       setError('Failed to remove key.');

@@ -29,7 +29,7 @@ function CreateForm({ onCreated }) {
     if (!form.title.trim()) return;
     setSaving(true);
     try {
-      const item = await api.post('/api/admin/roadmap', form);
+      const item = await api.post('/admin/roadmap', form);
       onCreated(item);
       setForm({ title: '', description: '', status: 'thinking', visibility: 'power_users', sort_order: 0 });
       setOpen(false);
@@ -96,7 +96,7 @@ function ItemRow({ item, onUpdate, onDelete }) {
   async function handleSave() {
     setSaving(true);
     try {
-      const updated = await api.patch(`/api/admin/roadmap/${item.id}`, form);
+      const updated = await api.patch(`/admin/roadmap/${item.id}`, form);
       onUpdate(updated);
       setEditing(false);
     } catch { /* stays in edit */ }
@@ -107,7 +107,7 @@ function ItemRow({ item, onUpdate, onDelete }) {
     if (!window.confirm(`Delete "${item.title}"?`)) return;
     setDeleting(true);
     try {
-      await api.delete(`/api/admin/roadmap/${item.id}`);
+      await api.delete(`/admin/roadmap/${item.id}`);
       onDelete(item.id);
     } catch { setDeleting(false); }
   }
@@ -165,7 +165,7 @@ export function Roadmap() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/api/admin/roadmap')
+    api.get('/admin/roadmap')
       .then(r => setItems(r.items || []))
       .catch(() => {})
       .finally(() => setLoading(false));

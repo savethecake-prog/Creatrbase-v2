@@ -64,14 +64,14 @@ export function PowerHub() {
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    api.get('/api/roadmap')
+    api.get('/roadmap')
       .then(r => setItems(r.items || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   async function handleVote(itemId) {
-    const res = await api.post(`/api/roadmap/${itemId}/vote`);
+    const res = await api.post(`/roadmap/${itemId}/vote`);
     setItems(prev => prev.map(item =>
       item.id !== itemId ? item : {
         ...item,

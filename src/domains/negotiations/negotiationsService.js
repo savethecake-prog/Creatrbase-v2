@@ -117,6 +117,7 @@ async function logDealUpdate({
   if (interactionType === 'deal_completed') {
     await getDataCollectionQueue().add('signals:ingest', {
       signalType:           'deal_closed',
+      sourceFeature:        'negotiations',
       sourceInteractionId:  rows[0].id,
       creatorId,
       tenantId,

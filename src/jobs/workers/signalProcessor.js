@@ -50,9 +50,12 @@ function buildDealDescription({ brandName, agreedRate, rateCurrency, nicheLabel,
 // ─── signals:ingest ───────────────────────────────────────────────────────────
 
 async function handleIngest(job) {
-  const { signalType, sourceInteractionId, creatorId, tenantId } = job.data;
+  const { signalType, sourceInteractionId, creatorId, tenantId, sourceFeature } = job.data;
   if (!signalType || !sourceInteractionId || !creatorId || !tenantId) {
     throw new Error('signals:ingest missing required fields');
+  }
+  if (!['negotiations', 'gmail_sync', 'brands_outreach'].includes(sourceFeature)) {
+    throw new Error(`signals:ingest invalid sourceFeature: ${sourceFeature}`);
   }
 
   const pool = getPool();
@@ -91,7 +94,7 @@ async function handleIngest(job) {
     [
       tenantId,
       creatorId,
-      sourceRow.interaction_type === 'outreach_responded' ? 'gmail_sync' : 'negotiations',
+      sourceFeature,
       signalType,
       sourceInteractionId,
       score,

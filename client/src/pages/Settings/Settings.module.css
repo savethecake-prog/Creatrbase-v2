@@ -1,0 +1,210 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.pageHeader {
+  margin-bottom: 40px;
+}
+
+.pageTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Section */
+.section { display: flex; flex-direction: column; gap: 20px; }
+
+.sectionHeader { display: flex; flex-direction: column; gap: 6px; }
+
+.sectionTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sectionDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sectionDesc strong { color: var(--text-primary); }
+
+/* Key card */
+.keyCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.keyCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.keyCardMeta { display: flex; align-items: center; gap: 10px; }
+
+.keyCardName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.keyBadgeActive {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cb-mint-shade);
+  background: rgba(79, 184, 147, 0.12);
+  border-radius: 20px;
+  padding: 2px 10px;
+  letter-spacing: 0.03em;
+}
+
+.keyBadgeInactive {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: var(--bg-surface-2);
+  border-radius: 20px;
+  padding: 2px 10px;
+  letter-spacing: 0.03em;
+}
+
+.keyCardVerified {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* Connected state */
+.keyCardConnected { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+.keyCardConnectedText {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  flex: 1;
+}
+
+.btnRemove {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btnRemove:hover { border-color: #e05a5a; color: #e05a5a; }
+.btnRemove:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Form state */
+.keyCardForm { display: flex; flex-direction: column; gap: 10px; }
+
+.keyCardHint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.keyInputRow { display: flex; gap: 8px; }
+
+.keyInput {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.keyInput:focus { border-color: var(--cb-lavender-deep); }
+
+.btnSave {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bg-page);
+  background: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.btnSave:hover { opacity: 0.85; }
+.btnSave:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Messages */
+.msgError {
+  font-size: 13px;
+  color: #e05a5a;
+  margin: 0;
+}
+
+.msgSuccess {
+  font-size: 13px;
+  color: var(--cb-mint-shade);
+  margin: 0;
+}
+
+/* Power user teaser */
+.powerUserTeaser {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.powerUserTeaserIcon {
+  color: var(--cb-lavender-deep);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.powerUserTeaserTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.powerUserTeaserText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .page { padding: 24px 16px 60px; }
+  .keyConnected { flex-direction: column; align-items: flex-start; }
+  .keyInputRow { flex-direction: column; }
+  .btnSave { width: 100%; }
+}

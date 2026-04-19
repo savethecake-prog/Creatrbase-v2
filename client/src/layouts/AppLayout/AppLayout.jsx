@@ -40,7 +40,7 @@ const NAV = [
     group: 'Account',
     items: [
       { label: 'Connections', to: '/connections' },
-      { label: 'Settings', to: '/settings', soon: true },
+      { label: 'Settings', to: '/settings' },
     ],
   },
 ];
@@ -67,10 +67,11 @@ export function AppLayout({ children }) {
     setDrawerOpen(false);
   }, [navigate]);
 
-  const displayName = user?.displayName ?? '';
-  const initials = displayName
+  const displayName   = user?.displayName ?? '';
+  const initials      = displayName
     ? displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : '?';
+  const isPowerUser   = user?.isPowerUser ?? false;
 
   const sub = user?.subscription;
   const isTrialling = sub?.status === 'trialling';
@@ -160,13 +161,14 @@ export function AppLayout({ children }) {
         
         <div className={styles.topbarRight}>
           <div className={styles.topbarUserContainer} ref={dropdownRef}>
-            <button 
+            <button
               type="button"
-              className={styles.topbarUser} 
-              onClick={() => setDropdownOpen(!dropdownOpen)} 
+              className={styles.topbarUser}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <div className={styles.avatar}>{initials}</div>
               <span className={styles.userName}>{displayName || 'Account'}</span>
+              {isPowerUser && <span className={styles.powerBadge}>API Wrangler</span>}
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={styles.chevron}>
                 <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

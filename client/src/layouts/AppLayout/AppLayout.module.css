@@ -139,6 +139,18 @@
   flex-shrink: 0;
 }
 
+.powerBadge {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--cb-navy);
+  background: var(--cb-mint);
+  border-radius: 20px;
+  padding: 2px 8px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
 .chevron {
   color: var(--text-tertiary);
   transition: transform 0.2s ease;

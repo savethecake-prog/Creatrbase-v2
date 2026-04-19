@@ -51,6 +51,7 @@ const FILES = [
   '034_admin_override_plan.sql',
   '035_content_studio.sql',
   '036_gdpr_compliance.sql',
+  '037_power_user.sql',
 ];
 
 async function run() {

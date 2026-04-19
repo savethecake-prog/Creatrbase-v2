@@ -92,15 +92,18 @@ async function authRoutes(app) {
   const { resolveTier } = require('../../services/tierResolver');
 
   app.get('/api/auth/me', { preHandler: authenticate }, async (req) => {
-    const prisma = require('../../lib/prisma').getPrisma();
+    const prisma   = require('../../lib/prisma').getPrisma();
+    const { getPool } = require('../../db/pool');
+    const pool     = getPool();
 
-    const [sub, creator, tierInfo] = await Promise.all([
+    const [sub, creator, tierInfo, userRow] = await Promise.all([
       getSubscription(req.user.tenantId),
       prisma.creator.findFirst({
         where:  { userId: req.user.userId, tenantId: req.user.tenantId },
         select: { onboardingStep: true },
       }),
       resolveTier(req.user.tenantId),
+      pool.query('SELECT is_power_user FROM users WHERE id = $1', [req.user.userId]),
     ]);
 
     const trialDaysLeft = sub?.trialEnd
@@ -114,6 +117,7 @@ async function authRoutes(app) {
       displayName:    req.user.displayName,
       onboardingStep: creator?.onboardingStep ?? null,
       tier:           tierInfo.tier,
+      isPowerUser:    userRow.rows[0]?.is_power_user ?? false,
       subscription: sub ? {
         status:        sub.status,
         planName:      sub.plan?.name ?? null,

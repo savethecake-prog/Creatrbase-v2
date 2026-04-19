@@ -86,15 +86,12 @@ async function sendMessage(sessionId, creatorId, userMessage) {
 
     loopMessages.push({ role: 'assistant', content: response.content });
 
-    const toolUseBlocks = response.content.filter(b => b.type === 'tool_use');
+    // Always capture text — Claude may return text alongside tool_use blocks
+    const textBlocks = response.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
+    if (textBlocks) responseText = textBlocks;
 
-    if (toolUseBlocks.length === 0) {
-      responseText = response.content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('\n');
-      break;
-    }
+    const toolUseBlocks = response.content.filter(b => b.type === 'tool_use');
+    if (toolUseBlocks.length === 0 || response.stop_reason === 'end_turn') break;
 
     const toolResults = [];
     for (const block of toolUseBlocks) {

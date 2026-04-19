@@ -36,6 +36,7 @@ import { Compare }      from './pages/Compare/Compare';
 import { NichePage, RatePage, ThresholdPage, ResearchPage } from './pages/Niche/NichePage';
 import { AuditPage }    from './pages/Audit/AuditPage';
 import { CoachPage }    from './pages/Coach/CoachPage';
+import { Settings }      from './pages/Settings/Settings';
 import { RequireAdmin } from './lib/RequireAdmin';
 import { CookieBanner } from './components/CookieBanner/CookieBanner';
 
@@ -90,6 +91,7 @@ function AppRoutes() {
         <Route path="/negotiations"  element={<RequireAuth><Negotiations /></RequireAuth>} />
         <Route path="/audit"         element={<RequireAuth><AuditPage /></RequireAuth>} />
         <Route path="/coach"         element={<RequireAuth><CoachPage /></RequireAuth>} />
+        <Route path="/settings"      element={<RequireAuth><Settings /></RequireAuth>} />
         <Route path="/" element={<Landing />} />
       </Routes>
     </>

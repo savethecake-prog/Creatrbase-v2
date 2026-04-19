@@ -55,22 +55,31 @@ async function handleSessionMessage(sessionId, userMessage) {
   const systemPrompt = buildSystemPrompt(session.content_type, session.brief_used);
   const fullSystem = `${skillsText}\n\n${systemPrompt}`;
 
-  // First turn
-  const response = await client.messages.create({
-    model: MODEL,
-    max_tokens: 8096,
-    system: fullSystem,
-    messages,
-    tools: TOOL_DEFINITIONS,
-  });
-
+  const MAX_ROUNDS = 10; // content agent needs more rounds for multi-step data fetching
   const toolUses = [];
-  let hasToolUse = false;
-  let responseMessages = [{ role: 'assistant', content: response.content }];
+  let loopMessages = [...messages];
+  let responseText = '';
 
-  for (const block of response.content) {
-    if (block.type === 'tool_use') {
-      hasToolUse = true;
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: 8096,
+      system: fullSystem,
+      messages: loopMessages,
+      tools: TOOL_DEFINITIONS,
+    });
+
+    loopMessages.push({ role: 'assistant', content: response.content });
+
+    // Always capture text — Claude may return text alongside tool_use blocks
+    const textBlocks = response.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
+    if (textBlocks) responseText = textBlocks;
+
+    const toolUseBlocks = response.content.filter(b => b.type === 'tool_use');
+    if (toolUseBlocks.length === 0 || response.stop_reason === 'end_turn') break;
+
+    const toolResults = [];
+    for (const block of toolUseBlocks) {
       const handler = TOOL_HANDLERS[block.name];
       let result;
       try {
@@ -79,42 +88,18 @@ async function handleSessionMessage(sessionId, userMessage) {
         result = { error: err.message };
       }
       toolUses.push({ tool: block.name, input: block.input, result });
-    }
-  }
-
-  // If tools were used, continue conversation with results
-  if (hasToolUse) {
-    const toolResults = response.content
-      .filter(b => b.type === 'tool_use')
-      .map((b, i) => ({
+      toolResults.push({
         type: 'tool_result',
-        tool_use_id: b.id,
-        content: JSON.stringify(toolUses[i]?.result || {}),
-      }));
+        tool_use_id: block.id,
+        content: JSON.stringify(result),
+      });
+    }
 
-    const followUp = await client.messages.create({
-      model: MODEL,
-      max_tokens: 8096,
-      system: fullSystem,
-      messages: [...messages, ...responseMessages, { role: 'user', content: toolResults }],
-      tools: TOOL_DEFINITIONS,
-    });
-
-    responseMessages.push({ role: 'user', content: toolResults });
-    responseMessages.push({ role: 'assistant', content: followUp.content });
+    loopMessages.push({ role: 'user', content: toolResults });
   }
-
-  const lastAssistant = responseMessages[responseMessages.length - 1];
-  const responseText = (lastAssistant.content || [])
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('\n');
 
   // Persist updated messages
-  const updatedMessages = [
-    ...messages,
-    ...responseMessages,
-  ];
+  const updatedMessages = loopMessages;
 
   // Reload session to get latest current_draft (may have been updated by save_draft tool)
   const { rows: [refreshed] } = await pool.query(

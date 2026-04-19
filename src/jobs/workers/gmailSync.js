@@ -113,14 +113,15 @@ function startGmailSyncWorker() {
         }
 
         // Reply detected — log outreach_responded
-        await pool.query(
+        const { rows: respondedRows } = await pool.query(
           `INSERT INTO brand_creator_interactions
              (brand_id, creator_id, tenant_id, niche, geo, interaction_type,
               interaction_date, evidence_type, confidence, deal_notes,
               is_public, created_by)
            VALUES ($1, $2, $3, $4, 'global', 'outreach_responded',
                    CURRENT_DATE, 'auto_detected', 'high', $5,
-                   FALSE, $6)`,
+                   FALSE, $6)
+           RETURNING id`,
           [
             row.brand_id,
             row.creator_id,
@@ -130,6 +131,14 @@ function startGmailSyncWorker() {
             row.created_by,
           ]
         );
+
+        await queue.add('signals:ingest', {
+          signalType:          'brand_replied',
+          sourceFeature:       'gmail_sync',
+          sourceInteractionId: respondedRows[0].id,
+          creatorId:           row.creator_id,
+          tenantId:            row.tenant_id,
+        });
 
         job.log(`Reply detected for creator ${row.creator_id} / brand ${row.brand_id} — logged outreach_responded`);
         console.log(`[gmailSync] reply detected: creator=${row.creator_id} brand=${row.brand_id}`);

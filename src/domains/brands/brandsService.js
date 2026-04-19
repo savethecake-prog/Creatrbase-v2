@@ -1,6 +1,7 @@
 'use strict';
 
-const { getPool } = require('../../db/pool');
+const { getPool }                = require('../../db/pool');
+const { getDataCollectionQueue } = require('../../jobs/queue');
 
 // ── getBrands ─────────────────────────────────────────────────────────────────
 // Returns brands, optionally filtered by niche / category.
@@ -95,7 +96,7 @@ async function getBrands({ niche = null, category = null, creatorId = null } = {
 
 async function logOutreach({ brandId, creatorId, tenantId, niche, notes, userId }) {
   const pool = getPool();
-  await pool.query(
+  const { rows } = await pool.query(
     `
     INSERT INTO brand_creator_interactions
       (brand_id, creator_id, tenant_id, niche, geo, interaction_type,
@@ -103,9 +104,18 @@ async function logOutreach({ brandId, creatorId, tenantId, niche, notes, userId 
     VALUES
       ($1, $2, $3, $4, 'global', 'outreach_sent',
        CURRENT_DATE, 'user_reported', 'high', $5, FALSE, $6)
+    RETURNING id
     `,
     [brandId, creatorId, tenantId, niche || 'general', notes || null, userId]
   );
+
+  await getDataCollectionQueue().add('signals:ingest', {
+    signalType:          'outreach_sent_with_state',
+    sourceFeature:       'brands_outreach',
+    sourceInteractionId: rows[0].id,
+    creatorId,
+    tenantId,
+  });
 }
 
 // ── updateOutreachStatus ──────────────────────────────────────────────────────
@@ -113,7 +123,7 @@ async function logOutreach({ brandId, creatorId, tenantId, niche, notes, userId 
 
 async function updateOutreachStatus({ brandId, creatorId, tenantId, interactionType, niche, notes, userId }) {
   const pool = getPool();
-  await pool.query(
+  const { rows } = await pool.query(
     `
     INSERT INTO brand_creator_interactions
       (brand_id, creator_id, tenant_id, niche, geo, interaction_type,
@@ -121,9 +131,20 @@ async function updateOutreachStatus({ brandId, creatorId, tenantId, interactionT
     VALUES
       ($1, $2, $3, $4, 'global', $5,
        CURRENT_DATE, 'user_reported', 'high', $6, FALSE, $7)
+    RETURNING id
     `,
     [brandId, creatorId, tenantId, niche || 'general', interactionType, notes || null, userId]
   );
+
+  if (interactionType === 'outreach_responded') {
+    await getDataCollectionQueue().add('signals:ingest', {
+      signalType:          'brand_replied',
+      sourceFeature:       'brands_outreach',
+      sourceInteractionId: rows[0].id,
+      creatorId,
+      tenantId,
+    });
+  }
 }
 
 // ── getOutreachHistory ────────────────────────────────────────────────────────

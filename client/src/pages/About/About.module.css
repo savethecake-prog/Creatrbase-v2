@@ -1,0 +1,297 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+/* ── Main ── */
+.main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 var(--space-12) 80px;
+}
+
+/* ── Eyebrow chip ── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cb-lavender);
+  border: 1px solid var(--cb-navy);
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cb-navy);
+  box-shadow: var(--shadow-sticker-sm);
+  margin-bottom: 24px;
+}
+
+.eyebrowPeach { background: var(--cb-peach); }
+.eyebrowMint  { background: var(--cb-mint); }
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cb-navy);
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 64px 0 56px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 64px;
+}
+
+.heroTitle {
+  font-family: 'Lilita One', cursive;
+  font-size: clamp(30px, 4.8vw, 50px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--cb-navy);
+  margin: 0 0 20px;
+}
+
+.heroDesc {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin: 0;
+}
+
+/* ── Section shared ── */
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  color: var(--cb-navy);
+  margin: 0 0 28px;
+  letter-spacing: -0.01em;
+  border-left: 4px solid var(--cb-mint);
+  padding-left: 16px;
+  line-height: 1.25;
+}
+
+/* ── Problem section ── */
+.problemSection {
+  margin-bottom: 72px;
+}
+
+.problemBody {
+  background: var(--bg-surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 36px 40px;
+}
+
+.problemBody p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text-primary);
+  margin: 0 0 20px;
+}
+
+.problemBody p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── What we built ── */
+.builtSection {
+  margin-bottom: 72px;
+}
+
+.builtBody {
+  margin-bottom: 36px;
+}
+
+.builtBody p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text-primary);
+  margin: 0 0 20px;
+}
+
+.builtBody p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Stats row ── */
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--cb-navy);
+  border-radius: var(--radius-xl);
+  padding: 28px 36px;
+  box-shadow: var(--shadow-sticker);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  gap: 6px;
+}
+
+.statNumber {
+  font-family: 'Lilita One', cursive;
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--cb-navy);
+  line-height: 1;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.statDivider {
+  width: 1px;
+  height: 48px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Principles ── */
+.principlesSection {
+  margin-bottom: 80px;
+}
+
+.principlesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.principleCard {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--cb-navy);
+  border-radius: var(--radius-xl);
+  padding: 30px 28px;
+  box-shadow: var(--shadow-sticker);
+}
+
+.principleCard_mint  { background: #F0FFF9; }
+.principleCard_peach { background: #FFF5EF; }
+
+.principleNum {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.principleHeading {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cb-navy);
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.principleBody {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── CTA strip ── */
+.ctaStrip {
+  background: var(--cb-navy);
+  padding: 72px var(--space-12);
+}
+
+.ctaInner {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ctaTitle {
+  font-family: 'Lilita One', cursive;
+  font-size: clamp(26px, 3.5vw, 36px);
+  font-weight: 400;
+  color: var(--bg-page);
+  margin: 0 0 12px;
+  line-height: 1.15;
+}
+
+.ctaDesc {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--cb-mint-deep);
+  margin: 0 0 32px;
+}
+
+.ctaBtn {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cb-navy);
+  background: var(--cb-mint);
+  text-decoration: none;
+  padding: 14px 32px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--bg-page);
+  box-shadow: 3px 3px 0 rgba(250, 246, 239, 0.35);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.ctaBtn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 rgba(250, 246, 239, 0.35);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .principlesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 0 24px 64px;
+  }
+  .hero {
+    padding: 48px 0 40px;
+    margin-bottom: 48px;
+  }
+  .problemBody {
+    padding: 28px 24px;
+  }
+  .statsRow {
+    flex-direction: column;
+    gap: 24px;
+    padding: 28px 24px;
+  }
+  .statDivider {
+    width: 48px;
+    height: 1px;
+  }
+  .ctaStrip {
+    padding: 56px 24px;
+  }
+}

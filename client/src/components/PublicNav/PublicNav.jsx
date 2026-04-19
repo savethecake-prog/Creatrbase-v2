@@ -32,6 +32,7 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
             <NavLink hash="#how-it-works" to="/scoring-explained" className={styles.linkV2}>How it works</NavLink>
             <Link to="/pricing" className={styles.linkV2}>Pricing</Link>
             <Link to="/blog" className={styles.linkV2}>Blog</Link>
+            <Link to="/about" className={styles.linkV2}>About</Link>
             <Link to="/honesty" className={styles.linkV2}>Honesty</Link>
           </div>
           <div className={styles.rightV2}>

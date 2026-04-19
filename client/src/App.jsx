@@ -29,6 +29,7 @@ import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
 import { VoiceMemory }    from './pages/Admin/VoiceMemory';
 import { Skills }         from './pages/Admin/Skills';
+import { About }         from './pages/About/About';
 import { Author }         from './pages/Author/Author';
 import { Compare }        from './pages/Compare/Compare';
 import { NichePage, RatePage, ThresholdPage, ResearchPage } from './pages/Niche/NichePage';
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="/honesty"     element={<Honesty />} />
           <Route path="/pricing"     element={<Pricing />} />
           <Route path="/score"       element={<ScoreForm />} />
+          <Route path="/about"       element={<About />} />
           <Route path="/author/anthony-saulderson" element={<Author />} />
           <Route path="/compare/:competitor" element={<Compare />} />
           <Route path="/niche/:slug" element={<NichePage />} />

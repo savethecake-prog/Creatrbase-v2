@@ -27,6 +27,7 @@ export function MarketingFooter() {
         <div>
           <h5 className={styles.colTitle}>Company</h5>
           <ul className={styles.links}>
+            <li><Link to="/about">About</Link></li>
             <li><Link to="/privacy">Privacy</Link></li>
             <li><Link to="/terms">Terms</Link></li>
           </ul>

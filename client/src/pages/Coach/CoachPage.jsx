@@ -137,7 +137,7 @@ function CoachChat() {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className={styles.layout}>
+    <div className={styles.layout} data-messages={messages.length > 0 ? 'true' : undefined}>
 
       {/* ── Left panel ── */}
       <aside className={styles.sidebar}>

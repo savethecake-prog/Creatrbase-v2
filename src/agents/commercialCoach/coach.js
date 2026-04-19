@@ -70,21 +70,34 @@ async function sendMessage(sessionId, creatorId, userMessage) {
 
   const messages = [...(snapshot.messages || []), { role: 'user', content: userMessage }];
 
-  const response = await client.messages.create({
-    model:      MODEL,
-    max_tokens: MAX_TOKENS,
-    system:     SYSTEM_PROMPT,
-    messages,
-    tools:      TOOL_DEFINITIONS,
-  });
-
+  const MAX_ROUNDS = 5;
   const toolUses = [];
-  let hasToolUse = false;
-  let responseMessages = [{ role: 'assistant', content: response.content }];
+  let loopMessages = [...messages];
+  let responseText = '';
 
-  for (const block of response.content) {
-    if (block.type === 'tool_use') {
-      hasToolUse = true;
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    const response = await client.messages.create({
+      model:      MODEL,
+      max_tokens: MAX_TOKENS,
+      system:     SYSTEM_PROMPT,
+      messages:   loopMessages,
+      tools:      TOOL_DEFINITIONS,
+    });
+
+    loopMessages.push({ role: 'assistant', content: response.content });
+
+    const toolUseBlocks = response.content.filter(b => b.type === 'tool_use');
+
+    if (toolUseBlocks.length === 0) {
+      responseText = response.content
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('\n');
+      break;
+    }
+
+    const toolResults = [];
+    for (const block of toolUseBlocks) {
       const handler = TOOL_HANDLERS[block.name];
       let result;
       try {
@@ -93,38 +106,22 @@ async function sendMessage(sessionId, creatorId, userMessage) {
         result = { error: err.message };
       }
       toolUses.push({ tool: block.name, result });
-    }
-  }
-
-  if (hasToolUse) {
-    const toolResults = response.content
-      .filter(b => b.type === 'tool_use')
-      .map((b, i) => ({
+      toolResults.push({
         type:        'tool_result',
-        tool_use_id: b.id,
-        content:     JSON.stringify(toolUses[i]?.result ?? {}),
-      }));
+        tool_use_id: block.id,
+        content:     JSON.stringify(result),
+      });
+    }
 
-    const followUp = await client.messages.create({
-      model:      MODEL,
-      max_tokens: MAX_TOKENS,
-      system:     SYSTEM_PROMPT,
-      messages:   [...messages, ...responseMessages, { role: 'user', content: toolResults }],
-      tools:      TOOL_DEFINITIONS,
-    });
-
-    responseMessages.push({ role: 'user', content: toolResults });
-    responseMessages.push({ role: 'assistant', content: followUp.content });
+    loopMessages.push({ role: 'user', content: toolResults });
   }
 
-  const lastAssistant = responseMessages[responseMessages.length - 1];
-  const responseText = (lastAssistant.content || [])
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('\n');
+  if (!responseText) {
+    responseText = "I wasn't able to generate a response. Please try again.";
+  }
 
   const updatedSnapshot = {
-    messages: [...messages, ...responseMessages],
+    messages: loopMessages,
     toolUses: [...(snapshot.toolUses || []), ...toolUses],
     meta:     snapshot.meta,
     lastResponse: responseText,

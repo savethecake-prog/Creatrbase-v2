@@ -150,7 +150,7 @@
   margin: 0;
   white-space: pre-wrap;
 }
-.msgUser .bubbleText { color: var(--bg-page); }
+.msgUser .bubbleText { color: #fff; }
 
 /* Citation chip */
 .citation {
@@ -237,9 +237,11 @@
 @media (max-width: 768px) {
   .layout { flex-direction: column; height: auto; max-height: none; }
   .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 20px 16px; }
-  .starters { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
-  .starter { white-space: nowrap; flex-shrink: 0; }
-  .chat { height: 60vh; min-height: 400px; }
+  /* hide starters sidebar once conversation is underway */
+  .layout[data-messages="true"] .sidebar { display: none; }
+  .starters { flex-direction: column; gap: 6px; }
+  .starter { white-space: normal; }
+  .chat { height: 70vh; min-height: 420px; }
   .messages { padding: 20px 16px 12px; }
   .inputRow { padding: 12px 16px 16px; }
 }

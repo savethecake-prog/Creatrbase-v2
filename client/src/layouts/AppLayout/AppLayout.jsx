@@ -41,6 +41,7 @@ const NAV = [
     items: [
       { label: 'Connections', to: '/connections' },
       { label: 'Settings', to: '/settings' },
+      { label: 'Engine Room', to: '/power', powerOnly: true },
     ],
   },
 ];
@@ -103,24 +104,28 @@ export function AppLayout({ children }) {
               &times;
             </button>
           </div>
-          {NAV.map(({ group, items }) => (
-            <div key={group} className={styles.navGroup}>
-              <p className={styles.navGroupLabel}>{group}</p>
-              {items.map(({ label, to, soon }) => (
-                <NavLink
-                  key={label}
-                  to={soon ? '#' : to}
-                  onClick={() => setDrawerOpen(false)}
-                  className={({ isActive }) =>
-                    `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
-                  }
-                >
-                  {label}
-                  {soon && <span className={styles.navSoon}>Soon</span>}
-                </NavLink>
-              ))}
-            </div>
-          ))}
+          {NAV.map(({ group, items }) => {
+            const visible = items.filter(item => !item.powerOnly || isPowerUser);
+            if (!visible.length) return null;
+            return (
+              <div key={group} className={styles.navGroup}>
+                <p className={styles.navGroupLabel}>{group}</p>
+                {visible.map(({ label, to, soon }) => (
+                  <NavLink
+                    key={label}
+                    to={soon ? '#' : to}
+                    onClick={() => setDrawerOpen(false)}
+                    className={({ isActive }) =>
+                      `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
+                    }
+                  >
+                    {label}
+                    {soon && <span className={styles.navSoon}>Soon</span>}
+                  </NavLink>
+                ))}
+              </div>
+            );
+          })}
         </nav>
       )}
       {showTrialBanner && (
@@ -216,23 +221,27 @@ export function AppLayout({ children }) {
       </header>
 
       <nav className={styles.sidebar}>
-        {NAV.map(({ group, items }) => (
-          <div key={group} className={styles.navGroup}>
-            <p className={styles.navGroupLabel}>{group}</p>
-            {items.map(({ label, to, soon }) => (
-              <NavLink
-                key={label}
-                to={soon ? '#' : to}
-                className={({ isActive }) =>
-                  `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
-                }
-              >
-                {label}
-                {soon && <span className={styles.navSoon}>Soon</span>}
-              </NavLink>
-            ))}
-          </div>
-        ))}
+        {NAV.map(({ group, items }) => {
+          const visible = items.filter(item => !item.powerOnly || isPowerUser);
+          if (!visible.length) return null;
+          return (
+            <div key={group} className={styles.navGroup}>
+              <p className={styles.navGroupLabel}>{group}</p>
+              {visible.map(({ label, to, soon }) => (
+                <NavLink
+                  key={label}
+                  to={soon ? '#' : to}
+                  className={({ isActive }) =>
+                    `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
+                  }
+                >
+                  {label}
+                  {soon && <span className={styles.navSoon}>Soon</span>}
+                </NavLink>
+              ))}
+            </div>
+          );
+        })}
       </nav>
 
       <main className={styles.main}>

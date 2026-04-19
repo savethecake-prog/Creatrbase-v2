@@ -37,6 +37,8 @@ import { NichePage, RatePage, ThresholdPage, ResearchPage } from './pages/Niche/
 import { AuditPage }    from './pages/Audit/AuditPage';
 import { CoachPage }    from './pages/Coach/CoachPage';
 import { Settings }      from './pages/Settings/Settings';
+import { PowerHub }      from './pages/PowerHub/PowerHub';
+import { Roadmap }       from './pages/Admin/Roadmap';
 import { RequireAdmin } from './lib/RequireAdmin';
 import { CookieBanner } from './components/CookieBanner/CookieBanner';
 
@@ -77,6 +79,7 @@ function AppRoutes() {
           <Route path="content"           element={<Content />} />
           <Route path="content/session/:id" element={<ContentSession />} />
           <Route path="token-cleanup"     element={<TokenCleanup />} />
+          <Route path="roadmap"           element={<Roadmap />} />
           <Route path="creators"  element={<AdminPlaceholder title="Creators" />} />
           <Route path="agents"    element={<AdminPlaceholder title="Agents" />} />
           <Route path="system"    element={<AdminPlaceholder title="System" />} />
@@ -92,6 +95,7 @@ function AppRoutes() {
         <Route path="/audit"         element={<RequireAuth><AuditPage /></RequireAuth>} />
         <Route path="/coach"         element={<RequireAuth><CoachPage /></RequireAuth>} />
         <Route path="/settings"      element={<RequireAuth><Settings /></RequireAuth>} />
+        <Route path="/power"         element={<RequireAuth><PowerHub /></RequireAuth>} />
         <Route path="/" element={<Landing />} />
       </Routes>
     </>

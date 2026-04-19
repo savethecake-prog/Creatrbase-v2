@@ -58,9 +58,9 @@ async function createSession(creatorId, tenantId) {
  * @param {string} userMessage
  * @returns {{ response: string, toolsUsed: string[] }}
  */
-async function sendMessage(sessionId, creatorId, userMessage) {
+async function sendMessage(sessionId, creatorId, userMessage, userApiKey = null) {
   const pool   = getPool();
-  const client = new Anthropic();
+  const client = new Anthropic(userApiKey ? { apiKey: userApiKey } : {});
 
   const { rows: [run] } = await pool.query('SELECT * FROM agent_run WHERE id = $1', [sessionId]);
   if (!run) throw new Error('Session not found');

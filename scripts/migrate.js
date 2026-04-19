@@ -52,6 +52,7 @@ const FILES = [
   '035_content_studio.sql',
   '036_gdpr_compliance.sql',
   '037_power_user.sql',
+  '038_roadmap.sql',
 ];
 
 async function run() {

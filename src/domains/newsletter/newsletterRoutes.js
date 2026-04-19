@@ -21,10 +21,14 @@ async function newsletterRoutes(app) {
 
   // POST /api/newsletter/subscribe
   app.post('/api/newsletter/subscribe', async (req, reply) => {
-    const { email, source, source_detail, segments } = req.body || {};
+    const { email, source, source_detail, segments, marketing_consent } = req.body || {};
 
     if (!email || !EMAIL_RE.test(email)) {
       return reply.code(400).send({ error: 'invalid_email', message: 'Please enter a valid email address.' });
+    }
+
+    if (!marketing_consent) {
+      return reply.code(400).send({ error: 'consent_required', message: 'Marketing consent is required to subscribe.' });
     }
 
     const ip = req.headers['x-real-ip'] || req.ip;
@@ -68,12 +72,15 @@ async function newsletterRoutes(app) {
       app.log.warn({ err: listmonkErr }, 'Listmonk subscribe failed (non-fatal)');
     }
 
-    // Record attribution
+    // Record attribution with consent timestamp
     await pool.query(
-      `INSERT INTO newsletter_subscriber_attribution (email, listmonk_sub_id, source, source_detail, initial_segments)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO newsletter_subscriber_attribution
+         (email, listmonk_sub_id, source, source_detail, initial_segments, marketing_consent, consent_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())
        ON CONFLICT ((LOWER(email))) DO NOTHING`,
-      [email.trim(), listmonkSubId, source || 'unknown', source_detail || null, segments || ['creator-economy', 'ai-for-creators', 'editorial']]
+      [email.trim(), listmonkSubId, source || 'unknown', source_detail || null,
+       segments || ['creator-economy', 'ai-for-creators', 'editorial'],
+       marketing_consent === true]
     );
 
     return {

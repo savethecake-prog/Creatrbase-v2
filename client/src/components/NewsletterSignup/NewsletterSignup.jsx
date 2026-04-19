@@ -18,6 +18,7 @@ import styles from './NewsletterSignup.module.css';
 export function NewsletterSignup({ source, sourceDetail, variant = 'block', copy = {}, onSubscribe }) {
   const [email, setEmail] = useState('');
   const [checked, setChecked] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -29,6 +30,10 @@ export function NewsletterSignup({ source, sourceDetail, variant = 'block', copy
   async function handleSubmit(e) {
     e.preventDefault();
     if (!email.trim() || status === 'loading') return;
+    if (!consentGiven) {
+      setErrorMsg('Please tick the consent box to subscribe.');
+      return;
+    }
 
     setStatus('loading');
     setErrorMsg('');
@@ -39,6 +44,7 @@ export function NewsletterSignup({ source, sourceDetail, variant = 'block', copy
         source,
         source_detail: sourceDetail,
         segments: ['creator-economy', 'ai-for-creators', 'editorial'],
+        marketing_consent: true,
       });
       setStatus('success');
     } catch (err) {
@@ -61,7 +67,7 @@ export function NewsletterSignup({ source, sourceDetail, variant = 'block', copy
           className={styles.checkbox}
         />
         <span className={styles.checkboxLabel}>
-          Also subscribe me to the Creatrbase newsletter for creator economy news, AI tips, and weekly editorial (three sends per week, opt out anytime).
+          I agree to receive the Creatrbase newsletter (creator economy, AI tips, weekly editorial). Three sends per week. Unsubscribe any time.
         </span>
       </label>
     );
@@ -97,10 +103,25 @@ export function NewsletterSignup({ source, sourceDetail, variant = 'block', copy
           required
           disabled={status === 'loading'}
         />
-        <button type="submit" className={styles.btn} disabled={status === 'loading' || !email.trim()}>
+        <button type="submit" className={styles.btn} disabled={status === 'loading' || !email.trim() || !consentGiven}>
           {status === 'loading' ? 'Subscribing...' : cta}
         </button>
       </form>
+      <label className={styles.consentRow}>
+        <input
+          type="checkbox"
+          checked={consentGiven}
+          onChange={e => {
+            setConsentGiven(e.target.checked);
+            if (e.target.checked) setErrorMsg('');
+          }}
+          className={styles.consentCheckbox}
+          disabled={status === 'loading'}
+        />
+        <span className={styles.consentLabel}>
+          I agree to receive the Creatrbase newsletter. Unsubscribe any time.
+        </span>
+      </label>
       {status === 'error' && <p className={styles.error}>{errorMsg}</p>}
       {variant !== 'compact' && (
         <p className={styles.meta}>Three sends per week. Segment-by-segment opt down. Opt out anytime.</p>

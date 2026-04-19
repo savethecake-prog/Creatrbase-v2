@@ -182,12 +182,14 @@ function scoreEngagementQuality({ engagementRate30d, avgViewsPerVideo30d, totalV
 // Measures: how commercially valuable this niche is for brand spend.
 // Input: niche classification output.
 
-function scoreNicheCommercialValue({ primaryNicheCategory, classificationConfidence, existingPartnerships, affiliateDomainsDetected, brandMentions }) {
+function scoreNicheCommercialValue({ primaryNicheCategory, classificationConfidence, existingPartnerships, affiliateDomainsDetected, brandMentions, nicheBaseScore = null }) {
   if (!primaryNicheCategory) {
     return { score: null, confidence: 'insufficient_data', state: 'insufficient_data' };
   }
 
-  let base = NICHE_BASE_SCORES[primaryNicheCategory] ?? 40;
+  // nicheBaseScore is passed by the scoring worker when >=5 signal-confirmed deals exist
+  // for this niche in cpm_benchmarks (source='signal_feedback'). Falls back to hardcoded table.
+  let base = nicheBaseScore ?? NICHE_BASE_SCORES[primaryNicheCategory] ?? 40;
 
   // Confidence discount — low-confidence classification less trustworthy
   const confMultiplier = classificationConfidence === 'high' ? 1.0
@@ -450,13 +452,15 @@ function runScoringEngine({
   promoCodesDetected,
   // Commercial history
   confirmedDealsCount = 0,
+  // Signal-derived niche benchmark — passed by worker when >=5 data points exist
+  nicheBaseScore = null,
 }) {
   const nicheClassified = !!primaryNicheCategory && classificationConfidence !== null;
 
   const dimensions = {
     subscriber_momentum:     scoreSubscriberMomentum({ subscriberCount, subVelocityPerDay, snapshotCount }),
     engagement_quality:      scoreEngagementQuality({ engagementRate30d, avgViewsPerVideo30d, totalViewCount, videoCount, subscriberCount }),
-    niche_commercial_value:  scoreNicheCommercialValue({ primaryNicheCategory, classificationConfidence, existingPartnerships, affiliateDomainsDetected, brandMentions }),
+    niche_commercial_value:  scoreNicheCommercialValue({ primaryNicheCategory, classificationConfidence, existingPartnerships, affiliateDomainsDetected, brandMentions, nicheBaseScore }),
     audience_geo_alignment:  scoreAudienceGeoAlignment({ primaryAudienceGeo }),
     content_consistency:     scoreContentConsistency({ publicUploads90d, videoCount }),
     content_brand_alignment: scoreContentBrandAlignment({ existingPartnerships, brandMentions, affiliateDomainsDetected, promoCodesDetected, primaryNicheCategory, classificationConfidence }),

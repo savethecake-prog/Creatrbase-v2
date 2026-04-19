@@ -21,8 +21,49 @@ function timeAgo(iso) {
   return `${days}d ago`;
 }
 
+function factorLines(factors) {
+  if (!factors) return [];
+  const lines = [];
+
+  if (factors.corroboration != null) {
+    const c = factors.corroboration;
+    if (c >= 0.7)      lines.push('Well supported by prior tracked activity');
+    else if (c >= 0.4) lines.push('Partially corroborated by prior signals');
+    else               lines.push('First signal of this type — no corroboration yet');
+  }
+
+  if (factors.recency != null) {
+    const r = factors.recency;
+    if (r >= 1.0)      lines.push('Very recent (less than 7 days old)');
+    else if (r >= 0.8) lines.push('Recent (within the last month)');
+    else if (r >= 0.6) lines.push('Moderate age (1-3 months)');
+    else if (r >= 0.4) lines.push('Getting older (3-6 months)');
+    else               lines.push('Old signal (over 6 months)');
+  }
+
+  if (factors.completeness != null) {
+    const pct = Math.round(factors.completeness * 100);
+    lines.push(`${pct}% of expected data fields were present`);
+  }
+
+  if (factors.sourceType != null) {
+    const s = factors.sourceType;
+    if (s >= 0.8)      lines.push('Source: user-recorded (most reliable)');
+    else if (s >= 0.5) lines.push('Source: auto-detected from email');
+    else               lines.push('Source: inferred');
+  }
+
+  if (Array.isArray(factors.notes)) {
+    factors.notes.forEach((n) => n && lines.push(n));
+  }
+
+  return lines;
+}
+
 function SignalPill({ signal }) {
+  const [expanded, setExpanded] = useState(false);
   const q = qualityLabel(signal.quality_score);
+  const factorText = factorLines(signal.quality_factors ?? null);
 
   return (
     <div className={styles.pill}>
@@ -41,7 +82,23 @@ function SignalPill({ signal }) {
           <span className={`${styles.qualityLabel} ${styles[`qualityLabel_${q.variant}`]}`}>
             {q.text}
           </span>
+          {factorText.length > 0 && (
+            <button
+              className={styles.expandBtn}
+              onClick={() => setExpanded((v) => !v)}
+              aria-expanded={expanded}
+            >
+              {expanded ? '▲' : '▼'}
+            </button>
+          )}
         </div>
+      )}
+      {expanded && factorText.length > 0 && (
+        <ul className={styles.factorList}>
+          {factorText.map((line, i) => (
+            <li key={i}>{line}</li>
+          ))}
+        </ul>
       )}
     </div>
   );
@@ -50,10 +107,14 @@ function SignalPill({ signal }) {
 export function SignalFeed({ limit = 3 }) {
   const [signals, setSignals] = useState(null);
   const [error, setError]     = useState(false);
+  const [total, setTotal]     = useState(0);
 
   useEffect(() => {
     api.get('/signals/recent')
-      .then(({ signals }) => setSignals(signals ?? []))
+      .then(({ signals: rows, total: t }) => {
+        setSignals(rows ?? []);
+        setTotal(t ?? 0);
+      })
       .catch(() => setError(true));
   }, []);
 
@@ -66,7 +127,7 @@ export function SignalFeed({ limit = 3 }) {
     <div className={styles.feed}>
       <div className={styles.feedHeader}>
         <p className={styles.feedTitle}>What the model learned</p>
-        {signals.length > limit && (
+        {total > limit && (
           <Link to="/honesty" className={styles.feedMore}>View all</Link>
         )}
       </div>

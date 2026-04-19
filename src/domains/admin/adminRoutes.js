@@ -8,6 +8,19 @@ const { handleSessionMessage, endSession } = require('../../agents/newsletter/ed
 const { v4: uuidv4 }  = require('uuid');
 const { listSkills }   = require('../../agents/newsletter/skills-loader');
 
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY not set');
+  return require('stripe')(process.env.STRIPE_SECRET_KEY);
+}
+
+async function logAdminAction(pool, actorUserId, actionType, actionTarget, metadata) {
+  await pool.query(
+    `INSERT INTO admin_action_log (actor_user_id, action_type, action_target, metadata)
+     VALUES ($1::uuid, $2, $3, $4::jsonb)`,
+    [actorUserId, actionType, actionTarget, JSON.stringify(metadata || {})]
+  );
+}
+
 async function adminRoutes(app) {
   const preHandler = [authenticate, requireAdmin];
 
@@ -147,6 +160,247 @@ async function adminRoutes(app) {
   app.get('/api/admin/skills', { preHandler }, async () => {
     const skills = listSkills();
     return { skills };
+  });
+
+  // ── User management ───────────────────────────────────────────────────────
+
+  // GET /api/admin/users?search=&offset=&limit=
+  app.get('/api/admin/users', { preHandler }, async (req) => {
+    const pool     = getPool();
+    const search   = req.query.search   ? `%${req.query.search}%` : '%';
+    const limit    = Math.min(100, Math.max(1, parseInt(req.query.limit  ?? '50', 10) || 50));
+    const offset   = Math.max(0,          parseInt(req.query.offset ?? '0',  10) || 0);
+
+    const [{ rows }, { rows: countRows }] = await Promise.all([
+      pool.query(
+        `SELECT u.id, u.email, u.created_at,
+                t.id AS tenant_id, t.status AS tenant_status, t.suspended_at,
+                COALESCE(sp.name, 'free') AS plan_name,
+                s.status AS sub_status,
+                s.admin_override_plan,
+                COALESCE(c.display_name, '') AS display_name
+         FROM users u
+         JOIN tenants t ON t.id = u.tenant_id
+         LEFT JOIN subscriptions s ON s.tenant_id = t.id
+         LEFT JOIN subscription_plans sp ON sp.id = s.plan_id
+         LEFT JOIN creators c ON c.user_id = u.id
+         WHERE u.email ILIKE $1
+         ORDER BY u.created_at DESC
+         LIMIT $2 OFFSET $3`,
+        [search, limit, offset]
+      ),
+      pool.query(
+        `SELECT COUNT(*) AS total FROM users u WHERE u.email ILIKE $1`,
+        [search]
+      ),
+    ]);
+
+    return { users: rows, total: parseInt(countRows[0]?.total ?? '0', 10) };
+  });
+
+  // GET /api/admin/users/:userId
+  app.get('/api/admin/users/:userId', { preHandler }, async (req, reply) => {
+    const pool = getPool();
+    const { rows } = await pool.query(
+      `SELECT u.id, u.email, u.created_at,
+              t.id AS tenant_id, t.status AS tenant_status,
+              t.suspended_at, t.suspended_by,
+              COALESCE(sp.name, 'free') AS plan_name,
+              s.status AS sub_status,
+              s.admin_override_plan, s.admin_override_by,
+              s.stripe_customer_id,
+              s.trial_end, s.current_period_end,
+              COALESCE(c.display_name, '') AS display_name
+       FROM users u
+       JOIN tenants t ON t.id = u.tenant_id
+       LEFT JOIN subscriptions s ON s.tenant_id = t.id
+       LEFT JOIN subscription_plans sp ON sp.id = s.plan_id
+       LEFT JOIN creators c ON c.user_id = u.id
+       WHERE u.id = $1`,
+      [req.params.userId]
+    );
+    if (rows.length === 0) return reply.code(404).send({ error: 'User not found' });
+
+    const user = rows[0];
+
+    // Look up most recent succeeded payment from Stripe if customer exists
+    let latestPayment = null;
+    if (user.stripe_customer_id && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const stripe = getStripe();
+        const intents = await stripe.paymentIntents.list({
+          customer: user.stripe_customer_id,
+          limit:    5,
+        });
+        const succeeded = intents.data.find(pi => pi.status === 'succeeded');
+        if (succeeded) {
+          latestPayment = {
+            amount:   succeeded.amount_received,
+            currency: succeeded.currency,
+            date:     new Date(succeeded.created * 1000).toISOString(),
+            intentId: succeeded.id,
+          };
+        }
+      } catch {
+        // Non-fatal — Stripe may not be configured in dev
+      }
+    }
+
+    // Compute effective tier for display
+    const effectiveTier = user.admin_override_plan
+      || (user.sub_status === 'active' && user.plan_name !== 'free' ? user.plan_name : null)
+      || (user.sub_status === 'trialling' && user.trial_end && new Date(user.trial_end) > new Date() ? user.plan_name : null)
+      || 'free';
+
+    return {
+      ...user,
+      effective_tier: effectiveTier,
+      latest_payment: latestPayment,
+    };
+  });
+
+  // POST /api/admin/users/:userId/override-tier  { plan: 'free'|'core'|'pro' }
+  app.post('/api/admin/users/:userId/override-tier', { preHandler }, async (req, reply) => {
+    const pool = getPool();
+    const { plan } = req.body ?? {};
+    if (!['free', 'core', 'pro'].includes(plan)) {
+      return reply.code(400).send({ error: 'plan must be free, core, or pro' });
+    }
+
+    // Resolve tenant
+    const { rows: userRows } = await pool.query(
+      'SELECT tenant_id, email FROM users WHERE id = $1',
+      [req.params.userId]
+    );
+    if (userRows.length === 0) return reply.code(404).send({ error: 'User not found' });
+    const { tenant_id: tenantId, email: targetEmail } = userRows[0];
+
+    if (plan === 'free') {
+      // Remove any override — fall back to natural Stripe state
+      await pool.query(
+        `UPDATE subscriptions
+         SET admin_override_plan = NULL, admin_override_by = NULL, updated_at = NOW()
+         WHERE tenant_id = $1`,
+        [tenantId]
+      );
+    } else {
+      // Upsert subscription with the target plan and mark as admin override
+      await pool.query(
+        `INSERT INTO subscriptions (tenant_id, plan_id, status, admin_override_plan, admin_override_by)
+         SELECT $1, id, 'active', $2, $3 FROM subscription_plans WHERE name = $2
+         ON CONFLICT (tenant_id) DO UPDATE
+           SET admin_override_plan = $2,
+               admin_override_by   = $3,
+               updated_at          = NOW()`,
+        [tenantId, plan, req.user.email]
+      );
+    }
+
+    await logAdminAction(pool, req.user.userId, 'override_tier', targetEmail, {
+      plan, grantedBy: req.user.email,
+    });
+
+    return { ok: true };
+  });
+
+  // POST /api/admin/users/:userId/suspend  { reason }
+  app.post('/api/admin/users/:userId/suspend', { preHandler }, async (req, reply) => {
+    const pool = getPool();
+    const { reason = '' } = req.body ?? {};
+
+    const { rows: userRows } = await pool.query(
+      'SELECT tenant_id, email FROM users WHERE id = $1',
+      [req.params.userId]
+    );
+    if (userRows.length === 0) return reply.code(404).send({ error: 'User not found' });
+    const { tenant_id: tenantId, email: targetEmail } = userRows[0];
+
+    await pool.query(
+      `UPDATE tenants
+       SET status = 'suspended', suspended_at = NOW(), suspended_by = $1
+       WHERE id = $2`,
+      [req.user.email, tenantId]
+    );
+
+    await logAdminAction(pool, req.user.userId, 'suspend_account', targetEmail, {
+      reason, suspendedBy: req.user.email,
+    });
+
+    return { ok: true };
+  });
+
+  // POST /api/admin/users/:userId/unsuspend
+  app.post('/api/admin/users/:userId/unsuspend', { preHandler }, async (req, reply) => {
+    const pool = getPool();
+
+    const { rows: userRows } = await pool.query(
+      'SELECT tenant_id, email FROM users WHERE id = $1',
+      [req.params.userId]
+    );
+    if (userRows.length === 0) return reply.code(404).send({ error: 'User not found' });
+    const { tenant_id: tenantId, email: targetEmail } = userRows[0];
+
+    await pool.query(
+      `UPDATE tenants
+       SET status = 'active', suspended_at = NULL, suspended_by = NULL
+       WHERE id = $1`,
+      [tenantId]
+    );
+
+    await logAdminAction(pool, req.user.userId, 'unsuspend_account', targetEmail, {
+      restoredBy: req.user.email,
+    });
+
+    return { ok: true };
+  });
+
+  // POST /api/admin/users/:userId/refund  { reason }
+  app.post('/api/admin/users/:userId/refund', { preHandler }, async (req, reply) => {
+    const pool = getPool();
+    const { reason = '' } = req.body ?? {};
+
+    const { rows: userRows } = await pool.query(
+      `SELECT u.tenant_id, u.email, s.stripe_customer_id
+       FROM users u
+       LEFT JOIN subscriptions s ON s.tenant_id = u.tenant_id
+       WHERE u.id = $1`,
+      [req.params.userId]
+    );
+    if (userRows.length === 0) return reply.code(404).send({ error: 'User not found' });
+
+    const { stripe_customer_id: stripeCustomerId, email: targetEmail } = userRows[0];
+
+    if (!stripeCustomerId) {
+      return reply.code(400).send({ error: 'No Stripe customer on record for this user' });
+    }
+
+    const stripe = getStripe();
+    const intents = await stripe.paymentIntents.list({ customer: stripeCustomerId, limit: 5 });
+    const latest  = intents.data.find(pi => pi.status === 'succeeded');
+
+    if (!latest) {
+      return reply.code(400).send({ error: 'No succeeded payment found to refund' });
+    }
+
+    const refund = await stripe.refunds.create({
+      payment_intent: latest.id,
+      reason:         'requested_by_customer',
+    });
+
+    await logAdminAction(pool, req.user.userId, 'refund_issued', targetEmail, {
+      stripeRefundId: refund.id,
+      amount:         latest.amount_received,
+      currency:       latest.currency,
+      reason,
+      issuedBy:       req.user.email,
+    });
+
+    return {
+      ok:       true,
+      refundId: refund.id,
+      amount:   latest.amount_received,
+      currency: latest.currency,
+    };
   });
 }
 

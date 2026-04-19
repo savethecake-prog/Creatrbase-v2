@@ -21,6 +21,7 @@ import { ScoreForm }    from './pages/Score/ScoreForm';
 import { AdminLayout }    from './pages/Admin/AdminLayout';
 import { AdminDashboard } from './pages/Admin/AdminDashboard';
 import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
+import { Subscribers }      from './pages/Admin/Subscribers';
 import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
 import { VoiceMemory }    from './pages/Admin/VoiceMemory';
@@ -56,7 +57,7 @@ export default function App() {
             <Route path="editorial/session" element={<EditorialSession />} />
             <Route path="editorial/voice-memory" element={<VoiceMemory />} />
             <Route path="skills" element={<Skills />} />
-            <Route path="subscribers" element={<AdminPlaceholder title="Subscribers" />} />
+            <Route path="subscribers" element={<Subscribers />} />
             <Route path="creators" element={<AdminPlaceholder title="Creators" />} />
             <Route path="agents" element={<AdminPlaceholder title="Agents" />} />
             <Route path="system" element={<AdminPlaceholder title="System" />} />

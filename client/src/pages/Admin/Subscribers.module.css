@@ -1,0 +1,711 @@
+/* ─── Page shell ─────────────────────────────────────────────────────────── */
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 28px;
+}
+
+/* ─── Toolbar ────────────────────────────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 38px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-4) 0 36px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.searchInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+.userCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* ─── Table ──────────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  white-space: nowrap;
+  background: var(--bg-surface);
+}
+
+.table td {
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.table tbody tr.rowSelected {
+  background: var(--accent-muted);
+}
+
+.emailCell {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.nameCell {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.joinedCell {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.manageBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.manageBtn:hover {
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+}
+
+/* ─── Tier badges ────────────────────────────────────────────────────────── */
+
+.tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.tier_free {
+  background: var(--bg-surface-2);
+  color: var(--text-tertiary);
+}
+
+.tier_core {
+  background: var(--accent-subtle);
+  color: var(--accent-hover);
+  border: 1px solid var(--accent-border);
+}
+
+.tier_pro {
+  background: var(--success-subtle);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+.tierDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--warning);
+  flex-shrink: 0;
+}
+
+/* ─── Status badges ──────────────────────────────────────────────────────── */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status_active .statusDot    { background: var(--success); }
+.status_active               { color: var(--success); }
+
+.status_suspended .statusDot { background: var(--error); }
+.status_suspended            { color: var(--error); }
+
+.status_trialling .statusDot { background: var(--warning); }
+.status_trialling            { color: var(--warning); }
+
+/* ─── Pagination ─────────────────────────────────────────────────────────── */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.pageBtn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.pageBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pageBtn:not(:disabled):hover {
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+}
+
+.pageInfo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding: 0 var(--space-2);
+}
+
+/* ─── Empty / loading states ─────────────────────────────────────────────── */
+
+.emptyRow td {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+/* ─── Backdrop ───────────────────────────────────────────────────────────── */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 16, 64, 0.18);
+  z-index: 99;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Drawer ─────────────────────────────────────────────────────────────── */
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 460px;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 40px rgba(27, 16, 64, 0.08);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.drawerAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent-hover);
+  flex-shrink: 0;
+}
+
+.drawerIdentity {
+  flex: 1;
+  min-width: 0;
+}
+
+.drawerName {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawerEmail {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawerClose {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.drawerClose:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.drawerBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ─── Drawer sections ────────────────────────────────────────────────────── */
+
+.section {}
+
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-3);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.infoItem {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-3);
+}
+
+.infoKey {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 4px;
+}
+
+.infoVal {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.infoValMuted {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ─── Action cards ───────────────────────────────────────────────────────── */
+
+.actionCard {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.actionCardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-1);
+}
+
+.actionCardDesc {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ─── Tier picker ────────────────────────────────────────────────────────── */
+
+.tierPicker {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.tierPickBtn {
+  flex: 1;
+  padding: 7px 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tierPickBtn:hover:not(.tierPickBtnActive) {
+  border-color: var(--accent-border);
+  color: var(--accent-hover);
+}
+
+.tierPickBtnActive.tierPickBtn_free {
+  background: var(--bg-active);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.tierPickBtnActive.tierPickBtn_core {
+  background: var(--accent-subtle);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+}
+
+.tierPickBtnActive.tierPickBtn_pro {
+  background: var(--success-subtle);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ─── Confirm strip ──────────────────────────────────────────────────────── */
+
+.confirmStrip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  animation: expandIn 0.15s ease;
+}
+
+@keyframes expandIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reasonInput {
+  flex: 1;
+  height: 34px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-3);
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.reasonInput::placeholder { color: var(--text-tertiary); }
+
+.reasonInput:focus {
+  outline: none;
+  border-color: var(--accent-hover);
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+.btnPrimary {
+  height: 34px;
+  padding: 0 var(--space-4);
+  background: var(--accent-hover);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bg-surface);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.btnPrimary:hover:not(:disabled) { opacity: 0.85; }
+.btnPrimary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btnDanger {
+  height: 34px;
+  padding: 0 var(--space-4);
+  background: none;
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--error);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: var(--error-subtle);
+}
+
+.btnDanger:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btnConfirmDanger {
+  height: 34px;
+  padding: 0 var(--space-4);
+  background: var(--error);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.btnConfirmDanger:hover { opacity: 0.88; }
+
+.btnSuccess {
+  height: 34px;
+  padding: 0 var(--space-4);
+  background: none;
+  border: 1px solid var(--success-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--success);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btnSuccess:hover:not(:disabled) { background: var(--success-subtle); }
+.btnSuccess:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btnGhost {
+  height: 34px;
+  padding: 0 var(--space-3);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.btnGhost:hover { color: var(--text-secondary); }
+
+/* ─── Inline feedback ────────────────────────────────────────────────────── */
+
+.feedbackOk {
+  font-size: 12px;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.feedbackErr {
+  font-size: 12px;
+  color: var(--error);
+  font-weight: 600;
+}
+
+/* ─── Payment info ───────────────────────────────────────────────────────── */
+
+.paymentLine {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin: 0 0 var(--space-1);
+}
+
+.paymentSub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-3);
+}
+
+.noPayment {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-3);
+}
+
+/* ─── Loading spinner ────────────────────────────────────────────────────── */
+
+.drawerLoading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}

@@ -50,6 +50,7 @@ const FILES = [
   '033_gmail_watch_history.sql',
   '034_admin_override_plan.sql',
   '035_content_studio.sql',
+  '036_gdpr_compliance.sql',
 ];
 
 async function run() {

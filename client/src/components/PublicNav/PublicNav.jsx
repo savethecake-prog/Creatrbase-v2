@@ -3,14 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { LogoWordmark } from '../ui/LogoWordmark';
 import styles from './PublicNav.module.css';
 
-function NavLink({ hash, to, className, children }) {
-  const { pathname } = useLocation();
-  if (hash && pathname === '/') {
-    return <a href={hash} className={className}>{children}</a>;
-  }
-  return <Link to={to || `/${hash}`} className={className}>{children}</Link>;
-}
-
 export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -55,7 +47,7 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
               </button>
             </div>
             <div className={styles.mobileMenuLinks}>
-              <NavLink hash="#how-it-works" to="/scoring-explained" className={styles.mobileMenuLink}>How it works</NavLink>
+              <Link to="/scoring-explained" className={styles.mobileMenuLink}>How it works</Link>
               <Link to="/pricing" className={styles.mobileMenuLink}>Pricing</Link>
               <Link to="/blog" className={styles.mobileMenuLink}>Blog</Link>
               <Link to="/honesty" className={styles.mobileMenuLink}>Honesty</Link>
@@ -72,14 +64,14 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
               <LogoWordmark variant="v2" dark />
             </Link>
             <div className={styles.linksV2}>
-              <NavLink hash="#how-it-works" to="/scoring-explained" className={styles.linkV2}>How it works</NavLink>
+              <Link to="/scoring-explained" className={styles.linkV2}>How it works</Link>
               <Link to="/pricing" className={styles.linkV2}>Pricing</Link>
               <Link to="/blog" className={styles.linkV2}>Blog</Link>
               <Link to="/honesty" className={styles.linkV2}>Honesty</Link>
             </div>
             <div className={styles.rightV2}>
               <Link to="/login" className={styles.loginV2}>Log in</Link>
-              <NavLink hash="#score" to="/score" className={styles.ctaV2}>Get your score</NavLink>
+              <Link to="/score" className={styles.ctaV2}>Get your score</Link>
               <button
                 type="button"
                 className={styles.mobileMenuBtn}

@@ -27,15 +27,20 @@ async function apiKeyRoutes(app) {
     }
 
     // Validate the key against the provider
-    try {
-      if (provider === 'anthropic') {
+    if (provider === 'anthropic') {
+      try {
         const client = new Anthropic({ apiKey });
-        // list models — costs nothing, confirms key is valid
-        await client.models.list({ limit: 1 });
+        await client.messages.create({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'hi' }],
+        });
+      } catch (err) {
+        // 401 = bad key. Rate limits (429) or other errors mean the key itself is valid.
+        if (err.status === 401 || err.status === 403) {
+          return reply.code(422).send({ error: 'Key validation failed. Check the key and try again.' });
+        }
       }
-      // google / openai validation stubs for future providers
-    } catch (err) {
-      return reply.code(422).send({ error: 'Key validation failed. Check the key and try again.' });
     }
 
     const pool = getPool();

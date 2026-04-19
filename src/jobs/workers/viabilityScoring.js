@@ -11,8 +11,9 @@
 //   5. Upsert creator_milestones for all five milestone types
 // ─────────────────────────────────────────────────────────────────────────────
 
-const { getPrisma }         = require('../../lib/prisma');
-const { runScoringEngine }  = require('../../services/scoringEngine');
+const { getPrisma }              = require('../../lib/prisma');
+const { getPool }                = require('../../db/pool');
+const { runScoringEngine }       = require('../../services/scoringEngine');
 const { getDataCollectionQueue } = require('../queue');
 
 function startViabilityScoringWorker() {
@@ -81,7 +82,50 @@ function startViabilityScoringWorker() {
       select: { confirmedDealsCount: true },
     });
 
-    // ── 2. Run scoring engine ──────────────────────────────────────────────────
+    // ── 2. Derive niche benchmark from signal data (if enough data points) ────
+    // Prefer real-world deal rates from cpm_benchmarks over hardcoded defaults
+    // once the platform has >=5 signal-confirmed deals for this niche.
+
+    let nicheBaseScore = null;
+    const nicheSlug = nicheProfile?.primaryNicheCategory?.toLowerCase().replace(/\s+/g, '-');
+    if (nicheSlug) {
+      const pool = getPool();
+      const { rows: benchRows } = await pool.query(
+        `SELECT typical_rate_high, COUNT(*) OVER () AS data_point_count
+         FROM cpm_benchmarks
+         WHERE niche_slug = $1
+           AND source = 'signal_feedback'
+           AND typical_rate_high IS NOT NULL
+         LIMIT 1`,
+        [nicheSlug]
+      );
+      if (benchRows.length > 0) {
+        const { rows: countRows } = await pool.query(
+          `SELECT COUNT(*) AS cnt
+           FROM brand_creator_interactions bci
+           JOIN signal_events se ON se.source_interaction_id = bci.id
+           WHERE bci.niche = $1
+             AND bci.interaction_type = 'deal_completed'
+             AND se.signal_type = 'deal_closed'
+             AND se.status = 'applied'`,
+          [nicheProfile.primaryNicheCategory]
+        );
+        const dataPoints = parseInt(countRows[0]?.cnt ?? '0', 10);
+        if (dataPoints >= 5) {
+          const rateHighPence = benchRows[0].typical_rate_high;
+          const pounds = rateHighPence / 100;
+          nicheBaseScore = pounds >= 5000 ? 85
+                         : pounds >= 3500 ? 75
+                         : pounds >= 2000 ? 65
+                         : pounds >= 1000 ? 55
+                         : pounds >= 500  ? 45
+                         : 35;
+          job.log(`Using signal-derived niche benchmark: niche=${nicheSlug} rate=£${Math.round(pounds)} → nicheBaseScore=${nicheBaseScore} (${dataPoints} data points)`);
+        }
+      }
+    }
+
+    // ── 3. Run scoring engine ──────────────────────────────────────────────────
 
     const result = runScoringEngine({
       // Platform metrics
@@ -102,15 +146,17 @@ function startViabilityScoringWorker() {
       affiliateDomainsDetected: nicheProfile?.affiliateDomainsDetected ?? [],
       brandMentions:           nicheProfile?.brandMentions ?? [],
       promoCodesDetected:      nicheProfile?.promoCodesDetected ?? [],
-      // History
+      // Commercial history
       confirmedDealsCount: commercialProfile?.confirmedDealsCount ?? 0,
+      // Signal-derived niche benchmark (null = use hardcoded defaults)
+      nicheBaseScore,
     });
 
     const { dimensions, overallScore, overallConfidence, tier, primaryConstraint, gapToNextTier, milestones } = result;
 
     job.log(`Score: ${overallScore} (${tier}) | constraint: ${primaryConstraint} | confidence: ${overallConfidence}`);
 
-    // ── 3. Persist ─────────────────────────────────────────────────────────────
+    // ── 4. Persist ─────────────────────────────────────────────────────────────
 
     await prisma.$transaction(async (tx) => {
 

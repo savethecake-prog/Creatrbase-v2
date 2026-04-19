@@ -545,6 +545,54 @@ async function handleReprocessFailed() {
   console.log(`[signalProcessor] reprocess-failed: queued ${failed.length} signal(s)`);
 }
 
+// ─── signals:rate-staleness-check ────────────────────────────────────────────
+// Runs weekly. If a creator has had no confirmed deal in 9+ months AND their
+// rate confidence is not already null, decay it one level:
+//   high → medium → low → null
+// Keeps the rate estimate visible but marks it as less trustworthy over time.
+
+async function handleRateStalenessCheck(job) {
+  const pool = getPool();
+
+  const { rows: staleProfiles } = await pool.query(`
+    SELECT ccp.id, ccp.creator_id, ccp.rate_confidence
+    FROM creator_commercial_profiles ccp
+    WHERE ccp.rate_confidence IS NOT NULL
+      AND ccp.rate_last_calculated < NOW() - INTERVAL '9 months'
+      AND NOT EXISTS (
+        SELECT 1
+        FROM brand_creator_interactions bci
+        WHERE bci.creator_id = ccp.creator_id
+          AND bci.interaction_type = 'deal_completed'
+          AND bci.created_at > NOW() - INTERVAL '9 months'
+      )
+  `);
+
+  if (staleProfiles.length === 0) {
+    job.log('No stale rate confidence profiles found');
+    return;
+  }
+
+  const DECAY = { high: 'medium', medium: 'low', low: null };
+  let decayed = 0;
+
+  for (const profile of staleProfiles) {
+    const next = DECAY[profile.rate_confidence];
+    await pool.query(
+      `UPDATE creator_commercial_profiles
+       SET rate_confidence = $1
+       WHERE id = $2`,
+      [next ?? null, profile.id]
+    );
+    decayed++;
+    job.log(
+      `Decayed rate confidence: creator=${profile.creator_id} ${profile.rate_confidence} → ${next ?? 'null'}`
+    );
+  }
+
+  console.log(`[signalProcessor] rate-staleness-check: decayed ${decayed} profile(s)`);
+}
+
 // ─── Worker registration ───────────────────────────────────────────────────────
 
 function startSignalProcessorWorker() {
@@ -569,7 +617,15 @@ function startSignalProcessorWorker() {
     removeOnFail:     5,
   });
 
-  console.log('[signalProcessor] worker registered — ingest, apply, reprocess-failed, and update-brand-windows active');
+  // Weekly rate staleness decay — Sundays at 3am
+  queue.process('signals:rate-staleness-check', async (job) => handleRateStalenessCheck(job));
+  queue.add('signals:rate-staleness-check', {}, {
+    repeat:           { cron: '0 3 * * 0' },
+    removeOnComplete: 3,
+    removeOnFail:     5,
+  });
+
+  console.log('[signalProcessor] worker registered — ingest, apply, reprocess-failed, update-brand-windows, rate-staleness-check active');
 }
 
 module.exports = { startSignalProcessorWorker };

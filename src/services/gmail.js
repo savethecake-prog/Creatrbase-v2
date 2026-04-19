@@ -148,15 +148,12 @@ async function checkThreadForReply(accessToken, threadId) {
   try {
     thread = await gmailGet(`/threads/${threadId}?format=metadata`, accessToken);
   } catch (err) {
-    // Thread may have been deleted or is inaccessible
     if (err.message.includes('404')) return { hasReply: false, messageCount: 0, latestSnippet: null };
     throw err;
   }
 
   const messages = thread.messages ?? [];
   const count    = messages.length;
-
-  // More than 1 message = there's a reply
   const hasReply = count > 1;
   const latest   = messages[count - 1];
 
@@ -167,10 +164,76 @@ async function checkThreadForReply(accessToken, threadId) {
   };
 }
 
+// ─── Full thread content ──────────────────────────────────────────────────────
+
+function extractTextBody(payload) {
+  if (!payload) return '';
+
+  // Direct text/plain body
+  if (payload.mimeType === 'text/plain' && payload.body?.data) {
+    return Buffer.from(payload.body.data, 'base64').toString('utf-8');
+  }
+
+  // Recurse into parts
+  if (payload.parts) {
+    for (const part of payload.parts) {
+      const text = extractTextBody(part);
+      if (text) return text;
+    }
+  }
+
+  return '';
+}
+
+function getHeader(headers, name) {
+  return headers?.find(h => h.name.toLowerCase() === name.toLowerCase())?.value ?? '';
+}
+
+/**
+ * Fetch the full content of a Gmail thread.
+ * Returns { threadId, messages: [{ from, internalDate, body }] }.
+ * Each message body is truncated to 800 chars to keep LLM token cost low.
+ */
+async function getThreadContent(accessToken, threadId) {
+  let thread;
+  try {
+    thread = await gmailGet(`/threads/${threadId}?format=full`, accessToken);
+  } catch (err) {
+    if (err.message.includes('404')) return { threadId, messages: [] };
+    throw err;
+  }
+
+  const messages = (thread.messages ?? []).map((msg) => {
+    const headers = msg.payload?.headers ?? [];
+    const rawBody = extractTextBody(msg.payload);
+    // Strip quoted reply chains (lines starting with >) to keep content lean
+    const body = rawBody
+      .split('\n')
+      .filter(line => !line.trimStart().startsWith('>'))
+      .join('\n')
+      .replace(/\s{3,}/g, '\n\n')
+      .trim()
+      .slice(0, 800);
+
+    return {
+      from:         getHeader(headers, 'From'),
+      internalDate: parseInt(msg.internalDate ?? '0', 10), // Unix ms
+      body,
+    };
+  });
+
+  // Only keep the last 12 messages — enough context, avoids token bloat
+  return {
+    threadId,
+    messages: messages.slice(-12),
+  };
+}
+
 module.exports = {
   refreshGmailToken,
   ensureLabel,
   applyLabel,
   sendEmail,
   checkThreadForReply,
+  getThreadContent,
 };

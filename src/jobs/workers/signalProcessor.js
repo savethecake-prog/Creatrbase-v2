@@ -71,17 +71,30 @@ async function handleIngest(job) {
   const { score, factors } = await calculateQuality(signalType, sourceRow);
 
   // Build human-readable description
+  const STAGE_LABELS = {
+    outreach_responded: 'replied',
+    deal_negotiating:   'negotiating',
+    deal_contracting:   'contracting',
+  };
   let description = '';
   if (signalType === 'deal_closed') {
     const currency = sourceRow.rate_currency === 'GBP' ? '£' : sourceRow.rate_currency === 'EUR' ? '€' : '$';
     const rateStr = sourceRow.agreed_rate
-      ? `${currency}${Number(sourceRow.agreed_rate).toLocaleString()} agreed`
+      ? `${currency}${Math.round(Number(sourceRow.agreed_rate) / 100).toLocaleString()} agreed`
       : 'rate not recorded';
     description = `Deal recorded (${rateStr}). Your rate estimate will be updated.`;
   } else if (signalType === 'brand_replied') {
     description = 'A brand replied to your outreach. Noted as a positive buying signal.';
   } else if (signalType === 'outreach_sent_with_state') {
     description = 'Outreach sent. Your commercial profile at this moment has been snapshotted for future reference.';
+  } else if (signalType === 'deal_progressed') {
+    const stageLabel = STAGE_LABELS[sourceRow.interaction_type] ?? sourceRow.interaction_type?.replace(/_/g, ' ');
+    description = `Your deal has moved to ${stageLabel} — auto-detected from your email thread.`;
+  } else if (signalType === 'deal_stale') {
+    // The stale context from the classifier is stored in deal_notes
+    description = sourceRow.deal_notes ?? 'This deal is currently dormant.';
+  } else if (signalType === 'deal_declined') {
+    description = 'Brand declined this deal — auto-detected from your email thread.';
   }
 
   // Insert signal_events row
@@ -155,6 +168,32 @@ async function handleApply(job) {
     const signalType  = ev.signal_type_val;
     const creatorId   = ev.signal_creator_id;
     const tenantId    = ev.signal_tenant_id;
+
+    // Directional signals: no model update — applied immediately for transparency feed
+    if (signalType === 'deal_progressed') {
+      await pool.query(
+        `UPDATE signal_events SET status = 'applied', processed_at = NOW() WHERE id = $1`,
+        [signalEventId]
+      );
+      return;
+    }
+
+    if (signalType === 'deal_stale') {
+      // Stale context already in description (set during ingest from deal_notes)
+      await pool.query(
+        `UPDATE signal_events SET status = 'applied', processed_at = NOW() WHERE id = $1`,
+        [signalEventId]
+      );
+      return;
+    }
+
+    if (signalType === 'deal_declined') {
+      await pool.query(
+        `UPDATE signal_events SET status = 'applied', processed_at = NOW() WHERE id = $1`,
+        [signalEventId]
+      );
+      return;
+    }
 
     if (signalType === 'brand_replied' || signalType === 'outreach_sent_with_state') {
       // outreach_sent_with_state: write creator state snapshot to the source interaction

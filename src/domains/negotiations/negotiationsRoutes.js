@@ -59,7 +59,8 @@ async function negotiationsRoutes(app) {
 
     const VALID_TYPES = [
       'outreach_sent', 'outreach_responded', 'outreach_declined',
-      'deal_negotiating', 'deal_completed', 'relationship_ongoing',
+      'deal_negotiating', 'deal_contracting', 'deal_completed',
+      'deal_declined', 'stale', 'relationship_ongoing',
     ];
     if (!VALID_TYPES.includes(interactionType)) {
       return reply.code(400).send({ error: 'Invalid interaction type' });

@@ -45,6 +45,7 @@ const FILES = [
   '028_voice_memory_agent_run.sql',
   '029_comparison_pages.sql',
   '030_programmatic_seo.sql',
+  '031_signal_feedback_loop.sql',
 ];
 
 async function run() {

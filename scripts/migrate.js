@@ -46,6 +46,7 @@ const FILES = [
   '029_comparison_pages.sql',
   '030_programmatic_seo.sql',
   '031_signal_feedback_loop.sql',
+  '032_thread_classifier_stages.sql',
 ];
 
 async function run() {

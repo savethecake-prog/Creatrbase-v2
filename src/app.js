@@ -53,6 +53,7 @@ app.register(require('./domains/signals/signalRoutes'));
 app.register(require('./domains/webhooks/gmailWebhookRoutes').gmailWebhookRoutes);
 app.register(require('./domains/admin/adminRoutes').adminRoutes);
 app.register(require('./domains/admin/contentRoutes').contentRoutes);
+app.register(require('./domains/admin/tokenCleanupRoutes').tokenCleanupRoutes);
 app.register(require('./domains/newsletter/newsletterRoutes').newsletterRoutes);
 app.register(require('./domains/compare/compareRoutes').compareRoutes);
 app.register(require('./domains/programmatic/programmaticRoutes').programmaticRoutes);

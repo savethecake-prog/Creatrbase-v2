@@ -24,6 +24,7 @@ import { AdminDashboard } from './pages/Admin/AdminDashboard';
 import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
 import { Subscribers }    from './pages/Admin/Subscribers';
 import { Content }        from './pages/Admin/Content';
+import { TokenCleanup }   from './pages/Admin/TokenCleanup';
 import { ContentSession } from './pages/Admin/ContentSession';
 import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
@@ -34,6 +35,7 @@ import { Compare }      from './pages/Compare/Compare';
 import { NichePage, RatePage, ThresholdPage, ResearchPage } from './pages/Niche/NichePage';
 import { AuditPage }    from './pages/Audit/AuditPage';
 import { CoachPage }    from './pages/Coach/CoachPage';
+import { About }        from './pages/About/About';
 import { RequireAdmin } from './lib/RequireAdmin';
 import { CookieBanner } from './components/CookieBanner/CookieBanner';
 
@@ -56,6 +58,7 @@ function AppRoutes() {
         <Route path="/honesty"     element={<Honesty />} />
         <Route path="/pricing"     element={<Pricing />} />
         <Route path="/score"       element={<ScoreForm />} />
+        <Route path="/about"       element={<About />} />
         <Route path="/author/anthony-saulderson" element={<Author />} />
         <Route path="/compare/:competitor" element={<Compare />} />
         <Route path="/niche/:slug"          element={<NichePage />} />
@@ -72,6 +75,7 @@ function AppRoutes() {
           <Route path="subscribers"       element={<Subscribers />} />
           <Route path="content"           element={<Content />} />
           <Route path="content/session/:id" element={<ContentSession />} />
+          <Route path="token-cleanup"     element={<TokenCleanup />} />
           <Route path="creators"  element={<AdminPlaceholder title="Creators" />} />
           <Route path="agents"    element={<AdminPlaceholder title="Agents" />} />
           <Route path="system"    element={<AdminPlaceholder title="System" />} />

@@ -15,6 +15,7 @@ const STATIC_PAGES = [
   { url: '/author/anthony-saulderson', changefreq: 'monthly', priority: '0.6' },
   { url: '/privacy',           changefreq: 'yearly',  priority: '0.3' },
   { url: '/terms',             changefreq: 'yearly',  priority: '0.3' },
+  { url: '/cookies',           changefreq: 'yearly',  priority: '0.3' },
 ];
 
 function xmlEscape(str) {

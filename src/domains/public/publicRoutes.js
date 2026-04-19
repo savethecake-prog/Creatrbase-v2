@@ -11,6 +11,7 @@ const STATIC_PAGES = [
   { url: '/blog',              changefreq: 'daily',   priority: '0.9' },
   { url: '/pricing',           changefreq: 'monthly', priority: '0.8' },
   { url: '/honesty',           changefreq: 'monthly', priority: '0.6' },
+  { url: '/about',             changefreq: 'monthly', priority: '0.7' },
   { url: '/score',             changefreq: 'monthly', priority: '0.8' },
   { url: '/author/anthony-saulderson', changefreq: 'monthly', priority: '0.6' },
   { url: '/privacy',           changefreq: 'yearly',  priority: '0.3' },

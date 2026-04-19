@@ -19,6 +19,7 @@ const STATIC_ROUTES = [
   '/pricing',
   '/scoring-explained',
   '/honesty',
+  '/about',
   '/blog',
   '/privacy',
   '/terms',

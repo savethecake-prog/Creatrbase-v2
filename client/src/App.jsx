@@ -30,12 +30,12 @@ import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
 import { VoiceMemory }  from './pages/Admin/VoiceMemory';
 import { Skills }       from './pages/Admin/Skills';
+import { About }        from './pages/About/About';
 import { Author }       from './pages/Author/Author';
 import { Compare }      from './pages/Compare/Compare';
 import { NichePage, RatePage, ThresholdPage, ResearchPage } from './pages/Niche/NichePage';
 import { AuditPage }    from './pages/Audit/AuditPage';
 import { CoachPage }    from './pages/Coach/CoachPage';
-import { About }        from './pages/About/About';
 import { RequireAdmin } from './lib/RequireAdmin';
 import { CookieBanner } from './components/CookieBanner/CookieBanner';
 

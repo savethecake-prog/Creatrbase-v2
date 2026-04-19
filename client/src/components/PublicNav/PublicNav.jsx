@@ -50,6 +50,7 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
               <Link to="/scoring-explained" className={styles.mobileMenuLink}>How it works</Link>
               <Link to="/pricing" className={styles.mobileMenuLink}>Pricing</Link>
               <Link to="/blog" className={styles.mobileMenuLink}>Blog</Link>
+              <Link to="/about" className={styles.mobileMenuLink}>About</Link>
               <Link to="/honesty" className={styles.mobileMenuLink}>Honesty</Link>
               <Link to="/login" className={styles.mobileMenuLink}>Log in</Link>
             </div>
@@ -67,6 +68,7 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
               <Link to="/scoring-explained" className={styles.linkV2}>How it works</Link>
               <Link to="/pricing" className={styles.linkV2}>Pricing</Link>
               <Link to="/blog" className={styles.linkV2}>Blog</Link>
+              <Link to="/about" className={styles.linkV2}>About</Link>
               <Link to="/honesty" className={styles.linkV2}>Honesty</Link>
             </div>
             <div className={styles.rightV2}>

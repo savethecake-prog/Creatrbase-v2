@@ -102,6 +102,13 @@ if (process.env.NODE_ENV === 'production') {
     prefix: '/',
   });
 
+  const uploadsDir = path.join(__dirname, '..', 'uploads');
+  app.register(require('@fastify/static'), {
+    root:        uploadsDir,
+    prefix:      '/uploads/',
+    decorateReply: false,
+  });
+
   app.setNotFoundHandler(async (req, reply) => {
     if (req.url.startsWith('/api/')) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });

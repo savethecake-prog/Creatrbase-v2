@@ -54,10 +54,19 @@ async function getDynamicRoutes() {
 }
 
 async function prerender() {
-  const dynamicRoutes = await getDynamicRoutes();
-  const allRoutes = [...STATIC_ROUTES, ...dynamicRoutes];
+  // --route /path flag: render only a single route (used by content publish)
+  const singleRouteIdx = process.argv.indexOf('--route');
+  const singleRoute = singleRouteIdx !== -1 ? process.argv[singleRouteIdx + 1] : null;
 
-  console.log(`[prerender] Pre-rendering ${allRoutes.length} routes against ${BASE_URL}`);
+  let allRoutes;
+  if (singleRoute) {
+    allRoutes = [singleRoute];
+  } else {
+    const dynamicRoutes = await getDynamicRoutes();
+    allRoutes = [...STATIC_ROUTES, ...dynamicRoutes];
+  }
+
+  console.log(`[prerender] Pre-rendering ${allRoutes.length} route(s) against ${BASE_URL}`);
 
   const browser = await puppeteer.launch({
     headless: true,

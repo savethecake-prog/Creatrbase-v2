@@ -98,3 +98,45 @@
 .qualityLabel_high   { color: var(--success); }
 .qualityLabel_medium { color: var(--warning); }
 .qualityLabel_low    { color: var(--text-tertiary); }
+
+.expandBtn {
+  background: none;
+  border: none;
+  font-size: 8px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.expandBtn:hover {
+  opacity: 1;
+}
+
+.factorList {
+  list-style: none;
+  padding: 8px 0 0;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.factorList li {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-left: 12px;
+  position: relative;
+}
+
+.factorList li::before {
+  content: '·';
+  position: absolute;
+  left: 2px;
+  color: var(--text-tertiary);
+}

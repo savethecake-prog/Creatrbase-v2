@@ -414,6 +414,112 @@ async function handleApply(job) {
   }
 }
 
+// ─── signals:update-brand-windows ────────────────────────────────────────────
+// Runs weekly. For every brand that has seen recent commercial activity
+// (across all tenants), updates brand_tier_profiles.buying_window_status
+// based on how many distinct creators are currently in active deal stages.
+//
+// Cross-tenant by design — buying window intelligence improves as more
+// creators use the platform. No PII is exposed; only brand IDs and
+// aggregate counts are used.
+
+function buyingWindowStatus(activeCount) {
+  if (activeCount >= 3) return 'active';
+  if (activeCount >= 1) return 'warming';
+  return 'inactive';
+}
+
+function windowConfidence(activeCount) {
+  if (activeCount >= 5) return 'high';
+  if (activeCount >= 3) return 'medium';
+  return 'low';
+}
+
+async function handleUpdateBrandWindows(job) {
+  const pool = getPool();
+
+  // Latest interaction per creator+brand pair, across all tenants.
+  // Join to platform_profiles for a subscriber count to estimate tier.
+  const { rows: activeRows } = await pool.query(`
+    WITH latest_per_pair AS (
+      SELECT DISTINCT ON (bci.creator_id, bci.brand_id)
+        bci.creator_id,
+        bci.brand_id,
+        COALESCE(bci.niche, 'general')  AS niche,
+        COALESCE(bci.geo, 'global')     AS geo,
+        bci.interaction_type,
+        bci.created_at
+      FROM brand_creator_interactions bci
+      WHERE bci.niche IS NOT NULL
+        AND bci.geo   IS NOT NULL
+      ORDER BY bci.creator_id, bci.brand_id, bci.created_at DESC
+    ),
+    with_tier AS (
+      SELECT
+        l.*,
+        COALESCE((
+          SELECT MAX(pp.subscriber_count)
+          FROM platform_profiles pp
+          WHERE pp.creator_id = l.creator_id
+        ), 0) AS subscriber_count
+      FROM latest_per_pair l
+      WHERE l.interaction_type IN (
+        'outreach_responded',
+        'deal_negotiating',
+        'deal_contracting',
+        'deal_completed',
+        'relationship_ongoing'
+      )
+        AND l.created_at > NOW() - INTERVAL '90 days'
+    )
+    SELECT
+      brand_id,
+      niche,
+      geo,
+      CASE
+        WHEN subscriber_count < 10000  THEN 'micro'
+        WHEN subscriber_count < 100000 THEN 'rising'
+        WHEN subscriber_count < 500000 THEN 'mid'
+        ELSE 'established'
+      END AS creator_tier,
+      COUNT(DISTINCT creator_id) AS active_count
+    FROM with_tier
+    GROUP BY brand_id, niche, geo, creator_tier
+  `);
+
+  if (activeRows.length === 0) {
+    job.log('No active brand windows to update');
+    return;
+  }
+
+  let updated = 0;
+  for (const row of activeRows) {
+    const count   = parseInt(row.active_count, 10);
+    const status  = buyingWindowStatus(count);
+    const conf    = windowConfidence(count);
+    const reason  = `${count} creator${count !== 1 ? 's' : ''} in active deal stages (last 90 days) — auto-calculated`;
+
+    await pool.query(
+      `INSERT INTO brand_tier_profiles
+         (brand_id, niche, geo, creator_tier,
+          buying_window_status, status_confidence, status_last_reviewed, status_reasoning, updated_by)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, 'signal_feedback')
+       ON CONFLICT (brand_id, niche, geo, creator_tier) DO UPDATE
+         SET buying_window_status  = EXCLUDED.buying_window_status,
+             status_confidence     = EXCLUDED.status_confidence,
+             status_last_reviewed  = NOW(),
+             status_reasoning      = EXCLUDED.status_reasoning,
+             updated_by            = 'signal_feedback',
+             updated_at            = NOW()`,
+      [row.brand_id, row.niche, row.geo, row.creator_tier, status, conf, reason]
+    );
+    updated++;
+  }
+
+  job.log(`Brand windows updated: ${updated} brand+niche+geo+tier combinations`);
+  console.log(`[signalProcessor] update-brand-windows: updated ${updated} rows`);
+}
+
 // ─── signals:reprocess-failed ─────────────────────────────────────────────────
 
 async function handleReprocessFailed() {
@@ -455,7 +561,15 @@ function startSignalProcessorWorker() {
     removeOnFail:     5,
   });
 
-  console.log('[signalProcessor] worker registered — ingest, apply, and reprocess-failed active');
+  // Weekly brand buying window update — Mondays at 2am
+  queue.process('signals:update-brand-windows', async (job) => handleUpdateBrandWindows(job));
+  queue.add('signals:update-brand-windows', {}, {
+    repeat:           { cron: '0 2 * * 1' },
+    removeOnComplete: 3,
+    removeOnFail:     5,
+  });
+
+  console.log('[signalProcessor] worker registered — ingest, apply, reprocess-failed, and update-brand-windows active');
 }
 
 module.exports = { startSignalProcessorWorker };

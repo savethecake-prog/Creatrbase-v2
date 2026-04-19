@@ -58,6 +58,8 @@ app.register(require('./domains/public/scoreCardRoutes').scoreCardRoutes);
 app.register(require('./domains/public/claimRoutes').claimRoutes);
 app.register(require('./domains/public/ogImage').ogImageRoutes);
 app.register(require('./domains/blog/blogRoutes'));
+app.register(require('./domains/commercialCoach/auditRoutes'));
+app.register(require('./domains/commercialCoach/coachRoutes'));
 
 // ── Background workers ────────────────────────────────────────────────────────
 

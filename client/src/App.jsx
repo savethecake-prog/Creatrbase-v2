@@ -28,6 +28,8 @@ import { Skills }         from './pages/Admin/Skills';
 import { Author }         from './pages/Author/Author';
 import { Compare }        from './pages/Compare/Compare';
 import { NichePage, RatePage, ThresholdPage, ResearchPage } from './pages/Niche/NichePage';
+import { AuditPage }      from './pages/Audit/AuditPage';
+import { CoachPage }      from './pages/Coach/CoachPage';
 import { RequireAdmin }   from './lib/RequireAdmin';
 
 export default function App() {
@@ -82,6 +84,12 @@ export default function App() {
           } />
           <Route path="/negotiations" element={
             <RequireAuth><Negotiations /></RequireAuth>
+          } />
+          <Route path="/audit" element={
+            <RequireAuth><AuditPage /></RequireAuth>
+          } />
+          <Route path="/coach" element={
+            <RequireAuth><CoachPage /></RequireAuth>
           } />
           <Route path="/" element={<Landing />} />
         </Routes>

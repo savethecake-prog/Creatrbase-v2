@@ -18,6 +18,8 @@ const NAV = [
     items: [
       { label: 'Dashboard', to: '/dashboard' },
       { label: 'Gap Tracker', to: '/gap' },
+      { label: 'Commercial Audit', to: '/audit' },
+      { label: 'Commercial Coach', to: '/coach' },
     ],
   },
   {

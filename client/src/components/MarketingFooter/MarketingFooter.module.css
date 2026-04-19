@@ -10,6 +10,12 @@
 .bottom { max-width: 1320px; margin: 48px auto 0; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
 
 @media (max-width: 768px) {
-  .footer { padding: 48px 24px 24px; }
-  .grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer { padding: 48px 20px 24px; }
+  .grid { grid-template-columns: 1fr 1fr; gap: 32px 24px; }
+  .bottom { flex-direction: column; gap: 12px; text-align: center; }
+}
+
+@media (max-width: 560px) {
+  .footer { padding: 40px 16px 20px; }
+  .grid { grid-template-columns: 1fr; gap: 28px; }
 }

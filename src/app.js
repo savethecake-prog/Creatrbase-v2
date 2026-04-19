@@ -52,6 +52,7 @@ app.register(require('./domains/negotiations/negotiationsRoutes'));
 app.register(require('./domains/signals/signalRoutes'));
 app.register(require('./domains/webhooks/gmailWebhookRoutes').gmailWebhookRoutes);
 app.register(require('./domains/admin/adminRoutes').adminRoutes);
+app.register(require('./domains/admin/contentRoutes').contentRoutes);
 app.register(require('./domains/newsletter/newsletterRoutes').newsletterRoutes);
 app.register(require('./domains/compare/compareRoutes').compareRoutes);
 app.register(require('./domains/programmatic/programmaticRoutes').programmaticRoutes);
@@ -75,6 +76,7 @@ require('./jobs/workers/retentionNotifications').startRetentionNotificationsWork
 require('./jobs/workers/ingestionFetcher').startIngestionFetcherWorker();
 require('./jobs/workers/newsletterDigests').startNewsletterDigestWorkers();
 require('./jobs/workers/signalProcessor').startSignalProcessorWorker();
+require('./jobs/workers/contentResearch').startContentResearchWorkers();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

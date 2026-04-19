@@ -22,6 +22,8 @@ import { AdminLayout }    from './pages/Admin/AdminLayout';
 import { AdminDashboard } from './pages/Admin/AdminDashboard';
 import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
 import { Subscribers }      from './pages/Admin/Subscribers';
+import { Content }          from './pages/Admin/Content';
+import { ContentSession }   from './pages/Admin/ContentSession';
 import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
 import { VoiceMemory }    from './pages/Admin/VoiceMemory';
@@ -58,6 +60,8 @@ export default function App() {
             <Route path="editorial/voice-memory" element={<VoiceMemory />} />
             <Route path="skills" element={<Skills />} />
             <Route path="subscribers" element={<Subscribers />} />
+            <Route path="content" element={<Content />} />
+            <Route path="content/session/:id" element={<ContentSession />} />
             <Route path="creators" element={<AdminPlaceholder title="Creators" />} />
             <Route path="agents" element={<AdminPlaceholder title="Agents" />} />
             <Route path="system" element={<AdminPlaceholder title="System" />} />

@@ -18,6 +18,7 @@ const NAV = [
   { group: 'Operations', items: [
     { label: 'Agents', to: '/admin/agents', soon: true },
     { label: 'System', to: '/admin/system', soon: true },
+    { label: 'Token Cleanup', to: '/admin/token-cleanup' },
   ] },
   { group: 'Business', items: [
     { label: 'Revenue', to: '/admin/revenue', soon: true },

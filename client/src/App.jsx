@@ -23,6 +23,7 @@ import { AdminDashboard } from './pages/Admin/AdminDashboard';
 import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
 import { Subscribers }      from './pages/Admin/Subscribers';
 import { Content }          from './pages/Admin/Content';
+import { TokenCleanup }     from './pages/Admin/TokenCleanup';
 import { ContentSession }   from './pages/Admin/ContentSession';
 import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
@@ -65,6 +66,7 @@ export default function App() {
             <Route path="creators" element={<AdminPlaceholder title="Creators" />} />
             <Route path="agents" element={<AdminPlaceholder title="Agents" />} />
             <Route path="system" element={<AdminPlaceholder title="System" />} />
+            <Route path="token-cleanup" element={<TokenCleanup />} />
             <Route path="revenue" element={<AdminPlaceholder title="Revenue" />} />
           </Route>
           <Route path="/onboarding" element={

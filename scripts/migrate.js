@@ -48,6 +48,7 @@ const FILES = [
   '031_signal_feedback_loop.sql',
   '032_thread_classifier_stages.sql',
   '033_gmail_watch_history.sql',
+  '034_admin_override_plan.sql',
 ];
 
 async function run() {

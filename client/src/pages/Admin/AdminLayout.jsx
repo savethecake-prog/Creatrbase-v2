@@ -11,7 +11,7 @@ const NAV = [
     { label: 'Skills', to: '/admin/skills' },
   ] },
   { group: 'People', items: [
-    { label: 'Subscribers', to: '/admin/subscribers', soon: true },
+    { label: 'Subscribers', to: '/admin/subscribers' },
     { label: 'Creators', to: '/admin/creators', soon: true },
   ] },
   { group: 'Operations', items: [

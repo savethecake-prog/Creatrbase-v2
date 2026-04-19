@@ -1,6 +1,6 @@
 'use strict';
 
-const { getPrisma } = require('../lib/prisma');
+const { getPool } = require('../db/pool');
 
 const TIER_ORDER = { free: 0, core: 1, pro: 2 };
 
@@ -8,25 +8,33 @@ const TIER_ORDER = { free: 0, core: 1, pro: 2 };
  * Resolve the effective tier for a tenant.
  * Returns { tier, status, features } where tier is 'free', 'core', or 'pro'.
  *
- * Logic:
- *  - active subscription on core/pro -> that tier
- *  - trialling on core/pro and trial not expired -> that tier
- *  - cancelled, expired trial, past_due, or no subscription -> free
+ * Admin override takes precedence over all Stripe state.
  */
 async function resolveTier(tenantId) {
-  const prisma = getPrisma();
+  const pool = getPool();
 
-  const sub = await prisma.subscription.findUnique({
-    where: { tenantId },
-    include: { plan: { select: { name: true, features: true } } },
-  });
+  const { rows } = await pool.query(
+    `SELECT s.status, s.trial_end, s.admin_override_plan,
+            sp.name AS plan_name, sp.features
+     FROM subscriptions s
+     JOIN subscription_plans sp ON sp.id = s.plan_id
+     WHERE s.tenant_id = $1
+     LIMIT 1`,
+    [tenantId]
+  );
 
-  if (!sub) {
+  if (rows.length === 0) {
     return { tier: 'free', status: 'none', features: {} };
   }
 
-  const planName = sub.plan.name;
-  const features = sub.plan.features || {};
+  const sub      = rows[0];
+  const planName = sub.plan_name;
+  const features = sub.features || {};
+
+  // Admin override takes precedence over all Stripe state
+  if (sub.admin_override_plan) {
+    return { tier: sub.admin_override_plan, status: 'admin_override', features };
+  }
 
   // Active paid subscription
   if (sub.status === 'active' && planName !== 'free') {
@@ -34,11 +42,10 @@ async function resolveTier(tenantId) {
   }
 
   // Active trial that hasn't expired
-  if (sub.status === 'trialling' && sub.trialEnd && sub.trialEnd > new Date()) {
+  if (sub.status === 'trialling' && sub.trial_end && new Date(sub.trial_end) > new Date()) {
     return { tier: planName, status: 'trialling', features };
   }
 
-  // Everything else falls to free
   return { tier: 'free', status: sub.status, features: {} };
 }
 

@@ -1,8 +1,9 @@
 'use strict';
 
 const { validateSession } = require('../domains/auth/authService');
+const { getPool }         = require('../db/pool');
 
-// Fastify preHandler — attaches req.user or throws 401
+// Fastify preHandler — attaches req.user or throws 401/403
 async function authenticate(req, reply) {
   try {
     await req.jwtVerify();
@@ -13,6 +14,16 @@ async function authenticate(req, reply) {
   const session = await validateSession(req.user.sessionId);
   if (!session) {
     return reply.code(401).send({ error: 'Session expired', statusCode: 401 });
+  }
+
+  // Block suspended accounts before setting req.user
+  const pool = getPool();
+  const { rows } = await pool.query(
+    'SELECT status FROM tenants WHERE id = $1',
+    [session.tenant_id]
+  );
+  if (rows[0]?.status === 'suspended') {
+    return reply.code(403).send({ error: 'Account suspended', statusCode: 403 });
   }
 
   req.user = {

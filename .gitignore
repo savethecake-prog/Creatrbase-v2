@@ -11,3 +11,4 @@ Thumbs.db
 prisma/generated/
 coverage/
 .nyc_output/
+uploads/

@@ -1,0 +1,3 @@
+ALTER TABLE gmail_connections
+  ADD COLUMN IF NOT EXISTS history_id   TEXT,
+  ADD COLUMN IF NOT EXISTS watch_expiry TIMESTAMPTZ;

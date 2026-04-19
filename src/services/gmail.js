@@ -229,6 +229,75 @@ async function getThreadContent(accessToken, threadId) {
   };
 }
 
+// ─── Gmail Watch (Pub/Sub push) ───────────────────────────────────────────────
+
+const GMAIL_WATCH_BASE = 'https://gmail.googleapis.com/gmail/v1/users/me';
+
+/**
+ * Register (or renew) a Gmail push watch for the authenticated user's inbox.
+ * topicName: full Pub/Sub topic resource name, e.g.
+ *   'projects/my-project/topics/creatrbase-gmail-notifications'
+ * Returns { historyId: string, expiration: Date }.
+ * Watch expires ~7 days after creation — store expiration and renew before it lapses.
+ */
+async function setupGmailWatch(accessToken, topicName) {
+  const res = await fetch(`${GMAIL_WATCH_BASE}/watch`, {
+    method:  'POST',
+    headers: {
+      Authorization:  `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      topicName,
+      labelIds:        ['INBOX'],
+      labelFilterBehavior: 'include',
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Gmail watch setup failed (${res.status}): ${text}`);
+  }
+  const data = await res.json();
+  return {
+    historyId:  String(data.historyId),
+    expiration: new Date(parseInt(data.expiration, 10)),
+  };
+}
+
+/**
+ * Fetch all new INBOX messages since a stored historyId checkpoint.
+ * Returns { messages: [{ messageId, threadId }], nextHistoryId: string }.
+ * If the historyId has expired (410 Gone), throws so the caller can re-watch.
+ */
+async function getHistorySince(accessToken, startHistoryId) {
+  const params = new URLSearchParams({
+    startHistoryId,
+    historyTypes: 'messageAdded',
+    labelId:      'INBOX',
+  });
+  const res = await fetch(`${GMAIL_WATCH_BASE}/history?${params}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Gmail history fetch failed (${res.status}): ${text}`);
+  }
+  const data = await res.json();
+  const messages = [];
+  for (const record of data.history ?? []) {
+    for (const added of record.messagesAdded ?? []) {
+      const m = added.message;
+      if (m?.id && m?.threadId) {
+        messages.push({ messageId: m.id, threadId: m.threadId });
+      }
+    }
+  }
+  return {
+    messages,
+    nextHistoryId: data.historyId ? String(data.historyId) : startHistoryId,
+  };
+}
+
 module.exports = {
   refreshGmailToken,
   ensureLabel,
@@ -236,4 +305,6 @@ module.exports = {
   sendEmail,
   checkThreadForReply,
   getThreadContent,
+  setupGmailWatch,
+  getHistorySince,
 };

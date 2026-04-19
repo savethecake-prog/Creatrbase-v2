@@ -28,6 +28,7 @@ export function AdminLayout() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -59,8 +60,43 @@ export function AdminLayout() {
 
   return (
     <div className={styles.layout}>
+      {drawerOpen && (
+        <div className={styles.drawerOverlay} onClick={() => setDrawerOpen(false)} />
+      )}
+      <nav className={`${styles.drawer} ${drawerOpen ? styles.drawerVisible : ''}`}>
+        <div className={styles.drawerHeader}>
+          <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoLight}`} />
+          <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoDark}`} />
+          <button className={styles.drawerClose} onClick={() => setDrawerOpen(false)} aria-label="Close menu">&times;</button>
+        </div>
+        {NAV.map(({ group, items }) => (
+          <div key={group} className={styles.navGroup}>
+            <p className={styles.navGroupLabel}>{group}</p>
+            {items.map(({ label, to, soon }) => (
+              <NavLink key={label} to={soon ? '#' : to} end={to === '/admin'}
+                onClick={() => setDrawerOpen(false)}
+                className={({ isActive }) => `${styles.navItem} ${isActive && !soon ? styles.active : ''}`}>
+                {label}
+                {soon && <span className={styles.navSoon}>Soon</span>}
+              </NavLink>
+            ))}
+          </div>
+        ))}
+      </nav>
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
+          <button
+            type="button"
+            className={styles.hamburger}
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open navigation"
+          >
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+              <rect y="0" width="16" height="2" rx="1" fill="currentColor"/>
+              <rect y="5" width="16" height="2" rx="1" fill="currentColor"/>
+              <rect y="10" width="16" height="2" rx="1" fill="currentColor"/>
+            </svg>
+          </button>
           <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoLight}`} />
           <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoDark}`} />
           <span className={styles.adminBadge}>Admin</span>

@@ -172,6 +172,98 @@
   box-shadow: 4px 4px 0 #1B1040;
 }
 
+/* ── V2 mobile menu ── */
+.mobileMenuBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1.5px solid #1B1040;
+  border-radius: 8px;
+  color: #1B1040;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mobileMenuBtn:hover {
+  background: #F4EFE5;
+}
+
+.mobileMenu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FAF6EF;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.mobileMenuHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.mobileMenuClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1.5px solid #1B1040;
+  border-radius: 8px;
+  color: #1B1040;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.mobileMenuLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.mobileMenuLink {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1B1040;
+  text-decoration: none;
+  padding: 14px 0;
+  border-bottom: 1px solid #F1ECDF;
+  transition: color 0.2s;
+}
+
+.mobileMenuLink:hover {
+  color: #3D1F7A;
+}
+
+.mobileMenuCta {
+  margin-top: 32px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FAF6EF;
+  background: #1B1040;
+  text-decoration: none;
+  padding: 16px 24px;
+  border-radius: 999px;
+  border: 1.5px solid #1B1040;
+  box-shadow: 3px 3px 0 #1B1040;
+  text-align: center;
+  display: block;
+}
+
 @media (max-width: 900px) {
   .linksV2 {
     display: none;
@@ -179,10 +271,16 @@
   .navInner {
     padding: 0 24px;
   }
+  .mobileMenuBtn {
+    display: flex;
+  }
 }
 
 @media (max-width: 560px) {
   .loginV2 {
     display: none;
+  }
+  .navInner {
+    padding: 0 16px;
   }
 }

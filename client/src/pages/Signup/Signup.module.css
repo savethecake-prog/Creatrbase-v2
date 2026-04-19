@@ -145,3 +145,7 @@
   font-size: 13px;
   color: #C43030;
 }
+
+@media (max-width: 430px) {
+  .nameRow { grid-template-columns: 1fr; }
+}

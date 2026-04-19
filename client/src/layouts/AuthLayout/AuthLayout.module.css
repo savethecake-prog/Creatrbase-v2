@@ -162,3 +162,9 @@
   .brandPanel { display: none; }
   .formPanel { padding: 32px 24px; }
 }
+
+@media (max-width: 430px) {
+  .formPanel { padding: 24px 16px; }
+  .formTitle { font-size: 28px; }
+  .logoLink { margin-bottom: 32px; }
+}

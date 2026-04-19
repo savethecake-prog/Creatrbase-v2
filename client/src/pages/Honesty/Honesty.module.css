@@ -393,3 +393,11 @@
 @media (max-width: 768px) {
   .pillar { padding: 28px 20px; }
 }
+
+@media (max-width: 430px) {
+  .main { padding: 0 16px 48px; }
+  .hero { padding: 36px 0 28px; }
+  .heroTitle { font-size: clamp(24px, 7vw, 36px); }
+  .pillar { padding: 22px 16px; }
+  .cta { padding: 30px 20px; }
+}

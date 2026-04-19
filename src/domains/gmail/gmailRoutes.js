@@ -17,6 +17,7 @@ const {
   ensureLabel,
   applyLabel,
   sendEmail,
+  setupGmailWatch,
 } = require('../../services/gmail');
 const { getPool } = require('../../db/pool');
 
@@ -161,6 +162,21 @@ async function gmailRoutes(app) {
         labelId,
       },
     });
+
+    // Register Gmail push watch — non-fatal if Pub/Sub not yet configured
+    if (process.env.GMAIL_PUBSUB_TOPIC) {
+      try {
+        const watch = await setupGmailWatch(accessToken, process.env.GMAIL_PUBSUB_TOPIC);
+        const pool  = getPool();
+        await pool.query(
+          `UPDATE gmail_connections SET history_id = $1, watch_expiry = $2 WHERE creator_id = $3`,
+          [watch.historyId, watch.expiration, creator.id]
+        );
+        app.log.info({ creatorId: creator.id, historyId: watch.historyId }, 'Gmail watch registered');
+      } catch (err) {
+        app.log.warn({ err }, 'Gmail watch setup failed — push notifications inactive until resolved');
+      }
+    }
 
     return reply.redirect('/connections?gmail_connected=1');
   });

@@ -47,6 +47,7 @@ const FILES = [
   '030_programmatic_seo.sql',
   '031_signal_feedback_loop.sql',
   '032_thread_classifier_stages.sql',
+  '033_gmail_watch_history.sql',
 ];
 
 async function run() {

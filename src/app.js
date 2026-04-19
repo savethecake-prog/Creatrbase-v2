@@ -50,6 +50,7 @@ app.register(require('./domains/creator/tagRoutes'));
 app.register(require('./domains/brands/brandsRoutes'));
 app.register(require('./domains/negotiations/negotiationsRoutes'));
 app.register(require('./domains/signals/signalRoutes'));
+app.register(require('./domains/webhooks/gmailWebhookRoutes').gmailWebhookRoutes);
 app.register(require('./domains/admin/adminRoutes').adminRoutes);
 app.register(require('./domains/newsletter/newsletterRoutes').newsletterRoutes);
 app.register(require('./domains/compare/compareRoutes').compareRoutes);

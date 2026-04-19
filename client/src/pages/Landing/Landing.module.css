@@ -416,23 +416,50 @@
 }
 
 @media (max-width: 768px) {
-  .section { padding: 80px 24px; }
-  .container { padding: 0 24px; }
-  .hero { padding: 48px 24px 80px; }
-  .display { font-size: 48px; }
-  .sectionTitle { font-size: 36px; }
+  .section { padding: 64px 20px; }
+  .container { padding: 0 20px; }
+  .hero { padding: 40px 20px 64px; }
+  .display { font-size: 44px; }
+  .sectionTitle { font-size: 34px; }
   .howGrid, .dimsGrid, .honestyGrid, .whomGrid, .pricingGrid { grid-template-columns: 1fr; }
   .tiersGrid { grid-template-columns: 1fr; }
   .faqGrid { grid-template-columns: 1fr; }
   .demoInner { grid-template-columns: 1fr; }
-  .demoCanvas { padding: 24px; }
-  .demoHead { flex-direction: column; gap: 24px; }
-  .demoHeadRight { text-align: left; }
-  .honesty { padding: 80px 24px; }
-  .finalCta { padding: 80px 24px; }
-  .finalTitle { font-size: 48px; }
+  .demoCanvas { padding: 20px; }
+  .demoTabs { overflow-x: auto; padding-bottom: 4px; flex-wrap: nowrap; }
+  .demoTab { flex-shrink: 0; }
+  .demoHead { flex-direction: column; gap: 20px; }
+  .demoHeadRight { text-align: left; max-width: 100%; }
+  .honesty { padding: 64px 20px; }
+  .finalCta { padding: 64px 20px; }
+  .finalTitle { font-size: 44px; }
   .priceCardFeatured { transform: none; }
   .proofRow { flex-direction: column; align-items: flex-start; gap: 12px; }
   .statNum { font-size: 64px; }
-  .scoreNum { font-size: 56px; }
+  .scoreNum { font-size: 48px; }
+  .statCard { padding: 32px 24px; }
+  .sectionBody { font-size: 16px; }
+  .sectionLede { font-size: 15px; }
+  .problemGrid { padding: 0 20px; }
+  .demoCta { flex-direction: column; gap: 16px; align-items: flex-start; }
+  .demoRowBar { width: 60px; }
+}
+
+@media (max-width: 430px) {
+  .section { padding: 48px 16px; }
+  .container { padding: 0 16px; }
+  .hero { padding: 32px 16px 48px; }
+  .display { font-size: 36px; }
+  .sectionTitle { font-size: 28px; }
+  .honesty { padding: 48px 16px; }
+  .finalCta { padding: 48px 16px; }
+  .finalTitle { font-size: 36px; }
+  .howStep { padding: 32px 20px 24px; }
+  .demoCanvas { padding: 16px; }
+  .scoreNum { font-size: 40px; }
+  .dimRow { grid-template-columns: 1fr 0.6fr; gap: 10px; }
+  .dimPct { display: none; }
+  .demoStats { grid-template-columns: 1fr 1fr; }
+  .scoreHeadline { flex-wrap: wrap; gap: 8px; }
+  .scoreMetaRight { margin-left: 0; text-align: left; }
 }

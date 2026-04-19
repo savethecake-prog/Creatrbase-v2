@@ -245,3 +245,16 @@
   padding: 0 16px 10px;
   flex-shrink: 0;
 }
+
+@media (max-width: 430px) {
+  .panel {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    bottom: 80px;
+  }
+  .trigger {
+    right: 16px;
+    bottom: 16px;
+  }
+}

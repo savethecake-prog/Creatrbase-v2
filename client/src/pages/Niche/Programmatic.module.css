@@ -131,4 +131,15 @@
 .notFound p { color: #76688F; margin-bottom: 24px; }
 .backLink { color: #1B1040; font-weight: 600; }
 
-@media (max-width: 768px) { .findingsGrid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+  .findingsGrid { grid-template-columns: 1fr; }
+  .metaRow { flex-wrap: wrap; gap: 8px; }
+  .gateUnlocked { flex-direction: column; gap: 12px; }
+}
+
+@media (max-width: 430px) {
+  .main { padding: 0 16px 48px; }
+  .hero { padding: 36px 0 28px; }
+  .gate { padding: 32px 20px; }
+  .cta { padding: 30px 20px; }
+}

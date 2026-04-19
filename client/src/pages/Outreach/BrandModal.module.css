@@ -769,6 +769,18 @@
   border-color: var(--border);
 }
 
+@media (max-width: 600px) {
+  .modal { max-height: 94vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .overlay { align-items: flex-end; padding: 0; }
+  .header { padding: var(--space-4); }
+  .body { padding: var(--space-4); gap: var(--space-4); }
+  .tabs { overflow-x: auto; }
+  .tab { flex-shrink: 0; padding: var(--space-3) var(--space-4); }
+  .aiFields { grid-template-columns: 1fr; }
+  .aiFieldFull { grid-column: 1; }
+  .composeActions { flex-wrap: wrap; }
+}
+
 .gmailSuccess {
   display: flex;
   align-items: flex-start;

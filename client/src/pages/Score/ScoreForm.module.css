@@ -221,3 +221,12 @@
   .steps { grid-template-columns: 1fr; }
   .formCard { padding: 24px; }
 }
+
+@media (max-width: 430px) {
+  .main { padding: 0 16px 48px; }
+  .hero { padding: 40px 0 28px; }
+  .heroTitle { font-size: clamp(26px, 7vw, 44px); }
+  .formCard { padding: 20px 16px; }
+  .platformTabs { flex-wrap: wrap; }
+  .formMeta { flex-wrap: wrap; gap: 10px; }
+}

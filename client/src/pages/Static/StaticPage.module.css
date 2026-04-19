@@ -79,3 +79,9 @@
 .content a:hover {
   text-decoration: underline;
 }
+
+/* ── Responsive ── */
+@media (max-width: 430px) {
+  .main { padding: 0 16px 48px; }
+  .header { padding: 40px 0 24px; }
+}

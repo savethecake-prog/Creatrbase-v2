@@ -506,3 +506,16 @@
 .tagChipRemove:hover {
   color: var(--error);
 }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+  .tagsSection { max-width: 100%; }
+  .tagInputRow { flex-wrap: wrap; }
+  .tagInputWrap { width: 100%; }
+}
+
+@media (max-width: 430px) {
+  .card { padding: 20px; }
+  .metricsRow { flex-wrap: wrap; gap: 16px; }
+}

@@ -39,6 +39,93 @@
 .ctaTitle { font-family: 'Lilita One', cursive; font-size: 24px; font-weight: 400; color: #1B1040; margin: 0 0 12px; }
 .ctaBtn { display: inline-block; font-size: 14px; font-weight: 600; color: #FAF6EF; background: #1B1040; text-decoration: none; padding: 12px 28px; border-radius: 999px; }
 
+/* ── Email gate ── */
+.gate {
+  background: #1B1040;
+  border-radius: 18px;
+  padding: 48px 40px;
+  margin: 48px 0 32px;
+  box-shadow: 4px 4px 0 #9EFFD8;
+}
+.gateInner { max-width: 480px; }
+.gateEyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4FB893;
+  margin-bottom: 10px;
+}
+.gateTitle {
+  font-family: 'Lilita One', cursive;
+  font-size: 26px;
+  font-weight: 400;
+  color: #FAF6EF;
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+.gateCopy { font-size: 15px; color: rgba(240,237,230,0.7); line-height: 1.65; margin-bottom: 24px; }
+.gateForm { display: flex; gap: 10px; flex-wrap: wrap; }
+.gateInput {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+  color: #FAF6EF;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.gateInput::placeholder { color: rgba(240,237,230,0.35); }
+.gateInput:focus { border-color: #9EFFD8; }
+.gateBtn {
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: none;
+  background: #9EFFD8;
+  color: #1B1040;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.gateBtn:disabled { opacity: 0.6; cursor: wait; }
+.gateBtn:not(:disabled):hover { opacity: 0.88; }
+.gateError { font-size: 13px; color: #E85C4C; margin-top: 10px; }
+.gatePrivacy { font-size: 12px; color: rgba(240,237,230,0.35); margin-top: 14px; line-height: 1.5; }
+
+.gateUnlocked {
+  background: #9EFFD8;
+  border: 1.5px solid #1B1040;
+  border-radius: 18px;
+  padding: 28px 32px;
+  margin: 48px 0 32px;
+  box-shadow: 4px 4px 0 #1B1040;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.gateUnlockedIcon { width: 28px; height: 28px; color: #1B1040; flex-shrink: 0; }
+.gateUnlockedTitle { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; color: #1B1040; margin-bottom: 10px; }
+.gateDownloadBtn {
+  display: inline-block;
+  padding: 11px 24px;
+  border-radius: 999px;
+  background: #1B1040;
+  color: #FAF6EF;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.gateDownloadBtn:hover { opacity: 0.85; }
+
 .notFound { padding: 80px 0; text-align: center; }
 .notFound h1 { font-family: 'Lilita One', cursive; font-size: 28px; margin-bottom: 12px; }
 .notFound p { color: #76688F; margin-bottom: 24px; }

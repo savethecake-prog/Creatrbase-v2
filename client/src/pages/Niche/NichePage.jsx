@@ -158,6 +158,10 @@ export function ResearchPage() {
   const { slug } = useParams();
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
+  const [gateEmail, setGateEmail] = useState('');
+  const [gateLoading, setGateLoading] = useState(false);
+  const [gateError, setGateError] = useState('');
+  const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
     api.get(`/research/${slug}`).then(d => setData(d.report)).catch(() => setError(true));
@@ -167,6 +171,31 @@ export function ResearchPage() {
   if (!data) return <Loading />;
 
   const findings = data.key_findings || [];
+  const showGate = data.email_gated && data.pdf_url;
+
+  async function handleGateSubmit(e) {
+    e.preventDefault();
+    setGateError('');
+    setGateLoading(true);
+    try {
+      await api.post('/newsletter/subscribe', {
+        email: gateEmail.trim(),
+        source: 'research_gate',
+        source_detail: slug,
+        segments: ['creator-economy'],
+      });
+      setUnlocked(true);
+    } catch (err) {
+      // 409 = already subscribed — still unlock
+      if (err?.status === 409 || err?.statusCode === 409) {
+        setUnlocked(true);
+        return;
+      }
+      setGateError(err?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setGateLoading(false);
+    }
+  }
 
   return (
     <div className={styles.page}>
@@ -178,7 +207,9 @@ export function ResearchPage() {
           <h1 className={styles.title}>{data.title}</h1>
           <div className={styles.metaRow}>
             {data.sample_size && <span>Sample: {data.sample_size.toLocaleString()} creators</span>}
-            {data.period_start && data.period_end && <span>Period: {data.period_start} to {data.period_end}</span>}
+            {data.period_start && data.period_end && (
+              <span>Period: {new Date(data.period_start).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} to {new Date(data.period_end).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</span>
+            )}
           </div>
         </header>
 
@@ -198,7 +229,43 @@ export function ResearchPage() {
           </section>
         )}
 
-        {data.pdf_url && (
+        {showGate && !unlocked && (
+          <div className={styles.gate}>
+            <div className={styles.gateInner}>
+              <p className={styles.gateEyebrow}>Free download</p>
+              <h2 className={styles.gateTitle}>Get the full report as a PDF</h2>
+              <p className={styles.gateCopy}>Eight pages covering all five findings in full, including data tables, the niche rate index, and the CVS framework breakdown. Free, no card required.</p>
+              <form className={styles.gateForm} onSubmit={handleGateSubmit}>
+                <input
+                  className={styles.gateInput}
+                  type="email"
+                  placeholder="your@email.com"
+                  value={gateEmail}
+                  onChange={e => setGateEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
+                <button className={styles.gateBtn} type="submit" disabled={gateLoading}>
+                  {gateLoading ? 'Sending\u2026' : 'Download now'}
+                </button>
+              </form>
+              {gateError && <p className={styles.gateError}>{gateError}</p>}
+              <p className={styles.gatePrivacy}>No spam. We send two newsletters per week on the creator economy and AI for creators. Unsubscribe any time.</p>
+            </div>
+          </div>
+        )}
+
+        {showGate && unlocked && (
+          <div className={styles.gateUnlocked}>
+            <svg className={styles.gateUnlockedIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div>
+              <p className={styles.gateUnlockedTitle}>Your download is ready</p>
+              <a href={data.pdf_url} className={styles.gateDownloadBtn} target="_blank" rel="noopener noreferrer">Download the report (PDF)</a>
+            </div>
+          </div>
+        )}
+
+        {!showGate && data.pdf_url && (
           <div className={styles.cta}>
             <h2 className={styles.ctaTitle}>Download the full report</h2>
             <a href={data.pdf_url} className={styles.ctaBtn} target="_blank" rel="noopener">Download PDF</a>

@@ -54,7 +54,7 @@
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.05em;
-  color: var(--cb-navy);
+  color: var(--text-primary);
   margin: 0 0 20px;
 }
 
@@ -71,7 +71,7 @@
   font-family: var(--font-display);
   font-size: clamp(22px, 3vw, 30px);
   font-weight: 700;
-  color: var(--cb-navy);
+  color: var(--text-primary);
   margin: 0 0 28px;
   letter-spacing: -0.01em;
   border-left: 4px solid var(--cb-mint);
@@ -128,7 +128,7 @@
   align-items: center;
   gap: 0;
   background: var(--bg-surface);
-  border: 1.5px solid var(--cb-navy);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-xl);
   padding: 28px 36px;
   box-shadow: var(--shadow-sticker);
@@ -148,7 +148,7 @@
   font-size: 36px;
   font-weight: 400;
   letter-spacing: -0.04em;
-  color: var(--cb-navy);
+  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -181,7 +181,7 @@
 
 .principleCard {
   background: var(--bg-surface);
-  border: 1.5px solid var(--cb-navy);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-xl);
   padding: 30px 28px;
   box-shadow: var(--shadow-sticker);
@@ -189,6 +189,9 @@
 
 .principleCard_mint  { background: #F0FFF9; }
 .principleCard_peach { background: #FFF5EF; }
+
+:global([data-theme="dark"]) .principleCard_mint  { background: rgba(164, 255, 219, 0.06); }
+:global([data-theme="dark"]) .principleCard_peach { background: rgba(255, 159, 122, 0.06); }
 
 .principleNum {
   display: inline-block;
@@ -205,7 +208,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
-  color: var(--cb-navy);
+  color: var(--text-primary);
   margin: 0 0 10px;
   line-height: 1.2;
 }

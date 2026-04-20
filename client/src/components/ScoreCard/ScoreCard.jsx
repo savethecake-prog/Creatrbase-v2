@@ -1,19 +1,6 @@
 import { useRef, useState } from 'react';
 import styles from './ScoreCard.module.css';
-
-const TIER_LABELS = {
-  pre_commercial: 'Pre-Commercial',
-  emerging:       'Emerging',
-  viable:         'Viable',
-  established:    'Established',
-};
-
-const TIER_VERDICTS = {
-  pre_commercial: 'building audience base',
-  emerging:       'early traction visible',
-  viable:         'partnership ready',
-  established:    'premium partner tier',
-};
+import { TIER_GRADE, TIER_LABEL, TIER_VERDICT } from '../../lib/tierGrades';
 
 const TIER_COLORS = {
   pre_commercial: '#8B8B9A',
@@ -29,8 +16,9 @@ function ScoreCardContent({ score, niche, platform, lightMode }) {
   const overall     = score?.overall ?? 0;
   const dimensions  = score?.dimensions ?? {};
   const color       = TIER_COLORS[tier] ?? '#A4FFDB';
-  const tierLabel   = TIER_LABELS[tier] ?? tier.replace(/_/g, ' ');
-  const tierVerdict = TIER_VERDICTS[tier] ?? '';
+  const grade       = TIER_GRADE[tier] ?? '?';
+  const tierLabel   = TIER_LABEL[tier] ?? tier.replace(/_/g, ' ');
+  const tierVerdict = TIER_VERDICT[tier] ?? '';
 
   const ringTrack = lightMode ? 'rgba(14,27,42,0.1)' : 'rgba(255,255,255,0.06)';
   const wordmark  = lightMode ? '/brand/wordmark-dark.png' : '/brand/wordmark-light.png';
@@ -67,7 +55,7 @@ function ScoreCardContent({ score, niche, platform, lightMode }) {
         {/* Right column */}
         <div className={styles.cardRight}>
           <span className={styles.cardEyebrow}>Commercial Intelligence Score</span>
-          <p className={styles.cardTierHeading}>{tierLabel} &mdash; {tierVerdict}</p>
+          <p className={styles.cardTierHeading}>{grade} tier &mdash; {tierVerdict}</p>
 
           {(niche || platform) && (
             <p className={styles.nicheTag}>
@@ -75,7 +63,7 @@ function ScoreCardContent({ score, niche, platform, lightMode }) {
             </p>
           )}
 
-          <div className={styles.tierBadge}>{tierLabel}</div>
+          <div className={styles.tierBadge}>{grade} tier</div>
 
           {Object.keys(dimensions).length > 0 && (
             <div className={styles.dims}>

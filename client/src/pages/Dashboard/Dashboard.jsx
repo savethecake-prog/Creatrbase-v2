@@ -8,6 +8,7 @@ import { ScoreCardModal } from '../../components/ScoreCard/ScoreCard';
 import { SignalFeed } from '../../components/SignalFeed/SignalFeed';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
+import { tierShort, tierMedium } from '../../lib/tierGrades';
 import styles from './Dashboard.module.css';
 
 // ─── Score history chart ──────────────────────────────────────────────────────
@@ -331,7 +332,7 @@ export function Dashboard() {
             <p className={styles.welcomeTitle}>
               Your commercial viability score is{' '}
               <span className={styles.welcomeScore}>{scoreData.score.overall}</span>
-              {' '}— {scoreData.score.tier?.replace(/_/g, ' ')}.
+              {' '}— {tierShort(scoreData.score.tier)}.
             </p>
             <p className={styles.welcomeDesc}>
               {scoreData.score.primary_constraint
@@ -432,7 +433,7 @@ export function Dashboard() {
             : <p className={styles.kpiEmpty}>—</p>}
           <p className={styles.kpiHint}>
             {scoreData?.score?.tier
-              ? scoreData.score.tier.replace(/_/g, ' ')
+              ? tierShort(scoreData.score.tier)
               : 'Calculated after content analysis'}
           </p>
         </div>
@@ -468,7 +469,7 @@ export function Dashboard() {
             eyebrow="How your score works"
             heading="Four tiers. Each one unlocks more."
           >
-            Emerging (0–24) builds the baseline. Viable (25–49) opens gifting and early outreach. Established (50–74) unlocks paid integrations and rate negotiation. Portfolio (75+) puts you in front of agencies. Your score updates after every sync.
+            D tier (0–24) builds the foundation. C tier (25–49) opens gifting and early outreach. B tier (50–74) unlocks paid integrations and rate negotiation. A tier (75+) puts you in front of agencies. Your score updates after every sync.
           </HintCallout>
           <div className={styles.scoreCard}>
             <div className={styles.scoreMain}>
@@ -479,7 +480,7 @@ export function Dashboard() {
               <div className={styles.scoreMeta}>
                 <p className={styles.scoreTier}>
                   {scoreData.score.tier
-                    ? scoreData.score.tier.replace(/_/g, ' ')
+                    ? tierMedium(scoreData.score.tier)
                     : 'Calculating…'}
                 </p>
                 <Badge

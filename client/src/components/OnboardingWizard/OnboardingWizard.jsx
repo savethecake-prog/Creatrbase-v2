@@ -59,10 +59,10 @@ function WelcomeContent() {
 
 function ScoreContent() {
   const tiers = [
-    { range: '0–24',   label: 'Emerging',    desc: 'Building foundations',          color: '#7B7A8E' },
-    { range: '25–49',  label: 'Viable',      desc: 'Giftable, early outreach',       color: '#FFBFA3' },
-    { range: '50–74',  label: 'Established', desc: 'Paid integrations, negotiate',   color: '#9EFFD8' },
-    { range: '75–100', label: 'Portfolio',   desc: 'Top-tier brand appeal',          color: '#D1B9FF' },
+    { range: '0–24',   label: 'D tier', desc: 'Building foundations',         color: '#7B7A8E' },
+    { range: '25–49',  label: 'C tier', desc: 'Giftable, early outreach',      color: '#FFBFA3' },
+    { range: '50–74',  label: 'B tier', desc: 'Paid integrations, negotiate',  color: '#9EFFD8' },
+    { range: '75–100', label: 'A tier', desc: 'Top-tier brand appeal',         color: '#D1B9FF' },
   ];
   return (
     <div className={styles.tierList}>

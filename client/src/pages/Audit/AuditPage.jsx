@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { UpgradeGate } from '../../components/UpgradeGate/UpgradeGate';
 import { api } from '../../lib/api';
+import { TIER_GRADE } from '../../lib/tierGrades';
 import styles from './AuditPage.module.css';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -40,10 +41,10 @@ const STATE_COPY = {
 };
 
 const TIER_META = {
-  established:    { label: 'Established',    bg: 'var(--cb-mint)',     text: 'var(--cb-navy)' },
-  viable:         { label: 'Viable',         bg: 'var(--cb-lavender)', text: 'var(--cb-navy)' },
-  emerging:       { label: 'Emerging',       bg: 'var(--cb-peach)',    text: 'var(--cb-navy)' },
-  pre_commercial: { label: 'Pre-commercial', bg: 'var(--error-subtle)',text: 'var(--error)' },
+  established:    { label: `${TIER_GRADE.established} tier`, bg: 'var(--cb-mint)',     text: 'var(--cb-navy)' },
+  viable:         { label: `${TIER_GRADE.viable} tier`,      bg: 'var(--cb-lavender)', text: 'var(--cb-navy)' },
+  emerging:       { label: `${TIER_GRADE.emerging} tier`,    bg: 'var(--cb-peach)',    text: 'var(--cb-navy)' },
+  pre_commercial: { label: `${TIER_GRADE.pre_commercial} tier`, bg: 'var(--error-subtle)', text: 'var(--error)' },
 };
 
 const MILESTONE_LABELS = {
@@ -73,10 +74,10 @@ const CONSTRAINT_LABELS = {
 function verdictCopy(score, tier, constraint) {
   const c = CONSTRAINT_LABELS[constraint] || constraint || 'an unspecified dimension';
   if (!score) return 'Score your channel to generate your commercial audit.';
-  if (score >= 75) return 'Your channel is commercially established and ready for premium brand deals.';
-  if (score >= 50) return `Your channel is commercially viable — ${c} is the main rate limiter right now.`;
-  if (score >= 25) return `Your channel is in the emerging phase — ${c} is the primary barrier to brand deals.`;
-  return `Your channel is pre-commercial — ${c} needs significant work before brands will engage.`;
+  if (score >= 75) return 'Your channel is A tier — commercially established and ready for premium brand deals.';
+  if (score >= 50) return `Your channel is B tier — ${c} is the main rate limiter right now.`;
+  if (score >= 25) return `Your channel is C tier — ${c} is the primary barrier to brand deals.`;
+  return `Your channel is D tier — ${c} needs significant work before brands will engage.`;
 }
 
 // ─── Components ───────────────────────────────────────────────────────────────

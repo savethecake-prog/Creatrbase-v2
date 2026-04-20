@@ -93,8 +93,6 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
   const [markingDone, setMarkingDone] = useState(false);
   const [marked,      setMarked]      = useState(false);
   const [history,     setHistory]     = useState(null);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
-
   // AI draft state
   const [aiContext,    setAiContext]    = useState('opening_position');
   const [aiDeliverable, setAiDeliverable] = useState('sponsored integration');
@@ -167,21 +165,6 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
       // best-effort
     } finally {
       setMarkingDone(false);
-    }
-  }
-
-  async function handleStatusUpdate(interactionType) {
-    setUpdatingStatus(true);
-    try {
-      await api.post(`/brands/${brand.id}/outreach/status`, { interactionType });
-      onOutreachLogged(brand.id, interactionType);
-      // Refresh history
-      const res = await api.get(`/brands/${brand.id}/outreach`);
-      setHistory(res.history);
-    } catch {
-      // best-effort
-    } finally {
-      setUpdatingStatus(false);
     }
   }
 
@@ -568,28 +551,6 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
                 )}
               </div>
 
-              {alreadyContacted && (
-                <div className={styles.statusRow}>
-                  <p className={styles.statusLabel}>Update status</p>
-                  <div className={styles.statusBtns}>
-                    {[
-                      { type: 'outreach_declined',     label: 'Declined' },
-                      { type: 'deal_negotiating',      label: 'Negotiating' },
-                      { type: 'deal_completed',        label: 'Deal done' },
-                      { type: 'relationship_ongoing',  label: 'Ongoing' },
-                    ].map(({ type, label }) => (
-                      <button
-                        key={type}
-                        className={styles.statusBtn}
-                        onClick={() => handleStatusUpdate(type)}
-                        disabled={updatingStatus}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </>
           )}
 

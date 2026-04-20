@@ -31,6 +31,7 @@ const NAV = [
     group: 'Toolkit',
     items: [
       { label: 'Negotiations', to: '/negotiations' },
+      { label: 'Brand Tags', to: '/toolkit' },
       { label: 'Contract Review', to: '/contracts', soon: true },
     ],
   },

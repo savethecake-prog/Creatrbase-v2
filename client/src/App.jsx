@@ -9,6 +9,7 @@ import { Dashboard }   from './pages/Dashboard/Dashboard';
 import { GapTracker }  from './pages/GapTracker/GapTracker';
 import { Tasks }       from './pages/Tasks/Tasks';
 import { Connections } from './pages/Connections/Connections';
+import { Toolkit }     from './pages/Toolkit/Toolkit';
 import { Outreach }      from './pages/Outreach/Outreach';
 import { Negotiations }  from './pages/Negotiations/Negotiations';
 import StaticPage from './pages/Static/StaticPage';
@@ -24,6 +25,8 @@ import { AdminPlaceholder } from './pages/Admin/AdminPlaceholder';
 import { Subscribers }      from './pages/Admin/Subscribers';
 import { Content }          from './pages/Admin/Content';
 import { TokenCleanup }     from './pages/Admin/TokenCleanup';
+import { Team }             from './pages/Admin/Team';
+import { Acquisition }      from './pages/Admin/Acquisition';
 import { ContentSession }   from './pages/Admin/ContentSession';
 import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
@@ -65,7 +68,8 @@ export default function App() {
             <Route path="subscribers" element={<Subscribers />} />
             <Route path="content" element={<Content />} />
             <Route path="content/session/:id" element={<ContentSession />} />
-            <Route path="creators" element={<AdminPlaceholder title="Creators" />} />
+            <Route path="team" element={<Team />} />
+            <Route path="acquisition" element={<Acquisition />} />
             <Route path="agents" element={<AdminPlaceholder title="Agents" />} />
             <Route path="system" element={<AdminPlaceholder title="System" />} />
             <Route path="token-cleanup" element={<TokenCleanup />} />
@@ -91,6 +95,9 @@ export default function App() {
           } />
           <Route path="/negotiations" element={
             <RequireAuth><Negotiations /></RequireAuth>
+          } />
+          <Route path="/toolkit" element={
+            <RequireAuth><Toolkit /></RequireAuth>
           } />
           <Route path="/" element={<Landing />} />
         </Routes>

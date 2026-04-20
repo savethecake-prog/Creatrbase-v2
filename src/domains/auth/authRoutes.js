@@ -115,7 +115,7 @@ async function authRoutes(app) {
       onboardingStep: creator?.onboardingStep ?? null,
       tier:           tierInfo.tier,
       subscription: sub ? {
-        status:        sub.status,
+        status:        tierInfo.status,
         planName:      sub.plan?.name ?? null,
         trialEnd:      sub.trialEnd,
         trialDaysLeft,

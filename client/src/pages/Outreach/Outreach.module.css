@@ -120,6 +120,7 @@
   padding: 32px;
   text-align: left;
   cursor: pointer;
+  color: var(--text-primary);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
@@ -184,6 +185,71 @@
 
 .cardFooter { margin-top: auto; border-top: 1px solid var(--glass-border); padding-top: 16px; }
 .openHint { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Card state variants */
+.cardReady    { border-color: rgba(164, 255, 219, 0.2); }
+.cardGifting  { border-color: rgba(209, 185, 255, 0.2); }
+.cardNotYet   { opacity: 0.7; }
+.cardContacted { border-color: var(--border); }
+
+/* Strip variants for not-yet and no-data states */
+.stripNotYet  { background: var(--bg-hover); color: var(--text-tertiary); }
+.stripNoData  { background: var(--bg-hover); color: var(--text-disabled); }
+
+/* Category and programme labels */
+.categoryLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.programmeLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--neon-purple);
+  background: rgba(209, 185, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.cardBadges { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Loading skeleton */
+.loadingRow { display: flex; flex-direction: column; gap: 16px; }
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-hover) 50%, var(--bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Empty state */
+.stateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 40px;
+  text-align: center;
+}
+.stateTitle { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--text-primary); }
+.stateDesc  { font-size: 14px; color: var(--text-secondary); line-height: 1.5; max-width: 360px; }
+
+/* Momentum trend pill */
+.momentumPillTrend { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+.trendUp   { color: var(--neon-mint);   background: rgba(164, 255, 219, 0.1); }
+.trendDown { color: #ff7b7b;            background: rgba(255, 123, 123, 0.1); }
+.trendFlat { color: var(--text-muted);  background: var(--bg-hover); }
+
+/* Filter divider */
+.filterDivider { width: 1px; height: 24px; background: var(--glass-border); flex-shrink: 0; }
 
 @media (max-width: 1024px) {
   .grid { grid-template-columns: 1fr; }

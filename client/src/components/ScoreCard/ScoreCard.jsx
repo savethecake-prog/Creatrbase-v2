@@ -8,6 +8,13 @@ const TIER_LABELS = {
   established:    'Established',
 };
 
+const TIER_VERDICTS = {
+  pre_commercial: 'building audience base',
+  emerging:       'early traction visible',
+  viable:         'partnership ready',
+  established:    'premium partner tier',
+};
+
 const TIER_COLORS = {
   pre_commercial: '#8B8B9A',
   emerging:       '#E8874C',
@@ -15,74 +22,83 @@ const TIER_COLORS = {
   established:    '#A4FFDB',
 };
 
-function ScoreCardContent({ score, niche, platform }) {
-  const tier       = score?.tier ?? 'emerging';
-  const overall    = score?.overall ?? 0;
-  const dimensions = score?.dimensions ?? {};
-  const color      = TIER_COLORS[tier] ?? '#A4FFDB';
-  const tierLabel  = TIER_LABELS[tier] ?? tier.replace(/_/g, ' ');
+const CIRCUMFERENCE = 490; // 2π × r=78
+
+function ScoreCardContent({ score, niche, platform, lightMode }) {
+  const tier        = score?.tier ?? 'emerging';
+  const overall     = score?.overall ?? 0;
+  const dimensions  = score?.dimensions ?? {};
+  const color       = TIER_COLORS[tier] ?? '#A4FFDB';
+  const tierLabel   = TIER_LABELS[tier] ?? tier.replace(/_/g, ' ');
+  const tierVerdict = TIER_VERDICTS[tier] ?? '';
+
+  const ringTrack = lightMode ? 'rgba(14,27,42,0.1)' : 'rgba(255,255,255,0.06)';
+  const wordmark  = lightMode ? '/brand/wordmark-dark.png' : '/brand/wordmark-light.png';
 
   return (
-    <div className={styles.card} data-tier={tier}>
+    <div className={styles.card} data-tier={tier} data-light={lightMode ? 'true' : 'false'}>
       {/* Header */}
       <div className={styles.cardHeader}>
-        <div className={styles.logoMark}>CB</div>
-        <span className={styles.cardBrand}>creatrbase.com</span>
+        <img src={wordmark} alt="Creatrbase" className={styles.wordmark} />
       </div>
 
-      {/* Score ring */}
-      <div className={styles.scoreRing}>
-        <svg viewBox="0 0 120 120" className={styles.ringsvg}>
-          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
-          <circle
-            cx="60" cy="60" r="50"
-            fill="none"
-            stroke={color}
-            strokeWidth="8"
-            strokeLinecap="round"
-            strokeDasharray={`${(overall / 100) * 314} 314`}
-            transform="rotate(-90 60 60)"
-          />
-        </svg>
-        <div className={styles.ringInner}>
-          <span className={styles.ringScore}>{overall}</span>
-          <span className={styles.ringLabel}>/ 100</span>
+      {/* Two-column body */}
+      <div className={styles.cardBody}>
+        {/* Score ring */}
+        <div className={styles.scoreRing}>
+          <svg viewBox="0 0 180 180" className={styles.ringsvg}>
+            <circle cx="90" cy="90" r="78" fill="none" stroke={ringTrack} strokeWidth="10" />
+            <circle
+              cx="90" cy="90" r="78"
+              fill="none"
+              stroke={color}
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray={`${(overall / 100) * CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+              transform="rotate(-90 90 90)"
+            />
+          </svg>
+          <div className={styles.ringInner}>
+            <span className={styles.ringScore}>{overall}</span>
+            <span className={styles.ringLabel}>/ 100</span>
+          </div>
         </div>
-      </div>
 
-      {/* Tier */}
-      <div className={styles.tierBadge} style={{ color, borderColor: `${color}40` }}>
-        {tierLabel}
-      </div>
+        {/* Right column */}
+        <div className={styles.cardRight}>
+          <span className={styles.cardEyebrow}>Commercial Intelligence Score</span>
+          <p className={styles.cardTierHeading}>{tierLabel} &mdash; {tierVerdict}</p>
 
-      {/* Niche + platform */}
-      {(niche || platform) && (
-        <p className={styles.nicheTag}>
-          {[niche, platform].filter(Boolean).join(' · ')}
-        </p>
-      )}
+          {(niche || platform) && (
+            <p className={styles.nicheTag}>
+              {[niche, platform].filter(Boolean).join(' · ')}
+            </p>
+          )}
 
-      {/* Dimension bars */}
-      {Object.keys(dimensions).length > 0 && (
-        <div className={styles.dims}>
-          {Object.entries(dimensions).map(([key, dim]) => (
-            <div key={key} className={styles.dimRow}>
-              <span className={styles.dimName}>{key.replace(/_/g, ' ')}</span>
-              <div className={styles.dimBarWrap}>
-                <div
-                  className={styles.dimBar}
-                  style={{
-                    width: `${dim.score ?? 0}%`,
-                    background: color,
-                    opacity: dim.confidence === 'insufficient_data' ? 0.25 : 0.7,
-                  }}
-                />
-              </div>
-              <span className={styles.dimVal}>{dim.score ?? '—'}</span>
+          <div className={styles.tierBadge}>{tierLabel}</div>
+
+          {Object.keys(dimensions).length > 0 && (
+            <div className={styles.dims}>
+              {Object.entries(dimensions).map(([key, dim]) => (
+                <div key={key} className={styles.dimRow}>
+                  <span className={styles.dimName}>{key.replace(/_/g, ' ')}</span>
+                  <div className={styles.dimBarWrap}>
+                    <div
+                      className={styles.dimBar}
+                      style={{
+                        width: `${dim.score ?? 0}%`,
+                        background: color,
+                        opacity: dim.confidence === 'insufficient_data' ? 0.25 : 0.7,
+                      }}
+                    />
+                  </div>
+                  <span className={styles.dimVal}>{dim.score ?? '—'}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </div>
 
       {/* Footer */}
       <p className={styles.cardFooter}>Commercial Viability Score</p>
@@ -92,8 +108,9 @@ function ScoreCardContent({ score, niche, platform }) {
 
 export function ScoreCardModal({ score, niche, platform, onClose }) {
   const cardRef  = useRef(null);
-  const [copied, setCopied]      = useState(false);
-  const [saving, setSaving]      = useState(false);
+  const [copied,    setCopied]    = useState(false);
+  const [saving,    setSaving]    = useState(false);
+  const [lightMode, setLightMode] = useState(true);
 
   async function handleDownload() {
     if (!cardRef.current || saving) return;
@@ -101,7 +118,7 @@ export function ScoreCardModal({ score, niche, platform, onClose }) {
     try {
       const html2canvas = (await import('html2canvas')).default;
       const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: '#05040A',
+        backgroundColor: lightMode ? '#FAF6EF' : '#05040A',
         scale: 2,
         useCORS: true,
         logging: false,
@@ -130,11 +147,30 @@ export function ScoreCardModal({ score, niche, platform, onClose }) {
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <p className={styles.modalTitle}>Your score card</p>
-          <button className={styles.close} onClick={onClose}>✕</button>
+          <div className={styles.modalHeaderRight}>
+            <button
+              className={`${styles.themeToggle} ${lightMode ? styles.themeToggleLight : ''}`}
+              onClick={() => setLightMode(m => !m)}
+              title={lightMode ? 'Switch to dark' : 'Switch to light'}
+            >
+              {lightMode ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+              {lightMode ? 'Light' : 'Dark'}
+            </button>
+            <button className={styles.close} onClick={onClose}>✕</button>
+          </div>
         </div>
 
         <div ref={cardRef} className={styles.cardWrap}>
-          <ScoreCardContent score={score} niche={niche} platform={platform} />
+          <ScoreCardContent score={score} niche={niche} platform={platform} lightMode={lightMode} />
         </div>
 
         <div className={styles.actions}>

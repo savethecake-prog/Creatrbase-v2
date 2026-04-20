@@ -13,7 +13,8 @@ const NAV = [
   ] },
   { group: 'People', items: [
     { label: 'Subscribers', to: '/admin/subscribers' },
-    { label: 'Creators', to: '/admin/creators', soon: true },
+    { label: 'Team', to: '/admin/team' },
+    { label: 'Acquisition', to: '/admin/acquisition' },
   ] },
   { group: 'Operations', items: [
     { label: 'Agents', to: '/admin/agents', soon: true },

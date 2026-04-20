@@ -5,6 +5,15 @@
    in components — always reference a token.
 ───────────────────────────────────────────── */
 
+/* ── Cunia — primary display face (licensed, self-hosted). Display ≥32px only, weight 400 only. ── */
+@font-face {
+  font-family: 'Cunia';
+  font-weight: 400;
+  font-style: normal;
+  src: url('/fonts/Cunia.ttf') format('truetype');
+  font-display: swap;
+}
+
 :root {
   /* ── Backgrounds (light default) ── */
   --bg-page:             #FAF6EF;
@@ -36,6 +45,7 @@
   --cb-lavender:         #C8AAFF;
   --cb-lavender-deep:    #A284E0;
   --cb-lavender-shade:   #7A5CBF;
+  --cb-cream:            #FAF6EF;
 
   /* ── Neon aliases (backward compat — darkened for light mode readability) ── */
   --neon-mint:           var(--cb-mint-shade);
@@ -112,11 +122,13 @@
   --nav-height:          64px;
 
   /* ── Typography ── */
-  --font-display:        'Outfit', sans-serif;
+  --font-display:        'Cunia', 'Outfit', 'DM Sans', system-ui, sans-serif;
+  --font-display-ui:     'Outfit', 'DM Sans', system-ui, sans-serif;
   --font-display-calm:   'Outfit', sans-serif;
-  --font-body:           'DM Sans', sans-serif;
-  --font-mono:           'JetBrains Mono', monospace;
+  --font-body:           'DM Sans', system-ui, sans-serif;
+  --font-mono:           'JetBrains Mono', ui-monospace, monospace;
   --font-data:           var(--font-mono);
+  --font-unique:         'Unique', 'Outfit', sans-serif;
 
   /* ── Border radius ── */
   --radius-sm:   6px;

@@ -123,3 +123,134 @@
 .stagger-1 { animation-delay: 0.1s; }
 .stagger-2 { animation-delay: 0.2s; }
 .stagger-3 { animation-delay: 0.3s; }
+
+/* ─────────────────────────────────────────────
+   CB TYPE SCALE  (v2 design system — additive)
+   .cb-* classes are the canonical type system.
+   Cunia for display ≥32px; Outfit for UI headings; DM Sans for body.
+───────────────────────────────────────────── */
+
+.cb-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(48px, 7vw, 88px);
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+  color: var(--text-primary);
+  text-wrap: pretty;
+}
+
+.cb-h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+  color: var(--text-primary);
+  text-wrap: pretty;
+}
+
+.cb-h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  text-wrap: pretty;
+}
+
+/* UI headings — Outfit, not Cunia (display metrics wrong at small sizes) */
+.cb-h1-ui,
+.cb-h2-ui {
+  font-family: var(--font-display-ui);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+  text-wrap: pretty;
+}
+
+.cb-h3 {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+  text-wrap: pretty;
+}
+
+.cb-h4 {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.cb-lede {
+  font-family: var(--font-body);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.cb-body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.cb-body-strong {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.cb-small {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+.cb-eyebrow {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.cb-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text-primary);
+}
+
+.cb-mono-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* ── Score count-up (first reveal only — add class via JS on initial mount) ── */
+@keyframes scoreCountUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cb-score-reveal {
+  animation: scoreCountUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

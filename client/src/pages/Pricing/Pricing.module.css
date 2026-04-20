@@ -39,12 +39,12 @@
 .eyebrowDot { width: 6px; height: 6px; border-radius: 50%; background: #1B1040; }
 
 .heroTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(32px, 5vw, 52px);
   font-weight: 400;
   margin: 0 0 16px;
   line-height: 1.05;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.05em;
   color: #1B1040;
 }
 
@@ -161,9 +161,9 @@
 .tierFeatured .tierName { color: rgba(255,255,255,0.5); }
 
 .tierTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display-ui);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   margin: 0 0 18px;
   line-height: 1;
 }
@@ -171,10 +171,10 @@
 .tierPrice { margin-bottom: 24px; }
 
 .priceNum {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: 40px;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
 }
 
 .pricePeriod {
@@ -343,9 +343,10 @@
 }
 
 .ctaTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: 32px;
   font-weight: 400;
+  letter-spacing: -0.04em;
   color: #1B1040;
   margin: 0 0 16px;
 }

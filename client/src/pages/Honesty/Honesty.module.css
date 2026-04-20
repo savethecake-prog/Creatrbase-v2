@@ -44,12 +44,12 @@
 }
 
 .heroTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(28px, 4.5vw, 44px);
   font-weight: 400;
   margin: 0;
   line-height: 1.15;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.04em;
   color: #1B1040;
 }
 
@@ -67,9 +67,9 @@
 .pillarLav { background: #F5F0FF; }
 
 .pillarTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display-ui);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   color: #1B1040;
   margin: 0 0 20px;
   line-height: 1;
@@ -362,9 +362,9 @@
 }
 
 .ctaTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display-ui);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   color: #1B1040;
   margin: 0 0 16px;
 }

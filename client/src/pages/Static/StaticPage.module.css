@@ -22,9 +22,10 @@
 }
 
 .title {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(28px, 4vw, 44px);
   font-weight: 400;
+  letter-spacing: -0.04em;
   color: #1B1040;
   margin: 0 0 12px;
   line-height: 1.1;

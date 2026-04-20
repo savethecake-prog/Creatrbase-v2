@@ -43,12 +43,12 @@
 }
 
 .formTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: 36px;
   font-weight: 400;
   color: #1B1040;
   margin-bottom: 8px;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.04em;
   line-height: 1.1;
 }
 
@@ -95,8 +95,10 @@
 }
 
 .brandTagline {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(28px, 3vw, 40px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
   line-height: 1.1;
   color: #FAF6EF;
   margin-bottom: 20px;

@@ -59,8 +59,8 @@
 .eyebrowDark .eyebrowDot { background: var(--lp-mint); }
 
 .sectionTitle {
-  font-family: 'Shrikhand', serif; font-size: 54px; line-height: 1.02;
-  color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 20px; max-width: 900px;
+  font-family: var(--font-display); font-size: 54px; line-height: 1.02;
+  color: var(--lp-navy); letter-spacing: -0.05em; margin-bottom: 20px; max-width: 900px;
 }
 .sectionTitle em { font-style: normal; color: var(--lp-peach-shade); }
 .sectionBody { font-size: 19px; color: var(--lp-ink-soft); line-height: 1.55; max-width: 580px; margin-bottom: 18px; }
@@ -68,8 +68,8 @@
 .sectionLede { font-size: 17px; color: var(--lp-ink-soft); max-width: 640px; line-height: 1.6; margin-bottom: 56px; }
 
 .display {
-  font-family: 'Shrikhand', serif; font-size: 76px; line-height: 0.98;
-  color: var(--lp-navy); letter-spacing: -0.015em; margin-bottom: 28px;
+  font-family: var(--font-display); font-size: 76px; line-height: 0.98;
+  color: var(--lp-navy); letter-spacing: -0.06em; margin-bottom: 28px;
 }
 .highlight { background: linear-gradient(180deg, transparent 60%, var(--lp-mint) 60%); padding: 0 4px; }
 .lede { font-size: 18px; color: var(--lp-ink-soft); max-width: 560px; line-height: 1.6; margin-bottom: 34px; }
@@ -159,12 +159,12 @@
 .scoreCard { background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 24px; padding: 32px; box-shadow: 8px 8px 0 var(--lp-navy); position: relative; z-index: 2; }
 .scoreCardHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .scoreCardChannel { display: flex; align-items: center; gap: 12px; }
-.channelAvatar { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg,#FFB89A,#E58860); border: 1.5px solid var(--lp-navy); display: flex; align-items: center; justify-content: center; font-family: 'Shrikhand', serif; color: var(--lp-navy); font-size: 18px; }
+.channelAvatar { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg,#FFB89A,#E58860); border: 1.5px solid var(--lp-navy); display: flex; align-items: center; justify-content: center; font-family: var(--font-display-ui); font-weight: 700; color: var(--lp-navy); font-size: 18px; }
 .channelName { font-weight: 600; font-size: 15px; color: var(--lp-ink); line-height: 1.2; }
 .channelHandle { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--lp-muted); letter-spacing: 0.04em; }
 .scoreTierPill { background: var(--lp-mint); border: 1.5px solid var(--lp-navy); border-radius: 999px; padding: 6px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lp-navy); }
 .scoreHeadline { display: flex; align-items: flex-end; gap: 14px; padding: 18px 0 22px; border-bottom: 1px dashed var(--lp-line); margin-bottom: 22px; }
-.scoreNum { font-family: 'Shrikhand', serif; font-size: 84px; line-height: 0.95; color: var(--lp-navy); letter-spacing: -0.02em; }
+.scoreNum { font-family: var(--font-display); font-size: 84px; line-height: 0.95; color: var(--lp-navy); letter-spacing: -0.06em; }
 .scoreOut { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--lp-muted); padding-bottom: 14px; letter-spacing: 0.06em; }
 .scoreMetaRight { margin-left: auto; text-align: right; padding-bottom: 10px; }
 .scoreMetaLabel { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lp-muted); margin-bottom: 6px; }
@@ -188,7 +188,7 @@
 .ticker { background: var(--lp-navy); padding: 18px 0; overflow: hidden; white-space: nowrap; border-top: 2px solid var(--lp-navy); }
 .tickerTrack { display: inline-flex; align-items: center; gap: 48px; padding-right: 48px; animation: tickerScroll 40s linear infinite; will-change: transform; }
 .ticker:hover .tickerTrack { animation-play-state: paused; }
-.tickerItem { font-family: 'Shrikhand', serif; color: var(--lp-mint); font-size: 18px; letter-spacing: 0.005em; display: inline-flex; align-items: center; gap: 48px; flex-shrink: 0; }
+.tickerItem { font-family: var(--font-display-ui); font-weight: 700; color: var(--lp-mint); font-size: 18px; letter-spacing: 0.005em; display: inline-flex; align-items: center; gap: 48px; flex-shrink: 0; }
 .tickerItem::after { content: '\2726'; color: var(--lp-peach); font-family: serif; font-size: 22px; }
 @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .tickerTrack { animation: none; } }
@@ -198,7 +198,7 @@
 .statCard { background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 22px; padding: 42px 36px; box-shadow: 6px 6px 0 var(--lp-navy); position: relative; min-height: 320px; }
 .statSlide { position: absolute; top: 42px; left: 36px; right: 36px; bottom: 42px; opacity: 0; transition: opacity 0.7s ease; pointer-events: none; }
 .statActive { opacity: 1; pointer-events: auto; }
-.statNum { font-family: 'Shrikhand', serif; font-size: 96px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.02em; margin-bottom: 10px; }
+.statNum { font-family: var(--font-display); font-size: 96px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.06em; margin-bottom: 10px; }
 .statUnit { color: var(--lp-peach-deep); font-size: 64px; }
 .statDesc { font-size: 15px; color: var(--lp-ink-soft); line-height: 1.5; margin-bottom: 18px; }
 .statDesc b { color: var(--lp-ink); font-weight: 600; }
@@ -215,7 +215,7 @@
 .howStepNum { position: absolute; top: -18px; left: 28px; background: var(--lp-lavender); border: 1.5px solid var(--lp-navy); border-radius: 999px; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--lp-navy); box-shadow: 2px 2px 0 var(--lp-navy); }
 .howStepPeach { background: var(--lp-peach); }
 .howStepMint { background: var(--lp-mint); }
-.howStepTitle { font-family: 'Shrikhand', serif; font-size: 28px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 12px; }
+.howStepTitle { font-family: var(--font-display-ui); font-weight: 700; font-size: 28px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.015em; margin-bottom: 12px; }
 .howVisual { height: 120px; border-radius: 14px; background: var(--lp-cream); border: 1px solid var(--lp-line); margin-bottom: 22px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
 .visual1 { background: linear-gradient(135deg, #FAF6EF, #F0E4FF); }
 .v1Mock { display: flex; align-items: center; gap: 8px; background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 10px; padding: 8px 10px 8px 14px; width: 80%; }
@@ -248,12 +248,12 @@
 .demoTab { background: rgba(158,255,216,0.12); border: 1px solid rgba(158,255,216,0.35); color: var(--lp-mint); padding: 8px 16px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
 .demoTabActive { background: var(--lp-mint); color: var(--lp-navy); border-color: var(--lp-mint); }
 .demoInner { background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 18px; padding: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; position: relative; z-index: 1; }
-.demoCreator { font-family: 'Shrikhand', serif; font-size: 36px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 10px; }
+.demoCreator { font-family: var(--font-display); font-size: 36px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.04em; margin-bottom: 10px; }
 .demoHandle { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--lp-muted); letter-spacing: 0.06em; margin-bottom: 22px; }
 .demoStats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px; }
 .demoStatCard { background: var(--lp-cream); border: 1px solid var(--lp-line); border-radius: 12px; padding: 16px 14px; }
 .demoStatLabel { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lp-muted); margin-bottom: 6px; }
-.demoStatValue { font-family: 'Shrikhand', serif; font-size: 28px; line-height: 1; color: var(--lp-navy); }
+.demoStatValue { font-family: var(--font-display-ui); font-weight: 700; font-size: 28px; line-height: 1; color: var(--lp-navy); }
 .demoStatDelta { font-size: 11px; font-weight: 600; color: var(--lp-mint-shade); margin-top: 4px; }
 .demoRight { display: flex; flex-direction: column; gap: 14px; }
 .demoRow { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--lp-cream); border: 1px solid var(--lp-line); border-radius: 12px; }
@@ -296,7 +296,7 @@
 /* Brand matches tab */
 .brandRow { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--lp-line); }
 .brandRow:last-child { border-bottom: none; }
-.brandIcon { width: 36px; height: 36px; border-radius: 10px; background: var(--lp-navy); color: var(--lp-cream); display: flex; align-items: center; justify-content: center; font-family: 'Shrikhand', serif; font-size: 16px; flex-shrink: 0; }
+.brandIcon { width: 36px; height: 36px; border-radius: 10px; background: var(--lp-navy); color: var(--lp-cream); display: flex; align-items: center; justify-content: center; font-family: var(--font-display-ui); font-weight: 700; font-size: 16px; flex-shrink: 0; }
 .brandInfo { flex: 1; }
 .brandName { font-size: 14px; font-weight: 600; color: var(--lp-navy); }
 .brandStatus { font-size: 11px; color: var(--lp-muted); }
@@ -312,7 +312,7 @@
 .dimCardEyebrow { display: inline-block; background: var(--lp-lavender); border: 1px solid var(--lp-navy); padding: 4px 10px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lp-navy); margin-bottom: 18px; }
 .dimCardEyebrowPeach { background: var(--lp-peach); }
 .dimCardEyebrowMint { background: var(--lp-mint); }
-.dimCardTitle { font-family: 'Shrikhand', serif; font-size: 26px; line-height: 1.05; color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 10px; }
+.dimCardTitle { font-family: var(--font-display-ui); font-weight: 700; font-size: 26px; line-height: 1.05; color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 10px; }
 .dimCardWeight { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px dashed var(--lp-line); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--lp-muted); letter-spacing: 0.06em; text-transform: uppercase; }
 .dimCardWeight b { color: var(--lp-navy); font-size: 14px; font-weight: 700; }
 
@@ -320,7 +320,7 @@
 .tiersGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 48px; }
 .tierCard { background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 18px; padding: 28px 24px; box-shadow: 4px 4px 0 var(--lp-navy); }
 .tierRange { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--lp-muted); margin-bottom: 18px; display: block; }
-.tierName { font-family: 'Shrikhand', serif; font-size: 32px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 10px; }
+.tierName { font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.04em; margin-bottom: 10px; }
 .tierCard p { font-size: 13px; color: var(--lp-ink-soft); line-height: 1.55; margin-bottom: 20px; min-height: 82px; }
 .tierStrip { height: 8px; border-radius: 999px; background: var(--lp-cream-2); border: 1px solid var(--lp-line); overflow: hidden; margin-bottom: 6px; }
 .tierStripFill { height: 100%; border-radius: 999px; }
@@ -332,7 +332,7 @@
 .honestyLede { color: rgba(255,255,255,0.75); }
 .honestyGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .honestyCard { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 28px 26px; }
-.honestyCard h3 { font-family: 'Shrikhand', serif; font-size: 28px; line-height: 1.05; color: var(--lp-cream); letter-spacing: -0.01em; margin-bottom: 14px; }
+.honestyCard h3 { font-family: var(--font-display-ui); font-weight: 700; font-size: 28px; line-height: 1.05; color: var(--lp-cream); letter-spacing: -0.015em; margin-bottom: 14px; }
 .honestyCard p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 20px; }
 .honestyLabel { display: inline-block; padding: 5px 11px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
 .honestyLabelMint { background: var(--lp-mint); color: var(--lp-navy); }
@@ -353,7 +353,7 @@
 .whomPhotoLabel { background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 10px; padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lp-navy); line-height: 1.3; text-align: center; }
 .whomPhotoImg { width: 100%; height: 100%; object-fit: cover; display: block; }
 .whomBody { padding: 28px 26px 30px; }
-.whomName { font-family: 'Shrikhand', serif; font-size: 26px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 6px; }
+.whomName { font-family: var(--font-display-ui); font-weight: 700; font-size: 26px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.01em; margin-bottom: 6px; }
 .whomSub { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--lp-peach-shade); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; margin-bottom: 16px; }
 .whomQuote { font-size: 14px; color: var(--lp-ink-soft); line-height: 1.55; font-style: italic; margin-bottom: 16px; }
 .whomTags { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -368,10 +368,10 @@
 .priceBadge { position: absolute; top: -16px; right: 28px; background: var(--lp-peach); border: 1.5px solid var(--lp-navy); padding: 5px 14px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lp-navy); box-shadow: 2px 2px 0 var(--lp-navy); }
 .priceTier { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lp-muted); margin-bottom: 14px; }
 .priceCardFeatured .priceTier { color: var(--lp-lavender); }
-.priceTitle { font-family: 'Shrikhand', serif; font-size: 38px; line-height: 1; letter-spacing: -0.01em; margin-bottom: 14px; color: var(--lp-navy); }
+.priceTitle { font-family: var(--font-display); font-size: 38px; line-height: 1; letter-spacing: -0.04em; margin-bottom: 14px; color: var(--lp-navy); }
 .priceCardFeatured .priceTitle { color: var(--lp-cream); }
 .priceAmount { display: flex; align-items: baseline; gap: 6px; margin-bottom: 22px; }
-.priceNum { font-family: 'Shrikhand', serif; font-size: 56px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.015em; }
+.priceNum { font-family: var(--font-display); font-size: 56px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.05em; }
 .priceCardFeatured .priceNum { color: var(--lp-mint); }
 .pricePeriod { font-size: 14px; color: var(--lp-muted); font-weight: 500; }
 .priceCardFeatured .pricePeriod { color: rgba(255,255,255,0.6); }
@@ -394,7 +394,7 @@
 .finalCta::before { content: ''; position: absolute; top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(158,255,216,0.25), transparent 65%); }
 .finalCta::after { content: ''; position: absolute; bottom: -100px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,191,163,0.25), transparent 65%); }
 .finalGrid { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 64px; align-items: center; position: relative; z-index: 1; }
-.finalTitle { font-family: 'Shrikhand', serif; font-size: 76px; line-height: 0.98; color: var(--lp-cream); letter-spacing: -0.015em; margin-bottom: 24px; }
+.finalTitle { font-family: var(--font-display); font-size: 76px; line-height: 0.98; color: var(--lp-cream); letter-spacing: -0.06em; margin-bottom: 24px; }
 .finalTitle em { color: var(--lp-mint); font-style: normal; }
 .finalLede { font-size: 18px; color: rgba(255,255,255,0.82); max-width: 520px; line-height: 1.6; margin-bottom: 32px; }
 .finalRight { text-align: right; }

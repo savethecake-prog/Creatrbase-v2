@@ -45,9 +45,10 @@
 }
 
 .heroTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(32px, 5vw, 56px);
   font-weight: 400;
+  letter-spacing: -0.05em;
   margin: 0 0 16px;
   letter-spacing: -0.015em;
   color: #1B1040;
@@ -197,9 +198,9 @@
 }
 
 .cardFeatured .cardTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display-ui);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.1;
 }
 

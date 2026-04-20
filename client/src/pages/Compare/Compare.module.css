@@ -5,7 +5,7 @@
 .hero { padding: 64px 0 40px; border-bottom: 1px solid #E8E1D4; margin-bottom: 40px; }
 .eyebrow { display: inline-flex; align-items: center; gap: 8px; background: #FFBFA3; border: 1px solid #1B1040; padding: 5px 14px; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #1B1040; box-shadow: 2px 2px 0 #1B1040; margin-bottom: 24px; }
 .eyebrowDot { width: 6px; height: 6px; border-radius: 50%; background: #1B1040; }
-.title { font-family: 'Lilita One', cursive; font-size: clamp(28px, 4vw, 40px); font-weight: 400; color: #1B1040; margin-bottom: 12px; line-height: 1.1; letter-spacing: -0.015em; }
+.title { font-family: var(--font-display); font-size: clamp(28px, 4vw, 40px); font-weight: 400; color: #1B1040; margin-bottom: 12px; line-height: 1.1; letter-spacing: -0.04em; }
 .meta { font-size: 13px; color: #76688F; }
 
 /* Comparison table */
@@ -29,7 +29,7 @@
 
 /* CTA */
 .cta { background: #9EFFD8; border: 1.5px solid #1B1040; border-radius: 18px; padding: 40px 32px; text-align: center; box-shadow: 4px 4px 0 #1B1040; margin-bottom: 32px; }
-.ctaTitle { font-family: 'Lilita One', cursive; font-size: 28px; font-weight: 400; color: #1B1040; margin: 0 0 8px; }
+.ctaTitle { font-family: var(--font-display-ui); font-size: 28px; font-weight: 700; color: #1B1040; margin: 0 0 8px; }
 .ctaDesc { font-size: 15px; color: #1B1040; opacity: 0.8; margin: 0 0 20px; }
 .ctaBtn { display: inline-block; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: #FAF6EF; background: #1B1040; text-decoration: none; padding: 12px 28px; border-radius: 999px; border: 1.5px solid #1B1040; box-shadow: 3px 3px 0 #1B1040; }
 .ctaBtn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #1B1040; }
@@ -37,7 +37,7 @@
 .disclaimer { font-size: 12px; color: #A69BB8; line-height: 1.5; text-align: center; }
 
 .notFound { padding: 80px 0; text-align: center; }
-.notFound h1 { font-family: 'Lilita One', cursive; font-size: 28px; margin-bottom: 12px; }
+.notFound h1 { font-family: var(--font-display-ui); font-weight: 700; font-size: 28px; margin-bottom: 12px; }
 .notFound p { color: #76688F; margin-bottom: 24px; }
 .backLink { color: #1B1040; font-weight: 600; }
 

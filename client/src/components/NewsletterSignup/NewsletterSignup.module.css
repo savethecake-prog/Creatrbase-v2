@@ -38,9 +38,9 @@
 }
 
 .title {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display-ui);
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 700;
   color: #1B1040;
   margin-bottom: 8px;
   line-height: 1.15;

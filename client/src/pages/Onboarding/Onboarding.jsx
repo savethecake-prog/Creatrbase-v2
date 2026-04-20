@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
-import logoMonogram from '../../assets/logo-monogram.svg';
+import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import styles from './Onboarding.module.css';
 
@@ -91,7 +91,7 @@ export function Onboarding() {
     <div className={styles.page}>
       <PageMeta title="Set up your account" noIndex={true} />
       <div className={styles.logoBar}>
-        <img src={logoMonogram} alt="Creatrbase" className={styles.logo} />
+        <LogoWordmark variant="v2" dark={true} height={36} />
       </div>
 
       <div className={styles.content}>

@@ -5,11 +5,11 @@
   font-size: 11px; /* Slightly tighter */
   font-weight: 700; /* Bolder */
   padding: 5px 14px;
-  border-radius: var(--r-pill);
+  border-radius: var(--radius-full);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: transform var(--t-fast), box-shadow var(--t-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .badge.dot::before {

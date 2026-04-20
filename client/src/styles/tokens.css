@@ -113,7 +113,7 @@
   --space-1:  4px;  --space-2:  8px;  --space-3:  12px;
   --space-4:  16px; --space-5:  20px; --space-6:  24px;
   --space-8:  32px; --space-10: 40px; --space-12: 48px;
-  --space-16: 64px;
+  --space-16: 64px; --space-24: 96px;
 
   /* ── Layout ── */
   --page-max-width:      1200px;
@@ -158,11 +158,6 @@
   --surface-3:     var(--bg-active);
   --text-muted:    var(--text-tertiary);
   --cb-white:      #FFFFFF;
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
-  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
-  --r-sm: var(--radius-sm); --r-md: var(--radius-md);
-  --r-lg: var(--radius-lg); --r-pill: var(--radius-full);
-  --t-fast: var(--transition-fast); --t-normal: var(--transition-base);
   --stroke-outer: var(--cb-navy); --stroke-inner: #FFFFFF;
 }
 

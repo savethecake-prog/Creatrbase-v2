@@ -1,5 +1,5 @@
 .header {
-  margin-bottom: var(--s10);
+  margin-bottom: var(--space-10);
 }
 
 .title {
@@ -9,7 +9,7 @@
   letter-spacing: -0.03em;
   color: var(--text-primary);
   line-height: 1.05;
-  margin-bottom: var(--s2);
+  margin-bottom: var(--space-2);
 }
 
 .sub {
@@ -21,7 +21,7 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: var(--s5);
+  gap: var(--space-6);
   max-width: 840px;
 }
 
@@ -40,7 +40,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--s4);
+  gap: var(--space-4);
   margin-bottom: 24px;
 }
 
@@ -191,7 +191,7 @@
   align-items: center;
   justify-content: center;
   z-index: 500;
-  padding: var(--s6);
+  padding: var(--space-8);
 }
 
 .modal {
@@ -234,7 +234,7 @@
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--neon-mint);
-  margin-bottom: var(--s3);
+  margin-bottom: var(--space-3);
 }
 
 .modalTitle {
@@ -243,7 +243,7 @@
   font-weight: 900;
   color: var(--text-primary);
   letter-spacing: -0.02em;
-  margin-bottom: var(--s4);
+  margin-bottom: var(--space-4);
   line-height: 1.2;
 }
 
@@ -251,7 +251,7 @@
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.7;
-  margin-bottom: var(--s5);
+  margin-bottom: var(--space-6);
 }
 
 .modalNote {
@@ -262,7 +262,7 @@
   font-size: 13px;
   color: var(--neon-mint);
   line-height: 1.6;
-  margin-bottom: var(--s6);
+  margin-bottom: var(--space-8);
 }
 
 .modalAction {
@@ -288,7 +288,7 @@
 /* ── Tags section ─────────────────────────────────────────────────────────── */
 
 .tagsSection {
-  margin-top: var(--s10);
+  margin-top: var(--space-10);
   max-width: 840px;
   display: flex;
   flex-direction: column;

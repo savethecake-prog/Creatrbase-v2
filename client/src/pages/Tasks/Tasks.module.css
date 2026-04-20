@@ -1,8 +1,8 @@
 .header {
-  margin-bottom: var(--s10);
+  margin-bottom: var(--space-10);
   display: flex;
   align-items: center;
-  gap: var(--s4);
+  gap: var(--space-4);
 }
 
 .title {
@@ -36,14 +36,14 @@
   background: rgba(164, 255, 219, 0.08);
   border-radius: 4px;
   padding: 4px 10px;
-  margin-bottom: var(--s5);
-  margin-top: var(--s8);
+  margin-bottom: var(--space-6);
+  margin-top: var(--space-16);
 }
 
 .taskList {
   display: flex;
   flex-direction: column;
-  gap: var(--s4);
+  gap: var(--space-4);
 }
 
 /* Card */

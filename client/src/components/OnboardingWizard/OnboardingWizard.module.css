@@ -158,7 +158,7 @@
   font-size: 13px;
   font-weight: 700;
   padding: 10px 22px;
-  border-radius: var(--r-pill);
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
 }
@@ -271,7 +271,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 7px 14px;
-  border-radius: var(--r-pill);
+  border-radius: var(--radius-full);
 }
 
 .loopArrow {

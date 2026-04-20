@@ -1,5 +1,5 @@
 .header {
-  margin-bottom: var(--s10);
+  margin-bottom: var(--space-10);
 }
 
 .title {
@@ -9,7 +9,7 @@
   letter-spacing: -0.03em;
   color: var(--text-primary);
   line-height: 1.05;
-  margin-bottom: var(--s2);
+  margin-bottom: var(--space-2);
 }
 
 .subtitle {

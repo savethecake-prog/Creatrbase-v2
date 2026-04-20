@@ -1,5 +1,5 @@
 .header {
-  margin-bottom: var(--s10);
+  margin-bottom: var(--space-10);
 }
 
 .greeting {
@@ -8,7 +8,7 @@
   font-weight: 900;
   letter-spacing: -0.04em;
   color: var(--text-primary);
-  margin-bottom: var(--s2);
+  margin-bottom: var(--space-2);
   line-height: 1.0;
 }
 
@@ -32,15 +32,15 @@
   background: rgba(164, 255, 219, 0.08);
   border-radius: 4px;
   padding: 4px 10px;
-  margin-bottom: var(--s5);
-  margin-top: var(--s10);
+  margin-bottom: var(--space-6);
+  margin-top: var(--space-10);
 }
 
 /* KPI Grid */
 .kpiGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--s5);
+  gap: var(--space-6);
   margin-bottom: 40px;
 }
 
@@ -95,7 +95,7 @@
 .momentumGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--s4);
+  gap: var(--space-4);
 }
 
 .momentumCard {
@@ -381,10 +381,10 @@
 }
 
 /* ── Section wrappers ──────────────────────────────────────────── */
-.momentumSection { margin-top: var(--s10); }
-.scoreSection    { margin-top: var(--s10); }
-.recSection      { margin-top: var(--s10); }
-.nicheSection    { margin-top: var(--s10); }
+.momentumSection { margin-top: var(--space-10); }
+.scoreSection    { margin-top: var(--space-10); }
+.recSection      { margin-top: var(--space-10); }
+.nicheSection    { margin-top: var(--space-10); }
 
 .momentumEmpty {
   font-size: 32px;
@@ -408,7 +408,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 40px;
-  margin-bottom: var(--s8);
+  margin-bottom: var(--space-16);
   position: relative;
   overflow: hidden;
 }
@@ -483,7 +483,7 @@
   border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
-  margin-bottom: var(--s8);
+  margin-bottom: var(--space-16);
 }
 
 .msgSuccess {
@@ -591,7 +591,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: var(--s8);
+  margin-bottom: var(--space-16);
 }
 
 .celebrationContent {

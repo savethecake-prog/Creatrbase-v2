@@ -18,8 +18,6 @@ const NAV = [
     items: [
       { label: 'Dashboard', to: '/dashboard' },
       { label: 'Gap Tracker', to: '/gap' },
-      { label: 'Commercial Audit', to: '/audit' },
-      { label: 'Commercial Coach', to: '/coach' },
     ],
   },
   {
@@ -33,6 +31,7 @@ const NAV = [
     group: 'Toolkit',
     items: [
       { label: 'Negotiations', to: '/negotiations' },
+      { label: 'Brand Tags', to: '/toolkit' },
       { label: 'Contract Review', to: '/contracts', soon: true },
     ],
   },
@@ -40,8 +39,7 @@ const NAV = [
     group: 'Account',
     items: [
       { label: 'Connections', to: '/connections' },
-      { label: 'Settings', to: '/settings' },
-      { label: 'Engine Room', to: '/power', powerOnly: true },
+      { label: 'Settings', to: '/settings', soon: true },
     ],
   },
 ];
@@ -50,7 +48,6 @@ export function AppLayout({ children }) {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -63,16 +60,10 @@ export function AppLayout({ children }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close drawer on route change
-  useEffect(() => {
-    setDrawerOpen(false);
-  }, [navigate]);
-
-  const displayName   = user?.displayName ?? '';
-  const initials      = displayName
+  const displayName = user?.displayName ?? '';
+  const initials = displayName
     ? displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : '?';
-  const isPowerUser   = user?.isPowerUser ?? false;
 
   const sub = user?.subscription;
   const isTrialling = sub?.status === 'trialling';
@@ -86,48 +77,7 @@ export function AppLayout({ children }) {
   }
 
   return (
-    <div className={`${styles.layout} ${drawerOpen ? styles.drawerOpen : ''}`}>
-      {drawerOpen && (
-        <div className={styles.drawerOverlay} onClick={() => setDrawerOpen(false)} />
-      )}
-      {drawerOpen && (
-        <nav className={styles.drawer}>
-          <div className={styles.drawerHeader}>
-            <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.drawerLogo} ${styles.logoLight}`} />
-            <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.drawerLogo} ${styles.logoDark}`} />
-            <button
-              type="button"
-              className={styles.drawerClose}
-              onClick={() => setDrawerOpen(false)}
-              aria-label="Close menu"
-            >
-              &times;
-            </button>
-          </div>
-          {NAV.map(({ group, items }) => {
-            const visible = items.filter(item => !item.powerOnly || isPowerUser);
-            if (!visible.length) return null;
-            return (
-              <div key={group} className={styles.navGroup}>
-                <p className={styles.navGroupLabel}>{group}</p>
-                {visible.map(({ label, to, soon }) => (
-                  <NavLink
-                    key={label}
-                    to={soon ? '#' : to}
-                    onClick={() => setDrawerOpen(false)}
-                    className={({ isActive }) =>
-                      `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
-                    }
-                  >
-                    {label}
-                    {soon && <span className={styles.navSoon}>Soon</span>}
-                  </NavLink>
-                ))}
-              </div>
-            );
-          })}
-        </nav>
-      )}
+    <div className={styles.layout}>
       {showTrialBanner && (
         <div className={styles.trialStrip}>
           <p className={styles.trialStripText}>
@@ -148,32 +98,19 @@ export function AppLayout({ children }) {
       )}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
-          <button
-            type="button"
-            className={styles.hamburger}
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open navigation"
-          >
-            <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
-              <rect y="0" width="18" height="2" rx="1" fill="currentColor"/>
-              <rect y="6" width="18" height="2" rx="1" fill="currentColor"/>
-              <rect y="12" width="18" height="2" rx="1" fill="currentColor"/>
-            </svg>
-          </button>
           <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.topbarLogo} ${styles.logoLight}`} />
           <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.topbarLogo} ${styles.logoDark}`} />
         </div>
         
         <div className={styles.topbarRight}>
           <div className={styles.topbarUserContainer} ref={dropdownRef}>
-            <button
+            <button 
               type="button"
-              className={styles.topbarUser}
-              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className={styles.topbarUser} 
+              onClick={() => setDropdownOpen(!dropdownOpen)} 
             >
               <div className={styles.avatar}>{initials}</div>
               <span className={styles.userName}>{displayName || 'Account'}</span>
-              {isPowerUser && <span className={styles.powerBadge}>API Wrangler</span>}
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={styles.chevron}>
                 <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -221,27 +158,23 @@ export function AppLayout({ children }) {
       </header>
 
       <nav className={styles.sidebar}>
-        {NAV.map(({ group, items }) => {
-          const visible = items.filter(item => !item.powerOnly || isPowerUser);
-          if (!visible.length) return null;
-          return (
-            <div key={group} className={styles.navGroup}>
-              <p className={styles.navGroupLabel}>{group}</p>
-              {visible.map(({ label, to, soon }) => (
-                <NavLink
-                  key={label}
-                  to={soon ? '#' : to}
-                  className={({ isActive }) =>
-                    `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
-                  }
-                >
-                  {label}
-                  {soon && <span className={styles.navSoon}>Soon</span>}
-                </NavLink>
-              ))}
-            </div>
-          );
-        })}
+        {NAV.map(({ group, items }) => (
+          <div key={group} className={styles.navGroup}>
+            <p className={styles.navGroupLabel}>{group}</p>
+            {items.map(({ label, to, soon }) => (
+              <NavLink
+                key={label}
+                to={soon ? '#' : to}
+                className={({ isActive }) =>
+                  `${styles.navItem} ${isActive && !soon ? styles.active : ''}`
+                }
+              >
+                {label}
+                {soon && <span className={styles.navSoon}>Soon</span>}
+              </NavLink>
+            ))}
+          </div>
+        ))}
       </nav>
 
       <main className={styles.main}>

@@ -15,25 +15,27 @@ const TIER_COLORS = {
   established:    '#A4FFDB',
 };
 
-function ScoreCardContent({ score, niche, platform }) {
+function ScoreCardContent({ score, niche, platform, lightMode }) {
   const tier       = score?.tier ?? 'emerging';
   const overall    = score?.overall ?? 0;
   const dimensions = score?.dimensions ?? {};
   const color      = TIER_COLORS[tier] ?? '#A4FFDB';
   const tierLabel  = TIER_LABELS[tier] ?? tier.replace(/_/g, ' ');
 
+  const ringTrack  = lightMode ? 'rgba(14,27,42,0.1)' : 'rgba(255,255,255,0.06)';
+  const wordmark   = lightMode ? '/brand/wordmark-dark.png' : '/brand/wordmark-light.png';
+
   return (
-    <div className={styles.card} data-tier={tier}>
+    <div className={styles.card} data-tier={tier} data-light={lightMode ? 'true' : 'false'}>
       {/* Header */}
       <div className={styles.cardHeader}>
-        <div className={styles.logoMark}>CB</div>
-        <span className={styles.cardBrand}>creatrbase.com</span>
+        <img src={wordmark} alt="Creatrbase" className={styles.wordmark} />
       </div>
 
       {/* Score ring */}
       <div className={styles.scoreRing}>
         <svg viewBox="0 0 120 120" className={styles.ringsvg}>
-          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+          <circle cx="60" cy="60" r="50" fill="none" stroke={ringTrack} strokeWidth="8" />
           <circle
             cx="60" cy="60" r="50"
             fill="none"
@@ -51,7 +53,7 @@ function ScoreCardContent({ score, niche, platform }) {
       </div>
 
       {/* Tier */}
-      <div className={styles.tierBadge} style={{ color, borderColor: `${color}40` }}>
+      <div className={styles.tierBadge} style={{ color, borderColor: `${color}50` }}>
         {tierLabel}
       </div>
 
@@ -92,8 +94,9 @@ function ScoreCardContent({ score, niche, platform }) {
 
 export function ScoreCardModal({ score, niche, platform, onClose }) {
   const cardRef  = useRef(null);
-  const [copied, setCopied]      = useState(false);
-  const [saving, setSaving]      = useState(false);
+  const [copied,    setCopied]    = useState(false);
+  const [saving,    setSaving]    = useState(false);
+  const [lightMode, setLightMode] = useState(false);
 
   async function handleDownload() {
     if (!cardRef.current || saving) return;
@@ -101,7 +104,7 @@ export function ScoreCardModal({ score, niche, platform, onClose }) {
     try {
       const html2canvas = (await import('html2canvas')).default;
       const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: '#05040A',
+        backgroundColor: lightMode ? '#FAF6EF' : '#05040A',
         scale: 2,
         useCORS: true,
         logging: false,
@@ -130,11 +133,30 @@ export function ScoreCardModal({ score, niche, platform, onClose }) {
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <p className={styles.modalTitle}>Your score card</p>
-          <button className={styles.close} onClick={onClose}>✕</button>
+          <div className={styles.modalHeaderRight}>
+            <button
+              className={`${styles.themeToggle} ${lightMode ? styles.themeToggleLight : ''}`}
+              onClick={() => setLightMode(m => !m)}
+              title={lightMode ? 'Switch to dark' : 'Switch to light'}
+            >
+              {lightMode ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+              {lightMode ? 'Light' : 'Dark'}
+            </button>
+            <button className={styles.close} onClick={onClose}>✕</button>
+          </div>
         </div>
 
         <div ref={cardRef} className={styles.cardWrap}>
-          <ScoreCardContent score={score} niche={niche} platform={platform} />
+          <ScoreCardContent score={score} niche={niche} platform={platform} lightMode={lightMode} />
         </div>
 
         <div className={styles.actions}>

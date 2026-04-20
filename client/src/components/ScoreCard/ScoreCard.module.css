@@ -14,7 +14,7 @@
 
 .modal {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
@@ -30,10 +30,42 @@
   justify-content: space-between;
 }
 
+.modalHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .modalTitle {
   font-size: 15px;
   font-weight: 600;
   margin: 0;
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.themeToggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.themeToggleLight {
+  border-color: rgba(14, 27, 42, 0.2);
+  background: rgba(14, 27, 42, 0.05);
 }
 
 .close {
@@ -60,11 +92,10 @@
   overflow: hidden;
 }
 
-/* ── Score card (the exportable piece) ───────────────────────────────────── */
+/* ── Score card — dark (default) ─────────────────────────────────────────── */
 
 .card {
-  background: var(--cb-navy);
-  border: 1px solid var(--border);
+  background: #05040A;
   border-radius: 16px;
   padding: 28px 24px 20px;
   display: flex;
@@ -73,33 +104,47 @@
   gap: 14px;
   font-family: 'DM Sans', sans-serif;
   color: #FAF6EF;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Subtle texture accent — dark */
+.card::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(164,255,219,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Score card — light mode ─────────────────────────────────────────────── */
+
+.card[data-light='true'] {
+  background: #FAF6EF;
+  color: #0E1B2A;
+  box-shadow: 4px 4px 0px #0E1B2A;
+  border: 2px solid #0E1B2A;
+}
+
+.card[data-light='true']::before {
+  background: radial-gradient(circle, rgba(14,27,42,0.04) 0%, transparent 70%);
+}
+
+/* ── Card header ─────────────────────────────────────────────────────────── */
 
 .cardHeader {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
-.logoMark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: #A4FFDB;
-  color: var(--cb-navy);
-  font-size: 11px;
-  font-weight: 800;
-  font-family: 'Outfit', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.cardBrand {
-  font-size: 12px;
-  color: rgba(237, 237, 232, 0.45);
+.wordmark {
+  height: 18px;
+  width: auto;
+  display: block;
 }
 
 /* ── Score ring ───────────────────────────────────────────────────────────── */
@@ -140,6 +185,10 @@
   color: rgba(237, 237, 232, 0.45);
 }
 
+.card[data-light='true'] .ringLabel {
+  color: rgba(14, 27, 42, 0.45);
+}
+
 /* ── Tier badge ───────────────────────────────────────────────────────────── */
 
 .tierBadge {
@@ -158,6 +207,10 @@
   color: rgba(237, 237, 232, 0.5);
   margin: 0;
   text-transform: capitalize;
+}
+
+.card[data-light='true'] .nicheTag {
+  color: rgba(14, 27, 42, 0.5);
 }
 
 /* ── Dimensions ───────────────────────────────────────────────────────────── */
@@ -184,11 +237,19 @@
   text-align: right;
 }
 
+.card[data-light='true'] .dimName {
+  color: rgba(14, 27, 42, 0.5);
+}
+
 .dimBarWrap {
   height: 4px;
-  background: var(--bg-hover);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 99px;
   overflow: hidden;
+}
+
+.card[data-light='true'] .dimBarWrap {
+  background: rgba(14, 27, 42, 0.1);
 }
 
 .dimBar {
@@ -204,6 +265,10 @@
   text-align: right;
 }
 
+.card[data-light='true'] .dimVal {
+  color: rgba(14, 27, 42, 0.5);
+}
+
 /* ── Card footer ─────────────────────────────────────────────────────────── */
 
 .cardFooter {
@@ -212,6 +277,10 @@
   margin: 4px 0 0;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.card[data-light='true'] .cardFooter {
+  color: rgba(14, 27, 42, 0.3);
 }
 
 /* ── Modal actions ────────────────────────────────────────────────────────── */
@@ -230,6 +299,7 @@
   color: var(--bg-page);
   font-size: 13px;
   font-weight: 600;
+  font-family: var(--font-body);
   cursor: pointer;
   transition: opacity 0.15s;
 }
@@ -246,6 +316,7 @@
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 500;
+  font-family: var(--font-body);
   cursor: pointer;
   transition: background 0.15s;
 }

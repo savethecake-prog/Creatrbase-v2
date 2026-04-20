@@ -12,7 +12,7 @@ function Cheeky404() {
       <div style={{ textAlign: 'center', maxWidth: 480, padding: 40 }}>
         <div style={{ fontSize: 48, marginBottom: 8 }}>🧢</div>
         <div style={{ fontSize: 120, lineHeight: 1, marginBottom: 24 }}>🫣</div>
-        <h1 style={{ fontFamily: "'Lilita One', cursive", fontSize: 32, marginBottom: 12 }}>
+        <h1 style={{ fontFamily: "'Outfit', 'DM Sans', sans-serif", fontSize: 32, marginBottom: 12 }}>
           Naughty naughty!
         </h1>
         <p style={{ fontSize: 16, color: '#76688F', lineHeight: 1.6, marginBottom: 32 }}>

@@ -3,6 +3,23 @@
   background: var(--bg-page);
   color: var(--text-primary);
   font-family: var(--font-body);
+  /* Force cream marketing palette regardless of OS/user dark mode */
+  --bg-page:           #FAF6EF;
+  --bg-surface:        #FFFFFF;
+  --bg-surface-2:      #F4EFE5;
+  --text-primary:      #1B1040;
+  --text-secondary:    #76688F;
+  --text-tertiary:     #A69BB8;
+  --border:            #E8E1D4;
+  --border-subtle:     #F0EBE0;
+  --border-strong:     #1B1040;
+  --shadow-sticker-sm: 2px 2px 0 #1B1040;
+  --shadow-sticker:    4px 4px 0 #1B1040;
+  --cb-navy:           #1B1040;
+  --cb-mint:           #9EFFD8;
+  --cb-mint-deep:      #6EDDB1;
+  --cb-lavender:       #C8AAFF;
+  --cb-peach:          #FFBFA3;
 }
 
 /* ── Main ── */
@@ -190,8 +207,6 @@
 .principleCard_mint  { background: #F0FFF9; }
 .principleCard_peach { background: #FFF5EF; }
 
-:global([data-theme="dark"]) .principleCard_mint  { background: rgba(164, 255, 219, 0.06); }
-:global([data-theme="dark"]) .principleCard_peach { background: rgba(255, 159, 122, 0.06); }
 
 .principleNum {
   display: inline-block;

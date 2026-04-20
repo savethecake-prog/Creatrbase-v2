@@ -336,6 +336,45 @@ function startGmailSyncWorker() {
         console.error(`[gmailSync] watch renewal error: ${err.message}`);
       }
     }
+
+    // Renew admin Gmail watch
+    try {
+      const { rows: adminRows } = await pool.query(`
+        SELECT id, access_token, refresh_token, token_expires_at
+        FROM admin_gmail_connections
+        WHERE watch_expiry IS NOT NULL
+          AND watch_expiry < NOW() + INTERVAL '2 days'
+          AND refresh_token IS NOT NULL
+        LIMIT 1
+      `);
+      if (adminRows.length > 0) {
+        const adminConn = adminRows[0];
+        let adminToken;
+        const bufferMs     = 5 * 60 * 1000;
+        const tokenExpires = adminConn.token_expires_at ? new Date(adminConn.token_expires_at) : null;
+        const needsRefresh = tokenExpires && (tokenExpires.getTime() - Date.now() < bufferMs);
+
+        if (needsRefresh) {
+          const refreshed = await refreshGmailToken(decrypt(adminConn.refresh_token));
+          await pool.query(
+            `UPDATE admin_gmail_connections SET access_token = $1, token_expires_at = $2, updated_at = NOW() WHERE id = $3`,
+            [encrypt(refreshed.accessToken), refreshed.expiresAt, adminConn.id]
+          );
+          adminToken = refreshed.accessToken;
+        } else {
+          adminToken = decrypt(adminConn.access_token);
+        }
+
+        const watch = await setupGmailWatch(adminToken, process.env.GMAIL_PUBSUB_TOPIC);
+        await pool.query(
+          `UPDATE admin_gmail_connections SET history_id = $1, watch_expiry = $2, updated_at = NOW() WHERE id = $3`,
+          [watch.historyId, watch.expiration, adminConn.id]
+        );
+        job.log(`Renewed admin Gmail watch (expires ${watch.expiration.toISOString()})`);
+      }
+    } catch (err) {
+      job.log(`Admin watch renewal failed (non-fatal): ${err.message}`);
+    }
   });
 
   // ── gmail:daily-fallback ──────────────────────────────────────────────────

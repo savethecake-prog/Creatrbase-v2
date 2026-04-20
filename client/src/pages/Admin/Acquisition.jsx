@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../../lib/api';
 import styles from './Acquisition.module.css';
 
@@ -52,19 +53,41 @@ function StagePip({ stage }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function Acquisition() {
-  const [stats,      setStats]      = useState(null);
-  const [prospects,  setProspects]  = useState([]);
-  const [total,      setTotal]      = useState(0);
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [stats,           setStats]           = useState(null);
+  const [prospects,       setProspects]        = useState([]);
+  const [total,           setTotal]            = useState(0);
+  const [loading,         setLoading]          = useState(true);
+  const [error,           setError]            = useState(null);
+  const [gmailConnected,  setGmailConnected]   = useState(null); // null = loading
+  const [gmailAddress,    setGmailAddress]     = useState(null);
+  const [gmailBanner,     setGmailBanner]      = useState(null); // 'success' | null
 
   const [activeStage, setActiveStage] = useState('all');
   const [search,      setSearch]      = useState('');
 
-  const [drawer,      setDrawer]     = useState(null); // prospect object
-  const [addOpen,     setAddOpen]    = useState(false);
+  const [drawer,  setDrawer]  = useState(null);
+  const [addOpen, setAddOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('gmail_connected') === '1') {
+      setGmailBanner('success');
+      setSearchParams({}, { replace: true });
+    }
+    checkGmail();
+  }, []);
 
   useEffect(() => { loadAll(); }, [activeStage, search]);
+
+  async function checkGmail() {
+    try {
+      const data = await api.get('/admin/gmail/status');
+      setGmailConnected(data.connected);
+      if (data.gmailAddress) setGmailAddress(data.gmailAddress);
+    } catch {
+      setGmailConnected(false);
+    }
+  }
 
   async function loadAll() {
     setLoading(true);
@@ -96,11 +119,6 @@ export function Acquisition() {
     }
   }
 
-  function handleAdded(prospect) {
-    setAddOpen(false);
-    loadAll();
-  }
-
   function handleDrawerUpdated() {
     loadAll();
     if (drawer) openDrawer(drawer.prospect);
@@ -108,15 +126,37 @@ export function Acquisition() {
 
   return (
     <div>
+      {/* Gmail banner */}
+      {gmailBanner === 'success' && (
+        <div className={styles.gmailSuccessBanner}>
+          Gmail connected successfully. Outreach will be sent from {gmailAddress}.
+          <button className={styles.bannerClose} onClick={() => setGmailBanner(null)}>✕</button>
+        </div>
+      )}
+
+      {gmailConnected === false && (
+        <div className={styles.gmailWarnBanner}>
+          <span>Connect Gmail to send outreach directly from Creatrbase.</span>
+          <a href="/api/admin/gmail/connect" className={styles.bannerBtn}>Connect Gmail</a>
+        </div>
+      )}
+
       {/* Header */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Acquisition</h1>
           <p className={styles.subtitle}>Track and manage creator outreach from first contact to active user.</p>
         </div>
-        <button className={styles.btnPrimary} onClick={() => setAddOpen(true)}>
-          + Add prospect
-        </button>
+        <div className={styles.headerActions}>
+          {gmailConnected && (
+            <span className={styles.gmailStatus}>
+              <span className={styles.gmailDot} /> {gmailAddress}
+            </span>
+          )}
+          <button className={styles.btnPrimary} onClick={() => setAddOpen(true)}>
+            + Add prospect
+          </button>
+        </div>
       </div>
 
       {/* Stats strip */}
@@ -180,7 +220,10 @@ export function Acquisition() {
                 {prospects.map(p => (
                   <tr key={p.id} className={styles.row} onClick={() => openDrawer(p)}>
                     <td>
-                      <div className={styles.channelName}>{p.channel_name}</div>
+                      <div className={styles.channelName}>
+                        {p.channel_name}
+                        {p.stage === 'responded' && <span className={styles.replyBadge}>replied</span>}
+                      </div>
                       {p.channel_url && (
                         <a
                           href={p.channel_url}
@@ -211,6 +254,7 @@ export function Acquisition() {
       {drawer && (
         <ProspectDrawer
           data={drawer}
+          gmailConnected={gmailConnected}
           onClose={() => setDrawer(null)}
           onUpdate={handleDrawerUpdated}
         />
@@ -220,7 +264,7 @@ export function Acquisition() {
       {addOpen && (
         <AddProspectModal
           onClose={() => setAddOpen(false)}
-          onAdded={handleAdded}
+          onAdded={() => { setAddOpen(false); loadAll(); }}
         />
       )}
     </div>
@@ -229,16 +273,20 @@ export function Acquisition() {
 
 // ── Prospect detail drawer ────────────────────────────────────────────────────
 
-function ProspectDrawer({ data, onClose, onUpdate }) {
+function ProspectDrawer({ data, gmailConnected, onClose, onUpdate }) {
   const { prospect: p, events } = data;
-  const [stage,    setStage]    = useState(p.stage);
-  const [note,     setNote]     = useState('');
-  const [evtType,  setEvtType]  = useState('note');
-  const [channel,  setChannel]  = useState('');
-  const [saving,   setSaving]   = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [stage,         setStage]         = useState(p.stage);
+  const [note,          setNote]          = useState('');
+  const [evtType,       setEvtType]       = useState('note');
+  const [channel,       setChannel]       = useState('');
+  const [saving,        setSaving]        = useState(false);
+  const [deleting,      setDeleting]      = useState(false);
   const [stageUpdating, setStageUpdating] = useState(false);
+  const [composeMode,   setComposeMode]   = useState(null); // 'outreach' | 'followup' | null
   const overlayRef = useRef(null);
+
+  const canOutreach  = gmailConnected && p.email && !p.gmail_thread_id;
+  const canFollowUp  = gmailConnected && p.email && !!p.gmail_thread_id;
 
   async function handleStageChange(newStage) {
     if (newStage === stage) return;
@@ -261,8 +309,8 @@ function ProspectDrawer({ data, onClose, onUpdate }) {
     try {
       await api.post(`/admin/acquisition/prospects/${p.id}/events`, {
         event_type: evtType,
-        channel: channel || undefined,
-        note: note.trim(),
+        channel:    channel || undefined,
+        note:       note.trim(),
       });
       setNote('');
       setChannel('');
@@ -301,8 +349,9 @@ function ProspectDrawer({ data, onClose, onUpdate }) {
             <h2 className={styles.drawerTitle}>{p.channel_name}</h2>
             <div className={styles.drawerMeta}>
               <span className={styles.platformTag}>{p.platform}</span>
-              {p.niche && <span className={styles.drawerMetaText}>{p.niche}</span>}
-              {p.est_subs && <span className={styles.drawerMetaText}>{fmtNum(p.est_subs)} subs</span>}
+              {p.niche     && <span className={styles.drawerMetaText}>{p.niche}</span>}
+              {p.est_subs  && <span className={styles.drawerMetaText}>{fmtNum(p.est_subs)} subs</span>}
+              {p.email     && <span className={styles.drawerMetaText}>{p.email}</span>}
             </div>
           </div>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
@@ -325,6 +374,30 @@ function ProspectDrawer({ data, onClose, onUpdate }) {
             ))}
           </div>
         </div>
+
+        {/* Email outreach actions */}
+        {p.email && (
+          <div className={styles.outreachRow}>
+            {canOutreach && (
+              <button className={styles.btnOutreach} onClick={() => setComposeMode('outreach')}>
+                Send outreach email
+              </button>
+            )}
+            {canFollowUp && (
+              <button className={styles.btnOutreach} onClick={() => setComposeMode('followup')}>
+                Send follow-up
+              </button>
+            )}
+            {p.gmail_thread_id && (
+              <span className={styles.threadLabel}>Thread active</span>
+            )}
+            {!gmailConnected && (
+              <a href="/api/admin/gmail/connect" className={styles.connectGmailLink}>
+                Connect Gmail to send outreach
+              </a>
+            )}
+          </div>
+        )}
 
         {p.channel_url && (
           <a href={p.channel_url} target="_blank" rel="noreferrer noopener" className={styles.channelLink}>
@@ -354,7 +427,7 @@ function ProspectDrawer({ data, onClose, onUpdate }) {
                   {ev.channel && <span className={styles.eventChannel}>{ev.channel}</span>}
                   <span className={styles.eventTime}>{timeAgo(ev.created_at)}</span>
                 </div>
-                {ev.note && <p className={styles.eventNote}>{ev.note}</p>}
+                {ev.note      && <p className={styles.eventNote}>{ev.note}</p>}
                 {ev.admin_email && <span className={styles.eventAdmin}>{ev.admin_email}</span>}
               </div>
             </div>
@@ -404,6 +477,116 @@ function ProspectDrawer({ data, onClose, onUpdate }) {
           </div>
         </form>
       </div>
+
+      {/* Compose modal — rendered inside overlay so it stacks correctly */}
+      {composeMode && (
+        <ComposeModal
+          prospect={p}
+          mode={composeMode}
+          onClose={() => setComposeMode(null)}
+          onSent={() => { setComposeMode(null); onUpdate(); }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Compose modal ─────────────────────────────────────────────────────────────
+
+function ComposeModal({ prospect, mode, onClose, onSent }) {
+  const isFollowUp = mode === 'followup';
+  const [subject, setSubject] = useState(
+    isFollowUp
+      ? (prospect.outreach_subject ? `Re: ${prospect.outreach_subject}` : 'Following up')
+      : ''
+  );
+  const [body,    setBody]    = useState('');
+  const [sending, setSending] = useState(false);
+  const [error,   setError]   = useState(null);
+
+  async function handleSend(e) {
+    e.preventDefault();
+    if (!body.trim()) return;
+    if (!isFollowUp && !subject.trim()) return;
+    setSending(true);
+    setError(null);
+    try {
+      const endpoint = isFollowUp
+        ? `/admin/acquisition/prospects/${prospect.id}/follow-up`
+        : `/admin/acquisition/prospects/${prospect.id}/send-email`;
+      const payload = isFollowUp
+        ? { body: body.trim() }
+        : { subject: subject.trim(), body: body.trim() };
+      await api.post(endpoint, payload);
+      onSent();
+    } catch (err) {
+      setError(err.message || 'Failed to send');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className={styles.composeOverlay} onClick={e => e.stopPropagation()}>
+      <div className={styles.composeModal}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>
+            {isFollowUp ? 'Send follow-up' : 'Send outreach email'}
+          </h2>
+          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+        </div>
+
+        <form onSubmit={handleSend} className={styles.composeForm}>
+          <label className={styles.formLabel}>
+            To
+            <input className={`${styles.input} ${styles.inputReadonly}`} type="text" value={prospect.email} readOnly />
+          </label>
+
+          {!isFollowUp && (
+            <label className={styles.formLabel}>
+              Subject *
+              <input
+                className={styles.input}
+                type="text"
+                required
+                value={subject}
+                onChange={e => setSubject(e.target.value)}
+                placeholder="e.g. Collaboration opportunity with Creatrbase"
+                autoFocus
+              />
+            </label>
+          )}
+
+          {isFollowUp && (
+            <label className={styles.formLabel}>
+              Subject
+              <input className={`${styles.input} ${styles.inputReadonly}`} type="text" value={subject} readOnly />
+            </label>
+          )}
+
+          <label className={styles.formLabel}>
+            Message *
+            <textarea
+              className={styles.textarea}
+              required
+              rows={8}
+              value={body}
+              onChange={e => setBody(e.target.value)}
+              placeholder="Write your message here..."
+              autoFocus={isFollowUp}
+            />
+          </label>
+
+          {error && <div className={styles.errorBox}>{error}</div>}
+
+          <div className={styles.modalActions}>
+            <button className={styles.btnPrimary} type="submit" disabled={sending || !body.trim()}>
+              {sending ? 'Sending...' : 'Send'}
+            </button>
+            <button type="button" className={styles.btnGhost} onClick={onClose}>Cancel</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -411,9 +594,9 @@ function ProspectDrawer({ data, onClose, onUpdate }) {
 // ── Add prospect modal ────────────────────────────────────────────────────────
 
 function AddProspectModal({ onClose, onAdded }) {
-  const [form,    setForm]    = useState({ platform: 'youtube', channel_name: '', channel_url: '', niche: '', est_subs: '', notes: '' });
-  const [saving,  setSaving]  = useState(false);
-  const [error,   setError]   = useState(null);
+  const [form,   setForm]   = useState({ platform: 'youtube', channel_name: '', channel_url: '', email: '', niche: '', est_subs: '', notes: '' });
+  const [saving, setSaving] = useState(false);
+  const [error,  setError]  = useState(null);
   const overlayRef = useRef(null);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -427,10 +610,11 @@ function AddProspectModal({ onClose, onAdded }) {
       const payload = {
         platform:     form.platform,
         channel_name: form.channel_name.trim(),
-        channel_url:  form.channel_url.trim() || undefined,
-        niche:        form.niche.trim() || undefined,
+        channel_url:  form.channel_url.trim()  || undefined,
+        email:        form.email.trim()         || undefined,
+        niche:        form.niche.trim()         || undefined,
         est_subs:     form.est_subs ? parseInt(form.est_subs) : undefined,
-        notes:        form.notes.trim() || undefined,
+        notes:        form.notes.trim()         || undefined,
       };
       const data = await api.post('/admin/acquisition/prospects', payload);
       onAdded(data.prospect);
@@ -469,6 +653,11 @@ function AddProspectModal({ onClose, onAdded }) {
           <label className={styles.formLabel}>
             Channel URL
             <input className={styles.input} type="url" value={form.channel_url} onChange={e => set('channel_url', e.target.value)} placeholder="https://..." />
+          </label>
+
+          <label className={styles.formLabel}>
+            Contact email
+            <input className={styles.input} type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="creator@example.com" />
           </label>
 
           <div className={styles.formRow}>

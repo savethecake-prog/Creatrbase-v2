@@ -208,6 +208,13 @@
   justify-content: flex-end;
 }
 
+/* Centred overlay variant for modals */
+.overlay:has(.modal) {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
 /* ── Drawer ──────────────────────────────────────────────────────────────── */
 
 .drawer {
@@ -627,3 +634,185 @@
   transition: background 0.15s;
 }
 .closeBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* ── Gmail banners ───────────────────────────────────────────────────────── */
+
+.gmailSuccessBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--success);
+  margin-bottom: var(--space-4);
+}
+
+.gmailWarnBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 10px 16px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+.bannerClose {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+.bannerClose:hover { opacity: 1; }
+
+.bannerBtn {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  background: var(--accent);
+  color: var(--bg-page);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.bannerBtn:hover { background: var(--accent-hover); }
+
+/* ── Header actions ──────────────────────────────────────────────────────── */
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.gmailStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.gmailDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+}
+
+/* ── Reply badge ─────────────────────────────────────────────────────────── */
+
+.replyBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  margin-left: 6px;
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+  border-radius: var(--radius-sm);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--warning);
+  vertical-align: middle;
+}
+
+/* ── Outreach row ────────────────────────────────────────────────────────── */
+
+.outreachRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.btnOutreach {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  background: var(--accent);
+  color: var(--bg-page);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnOutreach:hover { background: var(--accent-hover); }
+
+.threadLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.connectGmailLink {
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Compose modal ───────────────────────────────────────────────────────── */
+
+.composeOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(5, 4, 10, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.composeModal {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-elevated);
+}
+
+.composeForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.inputReadonly {
+  opacity: 0.6;
+  cursor: default;
+}
+.inputReadonly:focus { border-color: var(--border); }

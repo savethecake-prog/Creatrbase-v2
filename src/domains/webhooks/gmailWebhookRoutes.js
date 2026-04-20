@@ -76,7 +76,87 @@ async function gmailWebhookRoutes(app) {
           [emailAddress]
         );
         if (connRows.length === 0) {
-          app.log.warn({ emailAddress }, 'Gmail webhook: no connection found for address');
+          // ── Admin Gmail branch ─────────────────────────────────────────────
+          const { rows: adminRows } = await pool.query(
+            'SELECT id, access_token, refresh_token, token_expires_at, history_id FROM admin_gmail_connections WHERE gmail_address = $1 LIMIT 1',
+            [emailAddress]
+          );
+          if (adminRows.length === 0) {
+            app.log.warn({ emailAddress }, 'Gmail webhook: no connection found for address');
+            return;
+          }
+          const adminConn = adminRows[0];
+
+          // Get fresh token for admin
+          let adminToken;
+          const aBufferMs     = 5 * 60 * 1000;
+          const aTokenExpires = adminConn.token_expires_at ? new Date(adminConn.token_expires_at) : null;
+          const aNeedsRefresh = aTokenExpires && (aTokenExpires.getTime() - Date.now() < aBufferMs);
+
+          if (aNeedsRefresh && adminConn.refresh_token) {
+            const refreshed = await refreshGmailToken(decrypt(adminConn.refresh_token));
+            await pool.query(
+              `UPDATE admin_gmail_connections SET access_token = $1, token_expires_at = $2, updated_at = NOW() WHERE id = $3`,
+              [encrypt(refreshed.accessToken), refreshed.expiresAt, adminConn.id]
+            );
+            adminToken = refreshed.accessToken;
+          } else {
+            adminToken = decrypt(adminConn.access_token);
+          }
+
+          const storedAdminHistoryId = adminConn.history_id;
+          if (!storedAdminHistoryId) {
+            await pool.query(
+              `UPDATE admin_gmail_connections SET history_id = $1 WHERE id = $2`,
+              [incomingHistoryId, adminConn.id]
+            );
+            return;
+          }
+
+          let adminMessages, adminNextHistoryId;
+          try {
+            ({ messages: adminMessages, nextHistoryId: adminNextHistoryId } =
+              await getHistorySince(adminToken, storedAdminHistoryId));
+          } catch (err) {
+            if (err.message.includes('410')) {
+              await pool.query(
+                `UPDATE admin_gmail_connections SET history_id = NULL, watch_expiry = NULL WHERE id = $1`,
+                [adminConn.id]
+              );
+              app.log.warn('Admin Gmail history expired (410) — watch cleared');
+            } else {
+              app.log.error({ err }, 'Admin Gmail history fetch error');
+            }
+            return;
+          }
+
+          if (adminMessages.length > 0) {
+            const newThreadIds = [...new Set(adminMessages.map(m => m.threadId))];
+            const placeholders = newThreadIds.map((_, i) => `$${i + 1}`).join(', ');
+            const { rows: matchedProspects } = await pool.query(
+              `SELECT id, stage FROM creator_prospects WHERE gmail_thread_id IN (${placeholders})`,
+              newThreadIds
+            );
+
+            for (const prospect of matchedProspects) {
+              if (prospect.stage === 'responded' || prospect.stage === 'signed_up' || prospect.stage === 'active') continue;
+              await pool.query(
+                `INSERT INTO prospect_events (prospect_id, admin_id, event_type, channel, note)
+                 VALUES ($1, NULL, 'reply_received', 'email', 'Reply detected via Gmail push')`,
+                [prospect.id]
+              );
+              await pool.query(
+                `UPDATE creator_prospects SET stage = 'responded', updated_at = NOW() WHERE id = $1`,
+                [prospect.id]
+              );
+              app.log.info({ prospectId: prospect.id }, 'Prospect reply detected — stage advanced to responded');
+            }
+          }
+
+          await pool.query(
+            `UPDATE admin_gmail_connections SET history_id = $1 WHERE id = $2`,
+            [adminNextHistoryId, adminConn.id]
+          );
           return;
         }
         const conn = connRows[0];

@@ -54,6 +54,7 @@ const FILES = [
   '037_power_user.sql',
   '038_roadmap.sql',
   '039_creator_acquisition.sql',
+  '040_prospect_outreach.sql',
 ];
 
 async function run() {

@@ -128,9 +128,11 @@ function buildMimeMessage({ from, to, subject, body }) {
  * Send an email via Gmail API.
  * Returns { messageId, threadId }.
  */
-async function sendEmail({ accessToken, from, to, subject, body }) {
-  const raw  = buildMimeMessage({ from, to, subject, body });
-  const sent = await gmailPost('/messages/send', accessToken, { raw });
+async function sendEmail({ accessToken, from, to, subject, body, threadId }) {
+  const raw     = buildMimeMessage({ from, to, subject, body });
+  const payload = { raw };
+  if (threadId) payload.threadId = threadId;
+  const sent = await gmailPost('/messages/send', accessToken, payload);
   return {
     messageId: sent.id,
     threadId:  sent.threadId,

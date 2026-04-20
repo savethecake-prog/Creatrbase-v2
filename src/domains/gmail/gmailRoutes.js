@@ -9,8 +9,9 @@
 //   POST /api/brands/:brandId/send-email → send outreach email via Gmail
 // ─────────────────────────────────────────────────────────────────────────────
 
-const { authenticate } = require('../../middleware/authenticate');
-const { getPrisma }    = require('../../lib/prisma');
+const { authenticate }  = require('../../middleware/authenticate');
+const { requireAdmin }  = require('../../middleware/requireAdmin');
+const { getPrisma }     = require('../../lib/prisma');
 const { encrypt, decrypt } = require('../../lib/crypto');
 const {
   refreshGmailToken,
@@ -138,6 +139,39 @@ async function gmailRoutes(app) {
     } catch (err) {
       app.log.warn({ err }, 'Gmail label creation failed — proceeding without label');
     }
+
+    // ── Branch: admin system Gmail or creator Gmail ───────────────────────────
+
+    if (req.query.state === 'admin_system') {
+      const pool = getPool();
+      await pool.query(
+        `INSERT INTO admin_gmail_connections
+           (gmail_address, access_token, refresh_token, token_expires_at, label_id)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (gmail_address) DO UPDATE
+           SET access_token     = EXCLUDED.access_token,
+               refresh_token    = COALESCE(EXCLUDED.refresh_token, admin_gmail_connections.refresh_token),
+               token_expires_at = EXCLUDED.token_expires_at,
+               label_id         = COALESCE(EXCLUDED.label_id, admin_gmail_connections.label_id),
+               updated_at       = NOW()`,
+        [gmailAddress, encrypt(accessToken), refreshToken ? encrypt(refreshToken) : null, expiresAt, labelId || null]
+      );
+      if (process.env.GMAIL_PUBSUB_TOPIC) {
+        try {
+          const watch = await setupGmailWatch(accessToken, process.env.GMAIL_PUBSUB_TOPIC);
+          await pool.query(
+            `UPDATE admin_gmail_connections SET history_id = $1, watch_expiry = $2 WHERE gmail_address = $3`,
+            [watch.historyId, watch.expiration, gmailAddress]
+          );
+          app.log.info({ gmailAddress, historyId: watch.historyId }, 'Admin Gmail watch registered');
+        } catch (err) {
+          app.log.warn({ err }, 'Admin Gmail watch setup failed');
+        }
+      }
+      return reply.redirect('/admin/acquisition?gmail_connected=1');
+    }
+
+    // ── Creator Gmail flow ────────────────────────────────────────────────────
 
     const prisma  = getPrisma();
     const creator = await resolveCreator(req.user.userId, req.user.tenantId);
@@ -287,6 +321,39 @@ async function gmailRoutes(app) {
 
     app.log.info({ creatorId: creator.id, brandId, threadId }, 'Outreach email sent via Gmail');
     return { ok: true, threadId, gmailAddress: gmailConn.gmailAddress };
+  });
+
+  // ── Admin Gmail connect / status / disconnect ─────────────────────────────
+
+  const adminPreHandler = [authenticate, requireAdmin];
+
+  app.get('/api/admin/gmail/connect', { preHandler: adminPreHandler }, async (req, reply) => {
+    const params = new URLSearchParams({
+      client_id:     process.env.GOOGLE_CLIENT_ID,
+      redirect_uri:  `${APP_URL}/api/gmail/callback`,
+      response_type: 'code',
+      scope:         GMAIL_SCOPES,
+      access_type:   'offline',
+      prompt:        'consent',
+      state:         'admin_system',
+    });
+    return reply.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
+  });
+
+  app.get('/api/admin/gmail/status', { preHandler: adminPreHandler }, async () => {
+    const pool = getPool();
+    const { rows } = await pool.query(
+      'SELECT gmail_address, created_at, watch_expiry FROM admin_gmail_connections LIMIT 1'
+    );
+    return rows.length > 0
+      ? { connected: true, gmailAddress: rows[0].gmail_address, watchExpiry: rows[0].watch_expiry }
+      : { connected: false };
+  });
+
+  app.delete('/api/admin/gmail/disconnect', { preHandler: adminPreHandler }, async () => {
+    const pool = getPool();
+    await pool.query('DELETE FROM admin_gmail_connections');
+    return { ok: true };
   });
 }
 

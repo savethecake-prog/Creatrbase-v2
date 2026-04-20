@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import styles from './AuthLayout.module.css';
 
 export function AuthLayout({ children, title, subtitle, eyebrow }) {
@@ -8,7 +9,7 @@ export function AuthLayout({ children, title, subtitle, eyebrow }) {
       <div className={`${styles.panel} ${styles.formPanel}`}>
         <div className={styles.formWrap}>
           <Link to="/" className={styles.logoLink}>
-            <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={styles.logo} />
+            <LogoWordmark variant="v2" dark height={36} className={styles.logo} />
           </Link>
           {eyebrow && <span className={styles.eyebrow}>{eyebrow}</span>}
           <h1 className={styles.formTitle}>{title}</h1>

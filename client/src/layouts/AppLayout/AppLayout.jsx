@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
 import { api } from '../../lib/api';
@@ -98,8 +99,8 @@ export function AppLayout({ children }) {
       )}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
-          <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.topbarLogo} ${styles.logoLight}`} />
-          <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.topbarLogo} ${styles.logoDark}`} />
+          <LogoWordmark variant="v2" dark height={28} className={`${styles.topbarLogo} ${styles.logoLight}`} />
+          <LogoWordmark variant="v2" height={28} className={`${styles.topbarLogo} ${styles.logoDark}`} />
         </div>
         
         <div className={styles.topbarRight}>

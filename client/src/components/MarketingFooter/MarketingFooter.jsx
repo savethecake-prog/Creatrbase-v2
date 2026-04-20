@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { LogoWordmark } from '../ui/LogoWordmark';
 import styles from './MarketingFooter.module.css';
 
 export function MarketingFooter() {
@@ -6,7 +7,7 @@ export function MarketingFooter() {
     <footer className={styles.footer}>
       <div className={styles.grid}>
         <div className={styles.brand}>
-          <Link to="/"><img src="/brand/wordmark-light.png" alt="Creatrbase" className={styles.logo} /></Link>
+          <Link to="/"><LogoWordmark variant="v2" height={36} className={styles.logo} /></Link>
           <p className={styles.tag}>Commercial intelligence for independent creators on YouTube and Twitch. Built in the UK.</p>
         </div>
         <div>

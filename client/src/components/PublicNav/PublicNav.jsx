@@ -35,7 +35,7 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
           <div className={styles.mobileMenu}>
             <div className={styles.mobileMenuHeader}>
               <Link to="/" onClick={() => setMobileOpen(false)}>
-                <LogoWordmark variant="v2" dark style={{ height: 32 }} />
+                <LogoWordmark variant="v2" dark height={32} />
               </Link>
               <button
                 type="button"
@@ -62,7 +62,7 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
         <nav className={`${styles.navV2} ${scrolled ? styles.scrolledV2 : ''}`}>
           <div className={styles.navInner}>
             <Link to="/" className={styles.logoV2}>
-              <LogoWordmark variant="v2" dark />
+              <LogoWordmark variant="v2" dark height={36} />
             </Link>
             <div className={styles.linksV2}>
               <Link to="/scoring-explained" className={styles.linkV2}>How it works</Link>

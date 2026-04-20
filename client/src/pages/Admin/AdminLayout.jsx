@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
 import styles from './AdminLayout.module.css';
@@ -67,8 +68,8 @@ export function AdminLayout() {
       )}
       <nav className={`${styles.drawer} ${drawerOpen ? styles.drawerVisible : ''}`}>
         <div className={styles.drawerHeader}>
-          <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoLight}`} />
-          <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoDark}`} />
+          <LogoWordmark variant="v2" dark height={24} className={`${styles.logo} ${styles.logoLight}`} />
+          <LogoWordmark variant="v2" height={24} className={`${styles.logo} ${styles.logoDark}`} />
           <button className={styles.drawerClose} onClick={() => setDrawerOpen(false)} aria-label="Close menu">&times;</button>
         </div>
         {NAV.map(({ group, items }) => (
@@ -99,8 +100,8 @@ export function AdminLayout() {
               <rect y="10" width="16" height="2" rx="1" fill="currentColor"/>
             </svg>
           </button>
-          <img src="/brand/wordmark-dark.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoLight}`} />
-          <img src="/brand/wordmark-light.png" alt="Creatrbase" className={`${styles.logo} ${styles.logoDark}`} />
+          <LogoWordmark variant="v2" dark height={24} className={`${styles.logo} ${styles.logoLight}`} />
+          <LogoWordmark variant="v2" height={24} className={`${styles.logo} ${styles.logoDark}`} />
           <span className={styles.adminBadge}>Admin</span>
         </div>
         <div className={styles.topbarRight} ref={menuRef}>

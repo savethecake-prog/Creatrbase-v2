@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import styles from './ScoreCard.module.css';
 import { TIER_GRADE, TIER_LABEL, TIER_VERDICT } from '../../lib/tierGrades';
+import { LogoWordmark } from '../ui/LogoWordmark';
 
 const TIER_COLORS = {
   pre_commercial: '#8B8B9A',
@@ -21,13 +22,12 @@ function ScoreCardContent({ score, niche, platform, lightMode }) {
   const tierVerdict = TIER_VERDICT[tier] ?? '';
 
   const ringTrack = lightMode ? 'rgba(14,27,42,0.1)' : 'rgba(255,255,255,0.06)';
-  const wordmark  = lightMode ? '/brand/wordmark-dark.png' : '/brand/wordmark-light.png';
 
   return (
     <div className={styles.card} data-tier={tier} data-light={lightMode ? 'true' : 'false'}>
       {/* Header */}
       <div className={styles.cardHeader}>
-        <img src={wordmark} alt="Creatrbase" className={styles.wordmark} />
+        <LogoWordmark variant="v2" dark={lightMode} height={18} className={styles.wordmark} />
       </div>
 
       {/* Two-column body */}

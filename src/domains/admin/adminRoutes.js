@@ -354,6 +354,50 @@ async function adminRoutes(app) {
     return { ok: true };
   });
 
+  // GET /api/admin/team - list all admin users
+  app.get('/api/admin/team', { preHandler }, async () => {
+    const pool = getPool();
+    const { rows } = await pool.query(
+      `SELECT u.id, u.email, u.created_at, u.cfo_access_level,
+              COALESCE(c.display_name, '') AS display_name
+       FROM users u
+       LEFT JOIN creators c ON c.user_id = u.id
+       WHERE u.cfo_access_level >= 100
+       ORDER BY u.created_at ASC`
+    );
+    return { admins: rows };
+  });
+
+  // POST /api/admin/users/:userId/set-access-level  { level: 0 | 100 }
+  app.post('/api/admin/users/:userId/set-access-level', { preHandler }, async (req, reply) => {
+    const pool = getPool();
+    const level = Number(req.body?.level ?? -1);
+    if (![0, 100].includes(level)) {
+      return reply.code(400).send({ error: 'level must be 0 or 100' });
+    }
+
+    const { rows: targetRows } = await pool.query(
+      'SELECT id, email FROM users WHERE id = $1',
+      [req.params.userId]
+    );
+    if (targetRows.length === 0) return reply.code(404).send({ error: 'User not found' });
+
+    if (targetRows[0].id === req.user.userId) {
+      return reply.code(403).send({ error: 'Cannot change your own access level' });
+    }
+
+    await pool.query(
+      'UPDATE users SET cfo_access_level = $1 WHERE id = $2',
+      [level, req.params.userId]
+    );
+
+    await logAdminAction(pool, req.user.userId, 'set_access_level', targetRows[0].email, {
+      level, changedBy: req.user.email,
+    });
+
+    return { ok: true };
+  });
+
   // POST /api/admin/users/:userId/refund  { reason }
   app.post('/api/admin/users/:userId/refund', { preHandler }, async (req, reply) => {
     const pool = getPool();

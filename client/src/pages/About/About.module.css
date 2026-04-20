@@ -3,23 +3,6 @@
   background: var(--bg-page);
   color: var(--text-primary);
   font-family: var(--font-body);
-  /* Force cream marketing palette regardless of OS/user dark mode */
-  --bg-page:           #FAF6EF;
-  --bg-surface:        #FFFFFF;
-  --bg-surface-2:      #F4EFE5;
-  --text-primary:      #1B1040;
-  --text-secondary:    #76688F;
-  --text-tertiary:     #A69BB8;
-  --border:            #E8E1D4;
-  --border-subtle:     #F0EBE0;
-  --border-strong:     #1B1040;
-  --shadow-sticker-sm: 2px 2px 0 #1B1040;
-  --shadow-sticker:    4px 4px 0 #1B1040;
-  --cb-navy:           #1B1040;
-  --cb-mint:           #9EFFD8;
-  --cb-mint-deep:      #6EDDB1;
-  --cb-lavender:       #C8AAFF;
-  --cb-peach:          #FFBFA3;
 }
 
 /* ── Main ── */
@@ -66,12 +49,12 @@
 }
 
 .heroTitle {
-  font-family: var(--font-display);
+  font-family: 'Lilita One', cursive;
   font-size: clamp(30px, 4.8vw, 50px);
   font-weight: 400;
   line-height: 1.1;
-  letter-spacing: -0.05em;
-  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  color: var(--cb-navy);
   margin: 0 0 20px;
 }
 
@@ -88,7 +71,7 @@
   font-family: var(--font-display);
   font-size: clamp(22px, 3vw, 30px);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--cb-navy);
   margin: 0 0 28px;
   letter-spacing: -0.01em;
   border-left: 4px solid var(--cb-mint);
@@ -145,7 +128,7 @@
   align-items: center;
   gap: 0;
   background: var(--bg-surface);
-  border: 1.5px solid var(--border-strong);
+  border: 1.5px solid var(--cb-navy);
   border-radius: var(--radius-xl);
   padding: 28px 36px;
   box-shadow: var(--shadow-sticker);
@@ -161,11 +144,10 @@
 }
 
 .statNumber {
-  font-family: var(--font-display);
+  font-family: 'Lilita One', cursive;
   font-size: 36px;
   font-weight: 400;
-  letter-spacing: -0.04em;
-  color: var(--text-primary);
+  color: var(--cb-navy);
   line-height: 1;
 }
 
@@ -198,7 +180,7 @@
 
 .principleCard {
   background: var(--bg-surface);
-  border: 1.5px solid var(--border-strong);
+  border: 1.5px solid var(--cb-navy);
   border-radius: var(--radius-xl);
   padding: 30px 28px;
   box-shadow: var(--shadow-sticker);
@@ -206,7 +188,6 @@
 
 .principleCard_mint  { background: #F0FFF9; }
 .principleCard_peach { background: #FFF5EF; }
-
 
 .principleNum {
   display: inline-block;
@@ -223,7 +204,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--cb-navy);
   margin: 0 0 10px;
   line-height: 1.2;
 }
@@ -248,9 +229,9 @@
 }
 
 .ctaTitle {
-  font-family: var(--font-display-ui);
+  font-family: 'Lilita One', cursive;
   font-size: clamp(26px, 3.5vw, 36px);
-  font-weight: 700;
+  font-weight: 400;
   color: var(--bg-page);
   margin: 0 0 12px;
   line-height: 1.15;

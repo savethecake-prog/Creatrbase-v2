@@ -85,7 +85,7 @@ export function TokenCleanup() {
     setRunResult(null);
     setDryRunDone(false);
     try {
-      const data = await api.get('/admin/token-cleanup/audit');
+      const data = await api('/api/admin/token-cleanup/audit');
       setAudit(data);
     } catch (err) {
       setAuditError(err.message || 'Audit failed');
@@ -103,7 +103,10 @@ export function TokenCleanup() {
     setRunError(null);
     setRunResult(null);
     try {
-      const data = await api.post('/admin/token-cleanup/run', { dryRun: !isLive, targets });
+      const data = await api('/api/admin/token-cleanup/run', {
+        method: 'POST',
+        body: JSON.stringify({ dryRun: !isLive, targets }),
+      });
       setRunResult({ ...data, wasLive: isLive });
       if (!isLive) setDryRunDone(true);
     } catch (err) {

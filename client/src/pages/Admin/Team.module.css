@@ -1,0 +1,270 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.sectionDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-4);
+  line-height: 1.5;
+}
+
+/* ── Grant form ──────────────────────────────────────────────────────────── */
+
+.grantForm {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.input {
+  flex: 1;
+  height: 38px;
+  padding: 0 12px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--text-tertiary); }
+
+.foundUser {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
+}
+
+.foundUserInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.foundUserEmail {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.foundUserMeta {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface-2);
+}
+
+.table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: var(--bg-surface-2); }
+
+.tdMono { font-family: var(--font-mono); font-size: 12px; }
+.tdDim  { color: var(--text-secondary); }
+.tdEmpty { text-align: center; color: var(--text-secondary); font-size: 13px; padding: var(--space-6) 0; }
+
+.accessBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+/* ── Confirm inline ──────────────────────────────────────────────────────── */
+
+.confirmInline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.confirmText {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── States ──────────────────────────────────────────────────────────────── */
+
+.loadingText {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  padding: var(--space-4) 0;
+}
+
+.errorBox {
+  padding: 10px 14px;
+  background: var(--error-subtle);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--error);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 var(--space-4);
+  background: var(--accent);
+  color: var(--bg-page);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+}
+.btnPrimary:hover    { background: var(--accent-hover); }
+.btnPrimary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 var(--space-4);
+  background: none;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.btnGhost:hover    { color: var(--text-primary); border-color: var(--border-strong); }
+.btnGhost:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btnDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  background: none;
+  color: var(--error);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnDanger:hover { background: var(--error-subtle); }
+
+.btnDangerSm {
+  height: 24px;
+  padding: 0 10px;
+  background: var(--error);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btnDangerSm:disabled { opacity: 0.5; }
+
+.btnGhostSm {
+  height: 24px;
+  padding: 0 10px;
+  background: none;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.btnGhostSm:hover { color: var(--text-primary); }

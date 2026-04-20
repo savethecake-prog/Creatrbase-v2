@@ -3,23 +3,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { LogoWordmark } from '../ui/LogoWordmark';
 import styles from './PublicNav.module.css';
 
+function NavLink({ hash, to, className, children }) {
+  const { pathname } = useLocation();
+  if (hash && pathname === '/') {
+    return <a href={hash} className={className}>{children}</a>;
+  }
+  return <Link to={to || `/${hash}`} className={className}>{children}</Link>;
+}
+
 export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
 
   useEffect(() => {
     if (!scrollEffect) return;
@@ -30,66 +23,24 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
 
   if (variant === 'v2') {
     return (
-      <>
-        {mobileOpen && (
-          <div className={styles.mobileMenu}>
-            <div className={styles.mobileMenuHeader}>
-              <Link to="/" onClick={() => setMobileOpen(false)}>
-                <LogoWordmark variant="v2" dark height={32} />
-              </Link>
-              <button
-                type="button"
-                className={styles.mobileMenuClose}
-                onClick={() => setMobileOpen(false)}
-                aria-label="Close menu"
-              >
-                &times;
-              </button>
-            </div>
-            <div className={styles.mobileMenuLinks}>
-              <Link to="/scoring-explained" className={styles.mobileMenuLink}>How it works</Link>
-              <Link to="/pricing" className={styles.mobileMenuLink}>Pricing</Link>
-              <Link to="/blog" className={styles.mobileMenuLink}>Blog</Link>
-              <Link to="/about" className={styles.mobileMenuLink}>About</Link>
-              <Link to="/honesty" className={styles.mobileMenuLink}>Honesty</Link>
-              <Link to="/login" className={styles.mobileMenuLink}>Log in</Link>
-            </div>
-            <Link to="/score" className={styles.mobileMenuCta} onClick={() => setMobileOpen(false)}>
-              Get your score
-            </Link>
+      <nav className={`${styles.navV2} ${scrolled ? styles.scrolledV2 : ''}`}>
+        <div className={styles.navInner}>
+          <Link to="/" className={styles.logoV2}>
+            <LogoWordmark variant="v2" dark />
+          </Link>
+          <div className={styles.linksV2}>
+            <NavLink hash="#how-it-works" to="/scoring-explained" className={styles.linkV2}>How it works</NavLink>
+            <Link to="/pricing" className={styles.linkV2}>Pricing</Link>
+            <Link to="/blog" className={styles.linkV2}>Blog</Link>
+            <Link to="/about" className={styles.linkV2}>About</Link>
+            <Link to="/honesty" className={styles.linkV2}>Honesty</Link>
           </div>
-        )}
-        <nav className={`${styles.navV2} ${scrolled ? styles.scrolledV2 : ''}`}>
-          <div className={styles.navInner}>
-            <Link to="/" className={styles.logoV2}>
-              <LogoWordmark variant="v2" dark height={36} />
-            </Link>
-            <div className={styles.linksV2}>
-              <Link to="/scoring-explained" className={styles.linkV2}>How it works</Link>
-              <Link to="/pricing" className={styles.linkV2}>Pricing</Link>
-              <Link to="/blog" className={styles.linkV2}>Blog</Link>
-              <Link to="/about" className={styles.linkV2}>About</Link>
-              <Link to="/honesty" className={styles.linkV2}>Honesty</Link>
-            </div>
-            <div className={styles.rightV2}>
-              <Link to="/login" className={styles.loginV2}>Log in</Link>
-              <Link to="/score" className={styles.ctaV2}>Get your score</Link>
-              <button
-                type="button"
-                className={styles.mobileMenuBtn}
-                onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
-              >
-                <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
-                  <rect y="0" width="18" height="2" rx="1" fill="currentColor"/>
-                  <rect y="6" width="18" height="2" rx="1" fill="currentColor"/>
-                  <rect y="12" width="18" height="2" rx="1" fill="currentColor"/>
-                </svg>
-              </button>
-            </div>
+          <div className={styles.rightV2}>
+            <Link to="/login" className={styles.loginV2}>Log in</Link>
+            <NavLink hash="#score" to="/score" className={styles.ctaV2}>Get your score</NavLink>
           </div>
-        </nav>
-      </>
+        </div>
+      </nav>
     );
   }
 

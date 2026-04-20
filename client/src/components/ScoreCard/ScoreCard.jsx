@@ -1,7 +1,19 @@
 import { useRef, useState } from 'react';
 import styles from './ScoreCard.module.css';
-import { TIER_GRADE, TIER_LABEL, TIER_VERDICT } from '../../lib/tierGrades';
-import { LogoWordmark } from '../ui/LogoWordmark';
+
+const TIER_LABELS = {
+  pre_commercial: 'Pre-Commercial',
+  emerging:       'Emerging',
+  viable:         'Viable',
+  established:    'Established',
+};
+
+const TIER_VERDICTS = {
+  pre_commercial: 'building audience base',
+  emerging:       'early traction visible',
+  viable:         'partnership ready',
+  established:    'premium partner tier',
+};
 
 const TIER_COLORS = {
   pre_commercial: '#8B8B9A',
@@ -17,17 +29,17 @@ function ScoreCardContent({ score, niche, platform, lightMode }) {
   const overall     = score?.overall ?? 0;
   const dimensions  = score?.dimensions ?? {};
   const color       = TIER_COLORS[tier] ?? '#A4FFDB';
-  const grade       = TIER_GRADE[tier] ?? '?';
-  const tierLabel   = TIER_LABEL[tier] ?? tier.replace(/_/g, ' ');
-  const tierVerdict = TIER_VERDICT[tier] ?? '';
+  const tierLabel   = TIER_LABELS[tier] ?? tier.replace(/_/g, ' ');
+  const tierVerdict = TIER_VERDICTS[tier] ?? '';
 
   const ringTrack = lightMode ? 'rgba(14,27,42,0.1)' : 'rgba(255,255,255,0.06)';
+  const wordmark  = lightMode ? '/brand/wordmark-dark.png' : '/brand/wordmark-light.png';
 
   return (
     <div className={styles.card} data-tier={tier} data-light={lightMode ? 'true' : 'false'}>
       {/* Header */}
       <div className={styles.cardHeader}>
-        <LogoWordmark variant="v2" dark={lightMode} height={18} className={styles.wordmark} />
+        <img src={wordmark} alt="Creatrbase" className={styles.wordmark} />
       </div>
 
       {/* Two-column body */}
@@ -55,7 +67,7 @@ function ScoreCardContent({ score, niche, platform, lightMode }) {
         {/* Right column */}
         <div className={styles.cardRight}>
           <span className={styles.cardEyebrow}>Commercial Intelligence Score</span>
-          <p className={styles.cardTierHeading}>{grade} tier &mdash; {tierVerdict}</p>
+          <p className={styles.cardTierHeading}>{tierLabel} &mdash; {tierVerdict}</p>
 
           {(niche || platform) && (
             <p className={styles.nicheTag}>
@@ -63,7 +75,7 @@ function ScoreCardContent({ score, niche, platform, lightMode }) {
             </p>
           )}
 
-          <div className={styles.tierBadge}>{grade} tier</div>
+          <div className={styles.tierBadge}>{tierLabel}</div>
 
           {Object.keys(dimensions).length > 0 && (
             <div className={styles.dims}>

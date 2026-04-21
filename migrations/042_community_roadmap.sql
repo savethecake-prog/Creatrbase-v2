@@ -36,7 +36,9 @@ ALTER TABLE feature_votes
 UPDATE feature_votes SET vote_type = 'up' WHERE vote_type IS NULL OR vote_type = '';
 
 ALTER TABLE feature_votes
-  ADD CONSTRAINT IF NOT EXISTS feature_votes_vote_type_check
+  DROP CONSTRAINT IF EXISTS feature_votes_vote_type_check;
+ALTER TABLE feature_votes
+  ADD CONSTRAINT feature_votes_vote_type_check
     CHECK (vote_type IN ('up', 'down'));
 
 -- Backfill upvotes count from existing feature_votes

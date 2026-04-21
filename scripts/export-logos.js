@@ -118,6 +118,7 @@ function wordmarkHtml(height, dark) {
 // ── Export list ───────────────────────────────────────────────────────────────
 
 const ICON_EXPORTS = [
+  { name: 'logo-1024.png',      size: 1024, dark: true,  note: 'TikTok portal 1024×1024' },
   { name: 'logo-512.png',       size: 512, dark: true,  note: 'Google OAuth, TikTok portal' },
   { name: 'logo-512-light.png', size: 512, dark: false, note: 'Google OAuth light variant' },
   { name: 'logo-400.png',       size: 400, dark: true,  note: 'Twitter/X profile picture' },

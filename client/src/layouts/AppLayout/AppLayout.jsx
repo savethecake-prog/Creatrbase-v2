@@ -26,6 +26,7 @@ const NAV = [
     items: [
       { label: 'Weekly Tasks', to: '/tasks' },
       { label: 'Brand Outreach', to: '/outreach' },
+      { label: 'Community', to: '/community' },
     ],
   },
   {

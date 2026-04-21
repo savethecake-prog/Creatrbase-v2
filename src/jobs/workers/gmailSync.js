@@ -237,7 +237,7 @@ function startGmailSyncWorker() {
           evidence_type, confidence, deal_notes, is_public, created_by)
        VALUES ($1, $2, $3, $4, 'global', $5,
                CURRENT_DATE, $6, $7,
-               'auto_detected', 'high', $8, FALSE, $9)
+               'inferred', 'high', $8, FALSE, $9)
        RETURNING id`,
       [
         row.brand_id,

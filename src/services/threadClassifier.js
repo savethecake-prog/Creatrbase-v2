@@ -33,12 +33,13 @@ const STAGE_RANK = {
 
 // Classifier stage labels → interaction_type values
 const STAGE_TO_INTERACTION = {
-  replied:      'outreach_responded',
-  negotiating:  'deal_negotiating',
-  contracting:  'deal_contracting',
-  won:          'deal_completed',
-  declined:     'deal_declined',
-  stale:        'stale',
+  outreach_sent: 'outreach_sent',
+  replied:       'outreach_responded',
+  negotiating:   'deal_negotiating',
+  contracting:   'deal_contracting',
+  won:           'deal_completed',
+  declined:      'deal_declined',
+  stale:         'stale',
 };
 
 // Signal type to queue for each transition

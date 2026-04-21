@@ -66,6 +66,7 @@ app.register(require('./domains/blog/blogRoutes'));
 app.register(require('./domains/gdpr/gdprRoutes').gdprRoutes);
 app.register(require('./domains/apikeys/apiKeyRoutes').apiKeyRoutes);
 app.register(require('./domains/roadmap/roadmapRoutes').roadmapRoutes);
+app.register(require('./domains/community/communityRoutes').communityRoutes);
 app.register(require('./domains/commercialCoach/auditRoutes'));
 app.register(require('./domains/commercialCoach/coachRoutes'));
 

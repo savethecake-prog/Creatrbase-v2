@@ -34,6 +34,9 @@ import { EditorialHome }  from './pages/Admin/EditorialHome';
 import { EditorialSession } from './pages/Admin/EditorialSession';
 import { VoiceMemory }    from './pages/Admin/VoiceMemory';
 import { Skills }         from './pages/Admin/Skills';
+import { AdminRoadmap }   from './pages/Admin/AdminRoadmap';
+import { AdminCommunity } from './pages/Admin/AdminCommunity';
+import { Community }     from './pages/Community/Community';
 import { About }         from './pages/About/About';
 import { Author }         from './pages/Author/Author';
 import { Compare }        from './pages/Compare/Compare';
@@ -76,6 +79,8 @@ export default function App() {
             <Route path="system" element={<AdminPlaceholder title="System" />} />
             <Route path="token-cleanup" element={<TokenCleanup />} />
             <Route path="revenue" element={<AdminPlaceholder title="Revenue" />} />
+            <Route path="roadmap" element={<AdminRoadmap />} />
+            <Route path="community" element={<AdminCommunity />} />
           </Route>
           <Route path="/onboarding" element={
             <RequireAuth><Onboarding /></RequireAuth>
@@ -106,6 +111,9 @@ export default function App() {
           } />
           <Route path="/power" element={
             <RequireAuth><PowerHub /></RequireAuth>
+          } />
+          <Route path="/community" element={
+            <RequireAuth><Community /></RequireAuth>
           } />
           <Route path="/" element={<Landing />} />
         </Routes>

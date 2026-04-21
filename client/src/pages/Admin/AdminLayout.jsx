@@ -19,6 +19,7 @@ const NAV = [
   ] },
   { group: 'Operations', items: [
     { label: 'Roadmap', to: '/admin/roadmap' },
+    { label: 'Community', to: '/admin/community' },
     { label: 'Agents', to: '/admin/agents', soon: true },
     { label: 'System', to: '/admin/system', soon: true },
     { label: 'Token Cleanup', to: '/admin/token-cleanup' },

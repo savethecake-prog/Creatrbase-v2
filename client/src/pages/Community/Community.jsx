@@ -221,20 +221,32 @@ export function Community() {
   }, [sort, status, category, isFree]);
 
   async function handleVote(suggestionId, voteType) {
+    // Snapshot before optimistic update for rollback
+    const snapshot = suggestions.find(s => s.id === suggestionId);
+    // Optimistic update
+    setSuggestions(prev => prev.map(s => {
+      if (s.id !== suggestionId) return s;
+      const prevType = s.user_vote_type;
+      let up   = s.upvotes   || 0;
+      let down = s.downvotes || 0;
+      if (prevType === 'up')   up   = Math.max(0, up   - 1);
+      if (prevType === 'down') down = Math.max(0, down - 1);
+      const newType = (voteType === 'remove' || prevType === voteType) ? null : voteType;
+      if (newType === 'up')   up   += 1;
+      if (newType === 'down') down += 1;
+      return { ...s, user_vote_type: newType, upvotes: up, downvotes: down };
+    }));
     try {
       const res = await api.post(`/community/suggestions/${suggestionId}/vote`, { vote_type: voteType });
-      setSuggestions(prev => prev.map(s => {
-        if (s.id !== suggestionId) return s;
-        const prevType = s.user_vote_type;
-        let up   = s.upvotes   || 0;
-        let down = s.downvotes || 0;
-        if (prevType === 'up')   up   = Math.max(0, up   - 1);
-        if (prevType === 'down') down = Math.max(0, down - 1);
-        if (res.user_vote_type === 'up')   up   += 1;
-        if (res.user_vote_type === 'down') down += 1;
-        return { ...s, user_vote_type: res.user_vote_type, upvotes: up, downvotes: down };
-      }));
+      // Sync server response with actual counts
+      setSuggestions(prev => prev.map(s =>
+        s.id !== suggestionId ? s : { ...s, user_vote_type: res.user_vote_type }
+      ));
     } catch (err) {
+      // Rollback on error
+      if (snapshot) {
+        setSuggestions(prev => prev.map(s => s.id !== suggestionId ? s : snapshot));
+      }
       if (err?.status === 402) setCanVote(false);
     }
   }

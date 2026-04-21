@@ -5,6 +5,16 @@ const path = require('path');
 const fs   = require('fs');
 const Fastify = require('fastify');
 
+// ── Startup validation ────────────────────────────────────────────────────────
+// Fail fast rather than surfacing crypto errors mid-request
+try {
+  const { encrypt } = require('./lib/crypto');
+  encrypt('startup-check'); // validates ENCRYPTION_KEY at boot
+} catch (err) {
+  console.error('[startup] Encryption key validation failed:', err.message);
+  process.exit(1);
+}
+
 const app = Fastify({ logger: true });
 
 // ── Plugins ───────────────────────────────────────────────────────────────────

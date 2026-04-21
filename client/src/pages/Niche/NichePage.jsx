@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../../lib/api';
+import { sanitizeHtml } from '../../lib/sanitizeHtml';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
 import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
@@ -51,7 +52,7 @@ export function NichePage() {
 
         {niche.analysis_html && (
           <section className={styles.section}>
-            <div className={styles.body} dangerouslySetInnerHTML={{ __html: niche.analysis_html }} />
+            <div className={styles.body} dangerouslySetInnerHTML={{ __html: sanitizeHtml(niche.analysis_html) }} />
           </section>
         )}
 
@@ -143,7 +144,7 @@ export function ThresholdPage() {
           <span className={styles.eyebrow}>Commercial threshold</span>
           <h1 className={styles.title}>{data.title}</h1>
         </header>
-        <div className={styles.body} dangerouslySetInnerHTML={{ __html: data.content_html }} />
+        <div className={styles.body} dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.content_html) }} />
         <div className={styles.cta}>
           <h2 className={styles.ctaTitle}>See where you stand</h2>
           <a href="/score" className={styles.ctaBtn}>Score my channel</a>
@@ -213,7 +214,7 @@ export function ResearchPage() {
           </div>
         </header>
 
-        <div className={styles.body} dangerouslySetInnerHTML={{ __html: data.summary_html }} />
+        <div className={styles.body} dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.summary_html) }} />
 
         {findings.length > 0 && (
           <section className={styles.section}>

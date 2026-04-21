@@ -8,14 +8,20 @@ const { resolveTier }        = require('../../services/tierResolver');
 const { encrypt, decrypt }   = require('../../lib/crypto');
 const { sendEmail, refreshGmailToken } = require('../../services/gmail');
 
-// Compute week_year: YEAR * 100 + ISO_WEEK
+// Compute week_year: YEAR * 100 + ISO_WEEK (UTC to avoid timezone-based cap bypass)
 function currentWeekYear() {
-  const now = new Date();
-  // ISO week number
-  const jan4    = new Date(now.getFullYear(), 0, 4);
-  const dayDiff = (now - jan4) / 86400000;
-  const week    = Math.ceil((dayDiff + jan4.getDay() + 1) / 7);
-  return now.getFullYear() * 100 + week;
+  const now  = new Date();
+  const jan4 = new Date(Date.UTC(now.getUTCFullYear(), 0, 4));
+  const dayDiff = (now.getTime() - jan4.getTime()) / 86400000;
+  const week = Math.ceil((dayDiff + jan4.getUTCDay() + 1) / 7);
+  return now.getUTCFullYear() * 100 + Math.max(1, week);
+}
+
+// Escape HTML special chars for email body
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[m]));
 }
 
 // Weekly suggestion creation caps by tier
@@ -318,7 +324,7 @@ async function communityRoutes(app) {
       from:    gmailAddress,
       to:      item.author_email,
       subject: subject.trim(),
-      html:    `<p>${message.trim().replace(/\n/g, '<br>')}</p>`,
+      html:    `<p>${escapeHtml(message.trim()).replace(/\n/g, '<br>')}</p>`,
     });
 
     return { ok: true };

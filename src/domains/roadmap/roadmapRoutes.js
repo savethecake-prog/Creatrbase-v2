@@ -233,6 +233,9 @@ async function roadmapRoutes(app) {
     if (!title?.trim()) return reply.code(400).send({ error: 'title is required' });
     if (!VALID_STATUSES.includes(status)) return reply.code(400).send({ error: 'invalid status' });
     if (!VALID_VISIBILITY.includes(visibility)) return reply.code(400).send({ error: 'invalid visibility' });
+    if (launch_date && isNaN(new Date(launch_date).getTime())) {
+      return reply.code(400).send({ error: 'invalid launch_date format' });
+    }
 
     const pool = getPool();
     const { rows: [item] } = await pool.query(
@@ -255,6 +258,9 @@ async function roadmapRoutes(app) {
     } = req.body || {};
 
     if (status && !VALID_STATUSES.includes(status)) return reply.code(400).send({ error: 'invalid status' });
+    if (launch_date && isNaN(new Date(launch_date).getTime())) {
+      return reply.code(400).send({ error: 'invalid launch_date format' });
+    }
 
     const { rows: [updated] } = await pool.query(
       `UPDATE roadmap_items SET

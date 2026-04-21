@@ -5,6 +5,7 @@ import { PublicNav } from '../../components/PublicNav/PublicNav';
 import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { NewsletterSignup } from '../../components/NewsletterSignup/NewsletterSignup';
+import { sanitizeHtml } from '../../lib/sanitizeHtml';
 import styles from './BlogArticle.module.css';
 
 function fmtDate(d) {
@@ -120,7 +121,7 @@ export function BlogArticle() {
 
           <div
             className={styles.body}
-            dangerouslySetInnerHTML={{ __html: post.bodyHtml || '<p>Content coming soon.</p>' }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.bodyHtml || '<p>Content coming soon.</p>') }}
           />
 
           {/* Mid-article CTA */}

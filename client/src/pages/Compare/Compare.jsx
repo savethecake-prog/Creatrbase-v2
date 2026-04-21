@@ -4,6 +4,7 @@ import { api } from '../../lib/api';
 import { PublicNav } from '../../components/PublicNav/PublicNav';
 import { MarketingFooter } from '../../components/MarketingFooter/MarketingFooter';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
+import { sanitizeHtml } from '../../lib/sanitizeHtml';
 import styles from './Compare.module.css';
 
 export function Compare() {
@@ -96,7 +97,7 @@ export function Compare() {
           </div>
         )}
 
-        <div className={styles.body} dangerouslySetInnerHTML={{ __html: page.content_html }} />
+        <div className={styles.body} dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content_html) }} />
 
         <div className={styles.cta}>
           <h2 className={styles.ctaTitle}>Try Creatrbase free</h2>

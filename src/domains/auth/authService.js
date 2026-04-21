@@ -161,8 +161,8 @@ async function createSession(tx, { userId, tenantId, ip, userAgent }) {
     data: {
       userId,
       tenantId,
-      ipAddress: ip       ?? null,
-      userAgent: userAgent ?? null,
+      ipAddress: ip ? String(ip).slice(0, 64)  : null,
+      userAgent: userAgent ? String(userAgent).slice(0, 500) : null,
       expiresAt,
     },
   });

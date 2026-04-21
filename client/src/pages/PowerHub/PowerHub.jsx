@@ -187,27 +187,30 @@ export function PowerHub() {
   }, []);
 
   async function handleVote(itemId, voteType) {
+    // Snapshot for rollback
+    const snapshot = items.find(i => i.id === itemId);
+    // Optimistic update
+    setItems(prev => prev.map(item => {
+      if (item.id !== itemId) return item;
+      const prevType = item.user_vote_type;
+      let up   = item.upvotes   || 0;
+      let down = item.downvotes || 0;
+      if (prevType === 'up')   up   = Math.max(0, up   - 1);
+      if (prevType === 'down') down = Math.max(0, down - 1);
+      const newType = (voteType === 'remove' || prevType === voteType) ? null : voteType;
+      if (newType === 'up')   up   += 1;
+      if (newType === 'down') down += 1;
+      return { ...item, user_vote_type: newType, upvotes: up, downvotes: down };
+    }));
     try {
       const res = await api.post(`/roadmap/${itemId}/vote`, { vote_type: voteType });
-      setItems(prev => prev.map(item => {
-        if (item.id !== itemId) return item;
-        const prev_up   = item.upvotes   || 0;
-        const prev_down = item.downvotes || 0;
-        const prev_type = item.user_vote_type;
-        let up   = prev_up;
-        let down = prev_down;
-
-        // Undo previous
-        if (prev_type === 'up')   up   = Math.max(0, up   - 1);
-        if (prev_type === 'down') down = Math.max(0, down - 1);
-        // Apply new
-        if (res.user_vote_type === 'up')   up   += 1;
-        if (res.user_vote_type === 'down') down += 1;
-
-        return { ...item, user_vote_type: res.user_vote_type, upvotes: up, downvotes: down };
-      }));
+      setItems(prev => prev.map(item =>
+        item.id !== itemId ? item : { ...item, user_vote_type: res.user_vote_type }
+      ));
     } catch (err) {
-      if (err?.status === 402) setCanVote(false); // tier too low
+      // Rollback
+      if (snapshot) setItems(prev => prev.map(i => i.id !== itemId ? i : snapshot));
+      if (err?.status === 402) setCanVote(false);
     }
   }
 

@@ -13,6 +13,7 @@ import { Toolkit }     from './pages/Toolkit/Toolkit';
 import { Outreach }      from './pages/Outreach/Outreach';
 import { Negotiations }  from './pages/Negotiations/Negotiations';
 import { Settings }      from './pages/Settings/Settings';
+import { PowerHub }     from './pages/PowerHub/PowerHub';
 import StaticPage from './pages/Static/StaticPage';
 import { ScoringMethodology } from './pages/ScoringMethodology/ScoringMethodology';
 import { BlogIndex }    from './pages/Blog/BlogIndex';
@@ -102,6 +103,9 @@ export default function App() {
           } />
           <Route path="/settings" element={
             <RequireAuth><Settings /></RequireAuth>
+          } />
+          <Route path="/power" element={
+            <RequireAuth><PowerHub /></RequireAuth>
           } />
           <Route path="/" element={<Landing />} />
         </Routes>

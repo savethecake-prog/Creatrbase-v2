@@ -45,6 +45,10 @@ const NAV = [
   },
 ];
 
+const POWER_NAV = [
+  { label: 'Engine Room', to: '/power' },
+];
+
 export function AppLayout({ children }) {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
@@ -61,10 +65,11 @@ export function AppLayout({ children }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const displayName = user?.displayName ?? '';
-  const initials = displayName
+  const displayName  = user?.displayName ?? '';
+  const initials     = displayName
     ? displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : '?';
+  const isPowerUser  = user?.isPowerUser ?? false;
 
   const sub = user?.subscription;
   const isTrialling = sub?.status === 'trialling';
@@ -112,6 +117,7 @@ export function AppLayout({ children }) {
             >
               <div className={styles.avatar}>{initials}</div>
               <span className={styles.userName}>{displayName || 'Account'}</span>
+              {isPowerUser && <span className={styles.powerBadge}>Power</span>}
               <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={styles.chevron}>
                 <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -179,6 +185,22 @@ export function AppLayout({ children }) {
             ))}
           </div>
         ))}
+        {isPowerUser && (
+          <div className={styles.navGroup}>
+            <p className={styles.navGroupLabel}>Power User</p>
+            {POWER_NAV.map(({ label, to }) => (
+              <NavLink
+                key={label}
+                to={to}
+                className={({ isActive }) =>
+                  `${styles.navItem} ${isActive ? styles.active : ''}`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </div>
+        )}
       </nav>
 
       <main className={styles.main}>

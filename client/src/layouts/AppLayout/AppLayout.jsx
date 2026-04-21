@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { LogoWordmark } from '../../components/ui/LogoWordmark';
 import { useAuth } from '../../lib/AuthContext';
 import { logout } from '../../lib/auth';
@@ -40,7 +40,7 @@ const NAV = [
     group: 'Account',
     items: [
       { label: 'Connections', to: '/connections' },
-      { label: 'Settings', to: '/settings', soon: true },
+      { label: 'Settings', to: '/settings' },
     ],
   },
 ];
@@ -99,8 +99,8 @@ export function AppLayout({ children }) {
       )}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
-          <LogoWordmark variant="v2" dark height={28} className={`${styles.topbarLogo} ${styles.logoLight}`} />
-          <LogoWordmark variant="v2" height={28} className={`${styles.topbarLogo} ${styles.logoDark}`} />
+          <div className={styles.logoLight}><LogoWordmark variant="v2" dark height={28} /></div>
+          <div className={styles.logoDark}><LogoWordmark variant="v2" height={28} /></div>
         </div>
         
         <div className={styles.topbarRight}>
@@ -119,6 +119,9 @@ export function AppLayout({ children }) {
 
           {dropdownOpen && (
             <div className={styles.dropdown}>
+              <Link to="/settings" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                Settings
+              </Link>
               <div className={styles.dropdownItem}>
                 <span className={styles.dropdownLabel}>Theme</span>
                 <select

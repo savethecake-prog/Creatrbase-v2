@@ -69,8 +69,8 @@ export function AdminLayout() {
       )}
       <nav className={`${styles.drawer} ${drawerOpen ? styles.drawerVisible : ''}`}>
         <div className={styles.drawerHeader}>
-          <LogoWordmark variant="v2" dark height={24} className={`${styles.logo} ${styles.logoLight}`} />
-          <LogoWordmark variant="v2" height={24} className={`${styles.logo} ${styles.logoDark}`} />
+          <div className={styles.logoLight}><LogoWordmark variant="v2" dark height={24} /></div>
+          <div className={styles.logoDark}><LogoWordmark variant="v2" height={24} /></div>
           <button className={styles.drawerClose} onClick={() => setDrawerOpen(false)} aria-label="Close menu">&times;</button>
         </div>
         {NAV.map(({ group, items }) => (
@@ -101,8 +101,8 @@ export function AdminLayout() {
               <rect y="10" width="16" height="2" rx="1" fill="currentColor"/>
             </svg>
           </button>
-          <LogoWordmark variant="v2" dark height={24} className={`${styles.logo} ${styles.logoLight}`} />
-          <LogoWordmark variant="v2" height={24} className={`${styles.logo} ${styles.logoDark}`} />
+          <div className={styles.logoLight}><LogoWordmark variant="v2" dark height={24} /></div>
+          <div className={styles.logoDark}><LogoWordmark variant="v2" height={24} /></div>
           <span className={styles.adminBadge}>Admin</span>
         </div>
         <div className={styles.topbarRight} ref={menuRef}>

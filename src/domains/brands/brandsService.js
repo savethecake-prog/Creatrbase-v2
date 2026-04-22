@@ -7,9 +7,12 @@ const { getDataCollectionQueue } = require('../../jobs/queue');
 // Returns brands, optionally filtered by niche / category.
 // If creatorId supplied, includes the latest outreach interaction for that creator.
 
-async function getBrands({ niche = null, category = null, creatorId = null } = {}) {
+async function getBrands({ niche = null, category = null, creatorId = null, tenantId = null } = {}) {
   const pool = getPool();
 
+  // Watchlisted brands always appear regardless of category filter.
+  // The WHERE clause includes brands that either match the category filter
+  // OR are in this tenant's watchlist.
   const { rows } = await pool.query(
     `
     SELECT
@@ -26,6 +29,12 @@ async function getBrands({ niche = null, category = null, creatorId = null } = {
       b.registry_confidence,
       b.notes,
       b.known_promo_patterns,
+
+      -- Is this brand in the tenant's personal watchlist?
+      EXISTS(
+        SELECT 1 FROM tenant_brand_watchlist tbw
+        WHERE tbw.brand_id = b.id AND tbw.tenant_id = $4
+      ) AS is_watchlisted,
 
       -- Aggregate matching tier profiles (niche-filtered if provided)
       COALESCE(
@@ -73,11 +82,19 @@ async function getBrands({ niche = null, category = null, creatorId = null } = {
       ON btp.brand_id = b.id
       AND ($1::text IS NULL OR btp.niche = $1)
 
-    WHERE ($2::text IS NULL OR b.category = $2)
+    WHERE
+      -- Include brands matching the category filter...
+      ($2::text IS NULL OR b.category = $2)
+      -- ...OR brands the tenant has explicitly added to their watchlist
+      OR ($4::uuid IS NOT NULL AND EXISTS(
+        SELECT 1 FROM tenant_brand_watchlist tbw
+        WHERE tbw.brand_id = b.id AND tbw.tenant_id = $4
+      ))
 
     GROUP BY b.id
 
     ORDER BY
+      -- Watchlisted brands float to top within each confidence band
       CASE b.registry_confidence
         WHEN 'established' THEN 1
         WHEN 'partial'     THEN 2
@@ -85,7 +102,7 @@ async function getBrands({ niche = null, category = null, creatorId = null } = {
       END,
       b.brand_name
     `,
-    [niche, category, creatorId]
+    [niche, category, creatorId, tenantId],
   );
 
   return rows;

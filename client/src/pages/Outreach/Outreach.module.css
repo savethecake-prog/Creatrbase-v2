@@ -251,6 +251,21 @@
 /* Filter divider */
 .filterDivider { width: 1px; height: 24px; background: var(--glass-border); flex-shrink: 0; }
 
+/* Discover brands button (lives in filter bar) */
+.discoverBtn {
+  background: var(--neon-purple);
+  color: #1B1040;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  white-space: nowrap;
+}
+.discoverBtn:hover { opacity: 0.85; }
+
 @media (max-width: 1024px) {
   .grid { grid-template-columns: 1fr; }
 }

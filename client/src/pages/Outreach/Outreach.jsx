@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
 import { Badge } from '../../components/ui/Badge/Badge';
 import { BrandModal } from './BrandModal';
+import { BrandSearchModal } from './BrandSearchModal';
 import { api } from '../../lib/api';
 import styles from './Outreach.module.css';
 
@@ -403,8 +404,9 @@ export function Outreach() {
   const [readyOnly,       setReadyOnly]       = useState(false);
   const [selectedBrand,   setSelectedBrand]   = useState(null);
   const [selectedIds,     setSelectedIds]     = useState(new Set());
-  const [broadenSearch,   setBroadenSearch]   = useState(false);
-  const [batchStatus,     setBatchStatus]     = useState(null); // null | 'sending' | 'done' | 'error'
+  const [broadenSearch,    setBroadenSearch]   = useState(false);
+  const [batchStatus,      setBatchStatus]    = useState(null); // null | 'sending' | 'done' | 'error'
+  const [discoverOpen,     setDiscoverOpen]   = useState(false);
 
   // Parallel fetch on mount
   useEffect(() => {
@@ -454,16 +456,28 @@ export function Outreach() {
     }));
   }, [brandsData, creatorCtx, niche]);
 
+  // User-added watchlist brands (shown in a dedicated group)
+  const watchlistedBrands = useMemo(
+    () => sortedBrands.filter(b => b.is_watchlisted),
+    [sortedBrands],
+  );
+
+  // Registry-only brands (not user-added) for the niche-grouped view
+  const registryBrands = useMemo(
+    () => sortedBrands.filter(b => !b.is_watchlisted),
+    [sortedBrands],
+  );
+
   const readyCounts = useMemo(() => ({
     ready:   sortedBrands.filter(b => computeReadiness(b, creatorCtx).signal === 'ready').length,
     gifting: sortedBrands.filter(b => computeReadiness(b, creatorCtx).signal === 'gifting').length,
   }), [sortedBrands, creatorCtx]);
 
-  // Apply ready-only filter
+  // Apply ready-only filter (registry brands only — watchlisted brands always show)
   const filteredBrands = useMemo(() => {
-    if (!readyOnly) return sortedBrands;
-    return sortedBrands.filter(b => { const s = computeReadiness(b, creatorCtx).signal; return s === 'ready' || s === 'gifting'; });
-  }, [sortedBrands, readyOnly, creatorCtx]);
+    if (!readyOnly) return registryBrands;
+    return registryBrands.filter(b => { const s = computeReadiness(b, creatorCtx).signal; return s === 'ready' || s === 'gifting'; });
+  }, [registryBrands, readyOnly, creatorCtx]);
 
   // Group by fit band when niche is known
   const groupedBrands = useMemo(() => {
@@ -493,6 +507,12 @@ export function Outreach() {
       next.has(brandId) ? next.delete(brandId) : next.add(brandId);
       return next;
     });
+  }
+
+  function handleBrandsAdded() {
+    // Re-fetch brands so newly added watchlist brands appear immediately
+    const path = category ? `/brands?category=${encodeURIComponent(category)}` : '/brands';
+    api.get(path).then(res => setBrandsData(res)).catch(() => {});
   }
 
   async function handleBatchDiscover() {
@@ -538,6 +558,10 @@ export function Outreach() {
         >
           {readyOnly ? 'Show all' : 'Ready for me only'}
         </button>
+        <div className={styles.filterDivider} />
+        <button type="button" className={styles.discoverBtn} onClick={() => setDiscoverOpen(true)}>
+          + Discover brands
+        </button>
       </div>
 
       {loading && (
@@ -558,6 +582,19 @@ export function Outreach() {
             </p>
           </div>
         </div>
+      )}
+
+      {/* User-added watchlist brands — always shown regardless of filters */}
+      {!loading && watchlistedBrands.length > 0 && (
+        <BrandGroup
+          label="Your brands"
+          brands={watchlistedBrands}
+          ctx={creatorCtx}
+          selectedIds={selectedIds}
+          onSelect={handleToggleSelect}
+          onOpen={setSelectedBrand}
+          showFitBand={true}
+        />
       )}
 
       {/* Niche-grouped view */}
@@ -652,6 +689,14 @@ export function Outreach() {
           niche={niche}
           onClose={() => setSelectedBrand(null)}
           onOutreachLogged={handleOutreachLogged}
+        />
+      )}
+
+      {discoverOpen && (
+        <BrandSearchModal
+          creatorNiche={niche}
+          onClose={() => setDiscoverOpen(false)}
+          onBrandsAdded={handleBrandsAdded}
         />
       )}
     </AppLayout>

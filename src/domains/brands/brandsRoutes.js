@@ -6,6 +6,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { authenticate }  = require('../../middleware/authenticate');
 const { requireTier }   = require('../../middleware/requireTier');
 const { getBrands, logOutreach, updateOutreachStatus, getOutreachHistory } = require('./brandsService');
+const { discoverBrands, addToWatchlist } = require('./brandDiscoveryService');
 const { getPrisma }     = require('../../lib/prisma');
 const { getPool }       = require('../../db/pool');
 
@@ -61,7 +62,7 @@ async function brandsRoutes(app) {
       // Non-fatal — unfiltered brands
     }
 
-    const brands = await getBrands({ niche, category, creatorId });
+    const brands = await getBrands({ niche, category, creatorId, tenantId: req.user.tenantId });
     return { brands, niche };
   });
 
@@ -131,6 +132,93 @@ async function brandsRoutes(app) {
 
     const history = await getOutreachHistory({ brandId, creatorId: resolved.creatorId });
     return { history };
+  });
+
+  // ── POST /api/brands/discover-search ───────────────────────────────────────
+  // AI-powered brand discovery. Returns candidates for the user to review.
+  // Body: { category, query? }
+  // Returns: { results: [{name, website, category, programme_notes, confidence, in_registry}] }
+
+  app.post('/api/brands/discover-search', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
+    const { category, query = '' } = req.body ?? {};
+
+    const VALID_CATS = [
+      'gaming_hardware', 'gaming_software', 'gaming_nutrition', 'gaming_apparel',
+      'd2c_grooming', 'd2c_wellness', 'd2c_tech_accessories', 'publisher', 'other',
+    ];
+    if (!category || !VALID_CATS.includes(category)) {
+      return reply.code(400).send({ error: 'Invalid or missing category' });
+    }
+
+    const pool = getPool();
+
+    // Load existing brand names to avoid duplication in results
+    const { rows: existing } = await pool.query(
+      'SELECT brand_name FROM brands ORDER BY brand_name',
+    );
+    const existingNames = existing.map(r => r.brand_name);
+
+    // Also load tenant's current watchlist for flagging already-tracked brands
+    const { rows: watchlist } = await pool.query(
+      `SELECT b.brand_name FROM tenant_brand_watchlist tbw
+       JOIN brands b ON b.id = tbw.brand_id
+       WHERE tbw.tenant_id = $1`,
+      [req.user.tenantId],
+    );
+    const watchlistedNames = new Set(watchlist.map(r => r.brand_name.toLowerCase()));
+
+    let results;
+    try {
+      results = await discoverBrands({ category, query: query.trim() || null, existingNames });
+    } catch (err) {
+      app.log.error({ err }, 'Brand discovery Haiku call failed');
+      return reply.code(502).send({ error: 'Brand discovery temporarily unavailable. Please try again.' });
+    }
+
+    // Flag which results are already in the registry or watchlist
+    const brandNameSet = new Set(existingNames.map(n => n.toLowerCase()));
+    const annotated = results.map(r => ({
+      ...r,
+      in_registry:  brandNameSet.has(r.name.toLowerCase()),
+      is_watchlisted: watchlistedNames.has(r.name.toLowerCase()),
+    }));
+
+    return { results: annotated };
+  });
+
+  // ── POST /api/brands/watchlist ──────────────────────────────────────────────
+  // Adds selected discovered brands to the tenant's watchlist.
+  // Body: { brands: [{name, website, category, programme_notes, confidence}] }
+  // Queues contacts:discover for each newly added brand.
+
+  app.post('/api/brands/watchlist', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
+    const { brands } = req.body ?? {};
+    if (!Array.isArray(brands) || brands.length === 0) {
+      return reply.code(400).send({ error: 'brands array is required' });
+    }
+    if (brands.length > 20) {
+      return reply.code(400).send({ error: 'Maximum 20 brands per request' });
+    }
+
+    const { added, alreadyTracked } = await addToWatchlist({
+      tenantId: req.user.tenantId,
+      brands,
+    });
+
+    return { added: added.length, alreadyTracked: alreadyTracked.length };
+  });
+
+  // ── DELETE /api/brands/watchlist/:brandId ───────────────────────────────────
+  // Removes a brand from the tenant's watchlist.
+
+  app.delete('/api/brands/watchlist/:brandId', { preHandler: [authenticate, requireTier('pro')] }, async (req, reply) => {
+    const { brandId } = req.params;
+    const pool = getPool();
+    await pool.query(
+      'DELETE FROM tenant_brand_watchlist WHERE tenant_id = $1 AND brand_id = $2',
+      [req.user.tenantId, brandId],
+    );
+    return { ok: true };
   });
 
   // ── POST /api/brands/:brandId/draft-pitch ───────────────────────────────────

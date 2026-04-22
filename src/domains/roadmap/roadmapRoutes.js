@@ -72,7 +72,7 @@ async function roadmapRoutes(app) {
           json_agg(
             json_build_object(
               'userId',  v_top.user_id,
-              'name',    u_top.display_name,
+              'name',    cr_top.display_name,
               'colour',  '#C8AAFF'
             ) ORDER BY v_top.created_at ASC
           ) FILTER (WHERE v_top.id IS NOT NULL),
@@ -88,7 +88,7 @@ async function roadmapRoutes(app) {
         ORDER BY fv2.created_at ASC
         LIMIT 5
       ) v_top ON true
-      LEFT JOIN users u_top ON u_top.id = v_top.user_id
+      LEFT JOIN creators cr_top ON cr_top.user_id = v_top.user_id
       GROUP BY ri.id, fv_me.vote_type
       ORDER BY
         CASE ri.status

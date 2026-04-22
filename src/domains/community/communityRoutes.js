@@ -113,11 +113,11 @@ async function communityRoutes(app) {
         cs.created_at,
         cc.name         AS category_name,
         cc.slug         AS category_slug,
-        u.display_name  AS author_name,
+        cr.display_name AS author_name,
         cv_me.vote_type AS user_vote_type
       FROM community_suggestions cs
       LEFT JOIN community_categories cc ON cc.id = cs.category_id
-      LEFT JOIN users u ON u.id = cs.user_id
+      LEFT JOIN creators cr ON cr.user_id = cs.user_id
       LEFT JOIN community_votes cv_me
              ON cv_me.suggestion_id = cs.id AND cv_me.user_id = $1
       ${where}
@@ -255,11 +255,12 @@ async function communityRoutes(app) {
         cs.*,
         cc.name        AS category_name,
         cc.slug        AS category_slug,
-        u.display_name AS author_name,
+        cr.display_name AS author_name,
         u.email        AS author_email
       FROM community_suggestions cs
       LEFT JOIN community_categories cc ON cc.id = cs.category_id
       LEFT JOIN users u ON u.id = cs.user_id
+      LEFT JOIN creators cr ON cr.user_id = cs.user_id
       ${where}
       ORDER BY cs.created_at DESC
       LIMIT $${params.push(safeLimit)} OFFSET $${params.push(safeOffset)}
@@ -310,9 +311,10 @@ async function communityRoutes(app) {
 
     const pool = getPool();
     const { rows: [item] } = await pool.query(`
-      SELECT cs.*, u.email AS author_email, u.display_name AS author_name
+      SELECT cs.*, u.email AS author_email, cr.display_name AS author_name
       FROM community_suggestions cs
       JOIN users u ON u.id = cs.user_id
+      LEFT JOIN creators cr ON cr.user_id = cs.user_id
       WHERE cs.id = $1
     `, [req.params.id]);
     if (!item) return reply.code(404).send({ error: 'Suggestion not found' });

@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { AppLayout } from '../../layouts/AppLayout/AppLayout';
+import { Badge } from '../../components/ui/Badge/Badge';
 import { Button } from '../../components/ui/Button/Button';
 import { SignalFeed } from '../../components/SignalFeed/SignalFeed';
 import { useAuth } from '../../lib/AuthContext';

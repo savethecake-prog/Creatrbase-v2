@@ -282,11 +282,12 @@ async function discoverContacts(tenantId, brandId) {
   );
   if (!brand?.website) throw new Error('Brand has no website');
 
-  // Normalise domain
+  // Normalise domain — strip www. prefix so emails use the root domain
   const rawSite = brand.website.startsWith('http') ? brand.website : `https://${brand.website}`;
   let domain;
   try {
-    domain = new URL(rawSite).hostname;
+    const hostname = new URL(rawSite).hostname;
+    domain = hostname.startsWith('www.') ? hostname.slice(4) : hostname;
   } catch {
     throw new Error(`Invalid website URL: ${brand.website}`);
   }

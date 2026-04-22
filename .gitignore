@@ -12,3 +12,5 @@ prisma/generated/
 coverage/
 .nyc_output/
 uploads/
+graphify-out/
+.graphify_*

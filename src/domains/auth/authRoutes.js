@@ -1,6 +1,6 @@
 'use strict';
 
-const { signup, login, oauthUpsert, revokeSession } = require('./authService');
+const { signup, login, oauthUpsert, revokeSession, verifyEmail, sendVerificationEmail } = require('./authService');
 
 const COOKIE_NAME  = 'cb_session';
 const COOKIE_OPTS  = {
@@ -130,7 +130,10 @@ async function authRoutes(app) {
   });
 
   // ── OAuth: Google ───────────────────────────────────────────────────────────
-  const GOOGLE_ENABLED = !!(process.env.GOOGLE_LOGIN_CLIENT_ID && process.env.GOOGLE_LOGIN_CLIENT_SECRET);
+  // Normalise: GOOGLE_CLIENT_ID is canonical; GOOGLE_LOGIN_CLIENT_ID is a legacy alias
+  const GOOGLE_ID     = process.env.GOOGLE_CLIENT_ID     || process.env.GOOGLE_LOGIN_CLIENT_ID;
+  const GOOGLE_SECRET = process.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_LOGIN_CLIENT_SECRET;
+  const GOOGLE_ENABLED = !!(GOOGLE_ID && GOOGLE_SECRET);
   const TWITCH_ENABLED = !!(process.env.TWITCH_CLIENT_ID && process.env.TWITCH_CLIENT_SECRET);
 
   if (GOOGLE_ENABLED) {
@@ -140,8 +143,8 @@ async function authRoutes(app) {
       scope:          ['openid', 'email', 'profile'],
       credentials: {
         client: {
-          id:     process.env.GOOGLE_LOGIN_CLIENT_ID,
-          secret: process.env.GOOGLE_LOGIN_CLIENT_SECRET,
+          id:     GOOGLE_ID,
+          secret: GOOGLE_SECRET,
         },
         auth: oauthPlugin.GOOGLE_CONFIGURATION,
       },
@@ -235,6 +238,35 @@ async function authRoutes(app) {
       reply.code(503).send({ error: 'Twitch OAuth not configured' })
     );
   }
+
+  // ── GET /api/auth/verify-email ──────────────────────────────────────────────
+  app.get('/api/auth/verify-email', async (req, reply) => {
+    const { token } = req.query;
+    if (!token) return reply.redirect('/?verified=invalid');
+    try {
+      await verifyEmail(token);
+      return reply.redirect('/dashboard?verified=1');
+    } catch (err) {
+      const code = err.statusCode === 400 ? 'expired' : 'invalid';
+      return reply.redirect(`/?verified=${code}`);
+    }
+  });
+
+  // ── POST /api/auth/resend-verification ──────────────────────────────────────
+  app.post('/api/auth/resend-verification', {
+    config: { rateLimit: { max: 3, timeWindow: '1 hour' } },
+    preHandler: authenticate,
+  }, async (req, reply) => {
+    const prisma = require('../../lib/prisma').getPrisma();
+    const user   = await prisma.user.findUnique({
+      where:  { id: req.user.userId },
+      select: { email: true, emailVerified: true },
+    });
+    if (!user) return reply.code(404).send({ error: 'User not found.' });
+    if (user.emailVerified) return reply.code(400).send({ error: 'Email is already verified.' });
+    await sendVerificationEmail(req.user.userId, user.email);
+    return { ok: true };
+  });
 }
 
 module.exports = authRoutes;

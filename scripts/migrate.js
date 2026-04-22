@@ -59,6 +59,7 @@ const FILES = [
   '042_community_roadmap.sql',
   '043_brand_contacts.sql',
   '044_brand_watchlist.sql',
+  '045_email_verification.sql',
 ];
 
 async function run() {

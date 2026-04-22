@@ -47,6 +47,13 @@ async function signup({ firstName, lastName, email, password, ip, userAgent }) {
     console.error('Free subscription setup failed at signup (non-fatal):', subErr.message);
   }
 
+  // 3. Send verification email — non-fatal
+  try {
+    await sendVerificationEmail(userId, normalEmail);
+  } catch (emailErr) {
+    console.error('Verification email failed at signup (non-fatal):', emailErr.message);
+  }
+
   return { userId, tenantId, sessionId, displayName };
 }
 
@@ -196,4 +203,91 @@ async function revokeSession(sessionId) {
   await getPrisma().session.delete({ where: { id: sessionId } }).catch(() => {});
 }
 
-module.exports = { signup, login, oauthUpsert, validateSession, revokeSession };
+// ─── Email verification ───────────────────────────────────────────────────────
+
+const crypto = require('crypto');
+const { getPool } = require('../../db/pool');
+
+async function sendVerificationEmail(userId, email) {
+  const pool    = getPool();
+  const token   = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+
+  // Invalidate any existing tokens for this user
+  await pool.query('DELETE FROM email_verification_tokens WHERE user_id = $1', [userId]);
+  await pool.query(
+    'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
+    [userId, token, expires]
+  );
+
+  if (!process.env.RESEND_API_KEY) return; // email disabled in dev
+
+  const { Resend } = require('resend');
+  const resend     = new Resend(process.env.RESEND_API_KEY);
+  const verifyUrl  = `${process.env.APP_URL || 'https://creatrbase.com'}/api/auth/verify-email?token=${token}`;
+
+  await resend.emails.send({
+    from:    process.env.EMAIL_FROM || 'noreply@creatrbase.com',
+    to:      email,
+    subject: 'Verify your Creatrbase email',
+    html: `
+      <p style="font-family:sans-serif;font-size:15px;color:#1B1040">
+        Hi — please verify your email address to unlock all features.
+      </p>
+      <p style="margin:24px 0">
+        <a href="${verifyUrl}" style="background:#A4FFDB;color:#1B1040;font-weight:700;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">
+          Verify email
+        </a>
+      </p>
+      <p style="font-family:sans-serif;font-size:12px;color:#666">
+        This link expires in 24 hours. If you didn't create a Creatrbase account, ignore this email.
+      </p>
+    `,
+  });
+}
+
+async function verifyEmail(token) {
+  const pool = getPool();
+  const prisma = getPrisma();
+
+  const res = await pool.query(
+    `SELECT id, user_id, expires_at, used_at
+     FROM email_verification_tokens
+     WHERE token = $1`,
+    [token]
+  );
+
+  if (res.rows.length === 0) {
+    const err = new Error('Invalid or expired verification link.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const row = res.rows[0];
+
+  if (row.used_at) {
+    const err = new Error('This link has already been used.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  if (new Date(row.expires_at) < new Date()) {
+    const err = new Error('This verification link has expired. Please request a new one.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  await prisma.user.update({
+    where: { id: row.user_id },
+    data:  { emailVerified: true, emailVerifiedAt: new Date() },
+  });
+
+  await pool.query(
+    'UPDATE email_verification_tokens SET used_at = NOW() WHERE id = $1',
+    [row.id]
+  );
+
+  return { userId: row.user_id };
+}
+
+module.exports = { signup, login, oauthUpsert, validateSession, revokeSession, sendVerificationEmail, verifyEmail };

@@ -4,6 +4,9 @@ require('dotenv').config();
 const path = require('path');
 const fs   = require('fs');
 const Fastify = require('fastify');
+const { initSentry } = require('./lib/sentry');
+
+initSentry();
 
 // ── Startup validation ────────────────────────────────────────────────────────
 // Fail fast rather than surfacing crypto errors mid-request

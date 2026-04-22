@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { captureException } from '../../lib/sentry';
 import styles from './ErrorBoundary.module.css';
 
 export class ErrorBoundary extends Component {
@@ -13,6 +14,7 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error('[ErrorBoundary]', error, info?.componentStack);
+    captureException(error, { componentStack: info?.componentStack });
   }
 
   handleReset() {

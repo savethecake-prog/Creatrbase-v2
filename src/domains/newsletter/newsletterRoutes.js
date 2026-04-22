@@ -5,22 +5,12 @@ const { getListmonkClient } = require('../../services/listmonkClient');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Rate limit: 10 subscribes per IP per hour
-const subRateLimit = {};
-function checkSubRateLimit(ip) {
-  const now = Date.now();
-  const key = ip + ':sub';
-  if (!subRateLimit[key]) subRateLimit[key] = [];
-  subRateLimit[key] = subRateLimit[key].filter(t => t > now - 3600000);
-  if (subRateLimit[key].length >= 10) return false;
-  subRateLimit[key].push(now);
-  return true;
-}
-
 async function newsletterRoutes(app) {
 
   // POST /api/newsletter/subscribe
-  app.post('/api/newsletter/subscribe', async (req, reply) => {
+  app.post('/api/newsletter/subscribe', {
+    config: { rateLimit: { max: 10, timeWindow: '1 hour' } },
+  }, async (req, reply) => {
     const { email, source, source_detail, segments, marketing_consent } = req.body || {};
 
     if (!email || !EMAIL_RE.test(email)) {
@@ -29,11 +19,6 @@ async function newsletterRoutes(app) {
 
     if (!marketing_consent) {
       return reply.code(400).send({ error: 'consent_required', message: 'Marketing consent is required to subscribe.' });
-    }
-
-    const ip = req.headers['x-real-ip'] || req.ip;
-    if (!checkSubRateLimit(ip)) {
-      return reply.code(429).send({ error: 'rate_limited', message: 'Too many subscription attempts. Try again later.' });
     }
 
     const pool = getPool();

@@ -20,6 +20,7 @@ function setSessionCookie(reply, app, payload) {
 async function authRoutes(app) {
   // ── POST /api/auth/signup ───────────────────────────────────────────────────
   app.post('/api/auth/signup', {
+    config: { rateLimit: { max: 5, timeWindow: '1 minute' } },
     schema: {
       body: {
         type: 'object',
@@ -49,6 +50,7 @@ async function authRoutes(app) {
 
   // ── POST /api/auth/login ────────────────────────────────────────────────────
   app.post('/api/auth/login', {
+    config: { rateLimit: { max: 10, timeWindow: '1 minute' } },
     schema: {
       body: {
         type: 'object',

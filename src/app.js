@@ -20,7 +20,61 @@ const app = Fastify({ logger: true });
 // ── Plugins ───────────────────────────────────────────────────────────────────
 
 app.register(require('@fastify/helmet'), {
-  contentSecurityPolicy: false, // will tighten once frontend is stable
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:     ["'self'"],
+      scriptSrc: [
+        "'self'",
+        'https://plausible.io',
+        'https://js.stripe.com',
+        // Hashes for inline scripts in client/index.html
+        "'sha256-Ebt84R/xi8miDnxS/0/bkTjVgDRKQpWS1eI09TLbNkg='", // plausible init
+        "'sha256-bd5mhxix5nvOwxvyJuVf/HSQa6XelRbC3Ze3lH97gaw='", // theme init
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",              // CSS modules inject inline styles
+        'https://fonts.googleapis.com',
+      ],
+      fontSrc:   ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc:    ["'self'", 'data:', 'https:'],  // avatars from YouTube/Twitch vary by channel
+      connectSrc: [
+        "'self'",
+        'https://plausible.io',
+        'https://js.stripe.com',
+        'https://api.stripe.com',
+        'https://accounts.google.com',
+        'https://oauth2.googleapis.com',
+        'https://www.googleapis.com',
+        'https://youtubeanalytics.googleapis.com',
+        'https://gmail.googleapis.com',
+        'https://id.twitch.tv',
+        'https://api.twitch.tv',
+        'https://open.tiktokapis.com',
+        'https://graph.instagram.com',
+        'https://api.instagram.com',
+      ],
+      frameSrc:       ['https://js.stripe.com', 'https://hooks.stripe.com'],
+      frameAncestors: ["'none'"],
+      formAction:     ["'self'"],
+      baseUri:        ["'self'"],
+    },
+  },
+});
+
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+// Global default: 200 req/min per IP. Sensitive routes override below.
+
+app.register(require('@fastify/rate-limit'), {
+  global:     true,
+  max:        200,
+  timeWindow: '1 minute',
+  keyGenerator: (req) => req.ip,
+  errorResponseBuilder: () => ({
+    statusCode: 429,
+    error:      'Too Many Requests',
+    message:    'Rate limit exceeded. Please slow down.',
+  }),
 });
 
 app.register(require('@fastify/cors'), {
@@ -97,6 +151,7 @@ require('./jobs/workers/newsletterDigests').startNewsletterDigestWorkers();
 require('./jobs/workers/signalProcessor').startSignalProcessorWorker();
 require('./jobs/workers/contentResearch').startContentResearchWorkers();
 require('./jobs/workers/contactDiscovery').startContactDiscoveryWorker();
+require('./jobs/workers/gdprHardDelete').startGdprHardDeleteWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

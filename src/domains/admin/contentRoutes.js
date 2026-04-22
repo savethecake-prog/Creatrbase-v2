@@ -1,9 +1,9 @@
 'use strict';
 
 const { v4: uuidv4 } = require('uuid');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 const path = require('path');
 
 const { getPool } = require('../../db/pool');
@@ -18,7 +18,7 @@ const PRERENDER_SCRIPT = path.join(__dirname, '../../../scripts/prerender.js');
 
 async function triggerPrerender(route) {
   try {
-    await execAsync(`node "${PRERENDER_SCRIPT}" --route "${route}"`, { timeout: 60000 });
+    await execFileAsync('node', [PRERENDER_SCRIPT, '--route', route], { timeout: 60000 });
     console.log(`[contentRoutes] Prerendered ${route}`);
   } catch (err) {
     console.warn(`[contentRoutes] Prerender failed for ${route}: ${err.message}`);

@@ -10,7 +10,7 @@ export function Author() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    api.get('/blog/posts?limit=50').then(r => setPosts(r.posts || [])).catch(() => {});
+    api.get('/blog/posts?limit=50').then(r => setPosts(r.posts || [])).catch(err => console.error('[Author]', err));
   }, []);
 
   return (

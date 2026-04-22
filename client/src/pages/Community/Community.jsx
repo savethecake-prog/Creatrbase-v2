@@ -198,7 +198,7 @@ export function Community() {
   useEffect(() => {
     api.get('/community/categories')
       .then(r => setCategories(r.categories || []))
-      .catch(() => {});
+      .catch(err => console.error('[Community]', err));
   }, []);
 
   useEffect(() => {
@@ -216,7 +216,7 @@ export function Community() {
         setWeeklyUsed(r.weeklyUsed ?? 0);
         setWeeklyCap(r.weeklyCap ?? 0);
       })
-      .catch(() => {})
+      .catch(err => console.error('[Community]', err))
       .finally(() => setLoading(false));
   }, [sort, status, category, isFree]);
 

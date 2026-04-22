@@ -17,7 +17,7 @@ function TagsSection() {
   const [error,       setError]       = useState(null);
 
   useEffect(() => {
-    api.get('/creator/tags').then(res => setTags(res.tags ?? [])).catch(() => {});
+    api.get('/creator/tags').then(res => setTags(res.tags ?? [])).catch(err => console.error('[Toolkit]', err));
   }, []);
 
   useEffect(() => {

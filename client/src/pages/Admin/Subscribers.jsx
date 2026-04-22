@@ -425,7 +425,7 @@ export function Subscribers() {
         setUsers(rows ?? []);
         setTotal(t ?? 0);
       })
-      .catch(() => {})
+      .catch(err => console.error('[Subscribers]', err))
       .finally(() => setLoading(false));
   }, []);
 

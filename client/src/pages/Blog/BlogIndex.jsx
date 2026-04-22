@@ -76,8 +76,8 @@ export function BlogIndex() {
   const PAGE_SIZE = 12;
 
   useEffect(() => {
-    api.get('/blog/categories').then(r => setCategories(r.categories)).catch(() => {});
-    api.get('/blog/featured').then(r => setFeatured(r.posts)).catch(() => {});
+    api.get('/blog/categories').then(r => setCategories(r.categories)).catch(err => console.error('[BlogIndex]', err));
+    api.get('/blog/featured').then(r => setFeatured(r.posts)).catch(err => console.error('[BlogIndex]', err));
   }, []);
 
   useEffect(() => {

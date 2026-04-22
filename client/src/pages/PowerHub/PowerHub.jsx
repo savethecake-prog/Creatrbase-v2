@@ -182,7 +182,7 @@ export function PowerHub() {
         // Core and above can vote (tier check happens server-side; 402 = not allowed)
         setCanVote(true); // Optimistic; server enforces
       })
-      .catch(() => {})
+      .catch(err => console.error('[PowerHub]', err))
       .finally(() => setLoading(false));
   }, []);
 

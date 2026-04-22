@@ -15,7 +15,7 @@ export function VoiceMemory() {
     if (topicFilter) url += `topic=${encodeURIComponent(topicFilter)}&`;
     if (sourceFilter) url += `source=${sourceFilter}&`;
     if (confFilter) url += `confidence=${confFilter}&`;
-    api.get(url).then(d => setEntries(d.entries || [])).catch(() => {});
+    api.get(url).then(d => setEntries(d.entries || [])).catch(err => console.error('[VoiceMemory]', err));
   }
 
   useEffect(loadEntries, [topicFilter, sourceFilter, confFilter]);

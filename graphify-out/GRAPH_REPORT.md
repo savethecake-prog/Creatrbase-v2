@@ -1,12 +1,12 @@
-# Graph Report - C:\Users\savet\creatrbase-v2  (2026-04-21)
+# Graph Report - C:\Users\savet\creatrbase-v2  (2026-04-22)
 
 ## Corpus Check
-- 168 files · ~174,906 words
+- 181 files · ~191,531 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 782 nodes · 967 edges · 110 communities detected
-- Extraction: 83% EXTRACTED · 17% INFERRED · 0% AMBIGUOUS · INFERRED: 169 edges (avg confidence: 0.81)
+- 842 nodes · 1044 edges · 116 communities detected
+- Extraction: 82% EXTRACTED · 18% INFERRED · 0% AMBIGUOUS · INFERRED: 187 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -120,30 +120,36 @@
 - [[_COMMUNITY_Community 107|Community 107]]
 - [[_COMMUNITY_Community 108|Community 108]]
 - [[_COMMUNITY_Community 109|Community 109]]
+- [[_COMMUNITY_Community 110|Community 110]]
+- [[_COMMUNITY_Community 111|Community 111]]
+- [[_COMMUNITY_Community 112|Community 112]]
+- [[_COMMUNITY_Community 113|Community 113]]
+- [[_COMMUNITY_Community 114|Community 114]]
+- [[_COMMUNITY_Community 115|Community 115]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `getPool()` - 35 edges
+1. `getPool()` - 38 edges
 2. `getPrisma()` - 35 edges
-3. `getDataCollectionQueue()` - 20 edges
+3. `getDataCollectionQueue()` - 23 edges
 4. `useAuth()` - 14 edges
-5. `runScoringEngine()` - 13 edges
-6. `Gap Closure Task Generation Prompt v1` - 13 edges
-7. `Creatrbase Project` - 12 edges
-8. `Recommendation Generation Prompt v1` - 12 edges
-9. `ListmonkClient` - 11 edges
-10. `Support Assistant Prompt v1` - 11 edges
+5. `requireTier()` - 13 edges
+6. `runScoringEngine()` - 13 edges
+7. `Gap Closure Task Generation Prompt v1` - 13 edges
+8. `Creatrbase Project` - 12 edges
+9. `Recommendation Generation Prompt v1` - 12 edges
+10. `discoverContacts()` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `getPool()` --calls--> `isPowerUser()`  [INFERRED]
+  src\db\pool.js → C:\Users\savet\creatrbase-v2\src\domains\roadmap\roadmapRoutes.js
 - `resolveCreator()` --calls--> `getPrisma()`  [INFERRED]
-  src\domains\brands\brandsRoutes.js → src\lib\prisma.js
+  C:\Users\savet\creatrbase-v2\src\domains\brands\brandsRoutes.js → src\lib\prisma.js
 - `resolveCreator()` --calls--> `getPrisma()`  [INFERRED]
   C:\Users\savet\creatrbase-v2\src\domains\gmail\gmailRoutes.js → src\lib\prisma.js
 - `resolveCreator()` --calls--> `getPrisma()`  [INFERRED]
   C:\Users\savet\creatrbase-v2\src\domains\negotiations\negotiationsRoutes.js → src\lib\prisma.js
 - `getConnectedPlatforms()` --calls--> `getPrisma()`  [INFERRED]
   src\domains\platforms\platformConnectService.js → src\lib\prisma.js
-- `resolveCreator()` --calls--> `getPrisma()`  [INFERRED]
-  C:\Users\savet\creatrbase-v2\src\domains\signals\signalRoutes.js → src\lib\prisma.js
 
 ## Hyperedges (group relationships)
 - **Newsletter Digest Production Pipeline** — skill_newsletter_curation, skill_source_credibility, skill_newsletter_summarisation, skill_newsletter_subject_lines, skill_listmonk_posting, CLAUDE_newsletter_infra [INFERRED 0.90]
@@ -160,36 +166,36 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.05
-Nodes (34): authenticate(), login(), oauthUpsert(), revokeSession(), signup(), validateSession(), createCheckoutSession(), createFreeSubscription() (+26 more)
+Cohesion: 0.04
+Nodes (47): runAIForCreatorsDigest(), addToWatchlist(), toSlug(), getBrands(), getOutreachHistory(), logOutreach(), updateOutreachStatus(), createSession() (+39 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.05
-Nodes (38): runAIForCreatorsDigest(), getBrands(), getOutreachHistory(), logOutreach(), updateOutreachStatus(), createSession(), getSession(), sendMessage() (+30 more)
+Cohesion: 0.04
+Nodes (18): AdminLayout(), AppLayout(), useAuth(), BrandModal(), factorLines(), Honesty(), qualityVariant(), SignalLogEntry() (+10 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
 Nodes (53): Active Brands (in niche/geo), Brand Outreach Feature, Buying Window, Cadence-Based Task, Cold Outreach Gating Rule, Commercial Gap, Commercial Milestone, Commercial Tier (+45 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.04
-Nodes (18): AdminLayout(), AppLayout(), useAuth(), BrandModal(), factorLines(), Honesty(), qualityVariant(), SignalLogEntry() (+10 more)
+Cohesion: 0.05
+Nodes (27): authenticate(), login(), oauthUpsert(), revokeSession(), signup(), validateSession(), createCheckoutSession(), createFreeSubscription() (+19 more)
 
 ### Community 4 - "Community 4"
+Cohesion: 0.06
+Nodes (17): auditRoutes(), brandsRoutes(), resolveCreator(), coachRoutes(), communityRoutes(), contactRoutes(), gapTrackerRoutes(), negotiationsRoutes() (+9 more)
+
+### Community 5 - "Community 5"
 Cohesion: 0.08
 Nodes (32): agent_run Table (queued/running/complete/failed), Editorial Agents (12 skills), Skill: creatrbase-copy-rules, Copy Rule: No Em-dashes or En-dashes, Copy Rule: Number Formatting (under 10 as words), Copy Rule: Oxford Comma, Copy Rule: UK English Only, Skill: digest-ai-for-creators (+24 more)
 
-### Community 5 - "Community 5"
+### Community 6 - "Community 6"
 Cohesion: 0.07
 Nodes (30): Admin Platform (/admin), Creatrbase Project, Design System v2, Listmonk (Email Service, Docker port 9000), Newsletter Infrastructure (Listmonk), Product UI (Dashboard, Gap Tracker, Tasks, Connections, Outreach, Negotiations), Programmatic Page Infrastructure (compare, niche, rates, threshold, research), Public Pages (Pre-rendered) (+22 more)
 
-### Community 6 - "Community 6"
-Cohesion: 0.12
-Nodes (18): getUserApiKey(), decrypt(), encrypt(), getEncryptionKey(), decrypt(), encrypt(), getKey(), getFreshToken() (+10 more)
-
 ### Community 7 - "Community 7"
-Cohesion: 0.09
-Nodes (13): auditRoutes(), brandsRoutes(), resolveCreator(), coachRoutes(), gapTrackerRoutes(), negotiationsRoutes(), resolveCreator(), requireTier() (+5 more)
+Cohesion: 0.15
+Nodes (15): getUserApiKey(), decrypt(), encrypt(), getEncryptionKey(), getAdminGmailToken(), decrypt(), encrypt(), getKey() (+7 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.25
@@ -200,128 +206,128 @@ Cohesion: 0.3
 Nodes (15): calculatePublicScore(), calculateOverallScore(), clamp(), classify(), evaluateMilestones(), getGapToNextTier(), getPrimaryConstraint(), getTier() (+7 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.22
-Nodes (9): applyLabel(), buildMimeMessage(), checkThreadForReply(), ensureLabel(), getThreadContent(), gmailGet(), gmailPost(), refreshGmailToken() (+1 more)
+Cohesion: 0.23
+Nodes (12): discoverContacts(), extractJsonLdPeople(), extractPeopleWithAI(), extractTeamLinks(), fetchPage(), generateCandidates(), getMxHost(), hasTeamContent() (+4 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.21
+Cohesion: 0.17
 Nodes (7): BrandCard(), computeReadiness(), fmtViews(), formatRate(), MomentumPill(), ReadinessBanner(), viewMomentumSignal()
 
 ### Community 12 - "Community 12"
+Cohesion: 0.19
+Nodes (6): BlogArticle(), fmtDate(), NichePage(), ResearchPage(), ThresholdPage(), sanitizeHtml()
+
+### Community 13 - "Community 13"
+Cohesion: 0.24
+Nodes (8): applyLabel(), buildMimeMessage(), checkThreadForReply(), ensureLabel(), getThreadContent(), gmailGet(), gmailPost(), sendEmail()
+
+### Community 14 - "Community 14"
 Cohesion: 0.26
 Nodes (1): ListmonkClient
 
-### Community 13 - "Community 13"
+### Community 15 - "Community 15"
 Cohesion: 0.56
 Nodes (9): card(), ctaButton(), emailWrapper(), escHtml(), getCreatorEmailInfo(), sendBrandMatchAlert(), sendDealNudge(), sendMilestoneAlert() (+1 more)
 
-### Community 14 - "Community 14"
+### Community 16 - "Community 16"
 Cohesion: 0.27
 Nodes (5): Dashboard(), fmtViews(), MomentumCard(), tierMedium(), tierShort()
 
-### Community 15 - "Community 15"
+### Community 17 - "Community 17"
 Cohesion: 0.27
 Nodes (6): getDimensionLevel(), buildSharePNG(), esc(), truncate(), esc(), renderScoreCardHTML()
 
-### Community 16 - "Community 16"
-Cohesion: 0.33
-Nodes (5): effectiveTier(), formatCurrency(), initials(), timeAgo(), UserDrawer()
-
-### Community 17 - "Community 17"
+### Community 18 - "Community 18"
 Cohesion: 0.25
 Nodes (3): Content(), getDynamicRoutes(), prerender()
 
-### Community 18 - "Community 18"
+### Community 19 - "Community 19"
+Cohesion: 0.33
+Nodes (5): effectiveTier(), formatCurrency(), initials(), timeAgo(), UserDrawer()
+
+### Community 20 - "Community 20"
 Cohesion: 0.28
 Nodes (4): buildEmailHtml(), escHtml(), formatChange(), startEmailDigestWorker()
 
-### Community 19 - "Community 19"
+### Community 21 - "Community 21"
 Cohesion: 0.25
 Nodes (4): contentRoutes(), publishBlog(), inline(), markdownToHtml()
 
-### Community 20 - "Community 20"
+### Community 22 - "Community 22"
 Cohesion: 0.31
 Nodes (4): analyticsGet(), countUploads(), getExtendedAnalytics(), mapCountryToGeo()
 
-### Community 21 - "Community 21"
+### Community 23 - "Community 23"
 Cohesion: 0.29
 Nodes (2): fmtNum(), ProspectDrawer()
 
-### Community 22 - "Community 22"
+### Community 24 - "Community 24"
 Cohesion: 0.29
 Nodes (2): AuditContent(), verdictCopy()
 
-### Community 23 - "Community 23"
-Cohesion: 0.25
-Nodes (0): 
+### Community 25 - "Community 25"
+Cohesion: 0.39
+Nodes (6): buildDimensionData(), buildNicheBenchmark(), buildPrompt(), nearestMilestone(), startRecommendationEngineWorker(), toSeverity()
 
-### Community 24 - "Community 24"
+### Community 26 - "Community 26"
+Cohesion: 0.46
+Nodes (6): card(), ctaButton(), emailWrapper(), escHtml(), sendBrandRepliedEmail(), startGmailSyncWorker()
+
+### Community 27 - "Community 27"
 Cohesion: 0.33
 Nodes (2): fmtDate(), PlatformCard()
 
-### Community 25 - "Community 25"
+### Community 28 - "Community 28"
 Cohesion: 0.43
 Nodes (4): DimensionRow(), formatNum(), formatProjection(), formatVelocity()
 
-### Community 26 - "Community 26"
-Cohesion: 0.48
-Nodes (6): extractAttr(), extractTag(), fetchSource(), parseRSS(), startIngestionFetcherWorker(), stripHtml()
-
-### Community 27 - "Community 27"
+### Community 29 - "Community 29"
 Cohesion: 0.71
 Nodes (6): brandRepliedQuality(), calculateQuality(), completenessScore(), dealClosedQuality(), outreachSentWithStateQuality(), recencyScore()
 
-### Community 28 - "Community 28"
+### Community 30 - "Community 30"
 Cohesion: 0.29
 Nodes (7): Prompt: knowledge-synthesis-v1, Rationale: Knowledge must generalise, not describe events, Knowledge Synthesis Output Schema, Knowledge Types (content_pattern, audience_behaviour, negotiation_preference, etc.), Prompt: pattern-mining-v1, Rationale: Lead with implication not statistics in pattern summaries, Pattern Mining Output Schema
-
-### Community 29 - "Community 29"
-Cohesion: 0.33
-Nodes (0): 
-
-### Community 30 - "Community 30"
-Cohesion: 0.53
-Nodes (4): factorLines(), qualityLabel(), SignalPill(), timeAgo()
 
 ### Community 31 - "Community 31"
 Cohesion: 0.33
 Nodes (0): 
 
 ### Community 32 - "Community 32"
+Cohesion: 0.53
+Nodes (4): factorLines(), qualityLabel(), SignalPill(), timeAgo()
+
+### Community 33 - "Community 33"
 Cohesion: 0.33
 Nodes (0): 
 
-### Community 33 - "Community 33"
+### Community 34 - "Community 34"
+Cohesion: 0.33
+Nodes (0): 
+
+### Community 35 - "Community 35"
 Cohesion: 0.47
 Nodes (4): DIMENSION_LABEL(), fmtMetric(), MetricTracker(), TaskCard()
 
-### Community 34 - "Community 34"
+### Community 36 - "Community 36"
 Cohesion: 0.4
 Nodes (2): getResend(), sendEscalationEmail()
 
-### Community 35 - "Community 35"
+### Community 37 - "Community 37"
 Cohesion: 0.53
 Nodes (4): extractAffiliateDomains(), extractPromoCodes(), getVideoSignals(), ytGet()
 
-### Community 36 - "Community 36"
-Cohesion: 0.6
-Nodes (3): fmtDate(), getCardFallback(), PostCard()
-
-### Community 37 - "Community 37"
+### Community 38 - "Community 38"
 Cohesion: 0.4
 Nodes (2): Landing(), useIntersection()
-
-### Community 38 - "Community 38"
-Cohesion: 0.6
-Nodes (3): DealCard(), fmtDate(), fmtRate()
 
 ### Community 39 - "Community 39"
 Cohesion: 0.4
 Nodes (0): 
 
 ### Community 40 - "Community 40"
-Cohesion: 0.7
-Nodes (4): getAppAccessToken(), getPublicStats(), helixGet(), resolveHandle()
+Cohesion: 0.6
+Nodes (3): fmtDate(), getCardFallback(), PostCard()
 
 ### Community 41 - "Community 41"
 Cohesion: 0.4
@@ -329,27 +335,27 @@ Nodes (0):
 
 ### Community 42 - "Community 42"
 Cohesion: 0.6
-Nodes (3): getTwitchChannelMetrics(), helixGet(), parseDurationSeconds()
+Nodes (3): DealCard(), fmtDate(), fmtRate()
 
 ### Community 43 - "Community 43"
-Cohesion: 0.5
+Cohesion: 0.4
 Nodes (0): 
 
 ### Community 44 - "Community 44"
-Cohesion: 0.5
-Nodes (0): 
+Cohesion: 0.7
+Nodes (4): getAppAccessToken(), getPublicStats(), helixGet(), resolveHandle()
 
 ### Community 45 - "Community 45"
-Cohesion: 0.5
+Cohesion: 0.4
 Nodes (0): 
 
 ### Community 46 - "Community 46"
-Cohesion: 0.5
-Nodes (0): 
+Cohesion: 0.6
+Nodes (3): getTwitchChannelMetrics(), helixGet(), parseDurationSeconds()
 
 ### Community 47 - "Community 47"
-Cohesion: 0.83
-Nodes (3): AdminRow(), Team(), timeAgo()
+Cohesion: 0.5
+Nodes (0): 
 
 ### Community 48 - "Community 48"
 Cohesion: 0.5
@@ -360,40 +366,40 @@ Cohesion: 0.5
 Nodes (0): 
 
 ### Community 50 - "Community 50"
-Cohesion: 0.83
-Nodes (3): iconHtml(), main(), wordmarkHtml()
+Cohesion: 0.5
+Nodes (0): 
 
 ### Community 51 - "Community 51"
 Cohesion: 0.83
-Nodes (3): buildEmailHtml(), escHtml(), formatChange()
+Nodes (3): AdminRow(), Team(), timeAgo()
 
 ### Community 52 - "Community 52"
 Cohesion: 0.5
 Nodes (0): 
 
 ### Community 53 - "Community 53"
-Cohesion: 0.5
-Nodes (4): Niche Categories (gaming, lifestyle, tech, fitness, beauty, finance, other), Prompt: niche-classification-v1, Niche Classification Output Schema, Rationale: Classify by content IS (not what creator wishes), weight titles most
+Cohesion: 0.67
+Nodes (2): getBrandFit(), ResultCard()
 
 ### Community 54 - "Community 54"
-Cohesion: 0.67
+Cohesion: 0.5
 Nodes (0): 
 
 ### Community 55 - "Community 55"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 0.83
+Nodes (3): iconHtml(), main(), wordmarkHtml()
 
 ### Community 56 - "Community 56"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 0.83
+Nodes (3): buildEmailHtml(), escHtml(), formatChange()
 
 ### Community 57 - "Community 57"
-Cohesion: 0.67
+Cohesion: 0.5
 Nodes (0): 
 
 ### Community 58 - "Community 58"
-Cohesion: 1.0
-Nodes (2): BlogArticle(), fmtDate()
+Cohesion: 0.5
+Nodes (4): Niche Categories (gaming, lifestyle, tech, fitness, beauty, finance, other), Prompt: niche-classification-v1, Niche Classification Output Schema, Rationale: Classify by content IS (not what creator wishes), weight titles most
 
 ### Community 59 - "Community 59"
 Cohesion: 0.67
@@ -424,24 +430,24 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 66 - "Community 66"
-Cohesion: 1.0
-Nodes (2): classifyThread(), staleThreshold()
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 67 - "Community 67"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 68 - "Community 68"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 69 - "Community 69"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 70 - "Community 70"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): classifyThread(), staleThreshold()
 
 ### Community 71 - "Community 71"
 Cohesion: 1.0
@@ -599,110 +605,138 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 110 - "Community 110"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 111 - "Community 111"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 112 - "Community 112"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 113 - "Community 113"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 114 - "Community 114"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 115 - "Community 115"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
 - **62 isolated node(s):** `Tech Stack (Fastify + React SPA + PostgreSQL + Redis + Prisma)`, `tokens.css (Design Token Source of Truth)`, `Public Pages (Pre-rendered)`, `Free/Core/Pro Tier System`, `VPS Deployment (153.92.208.28, PM2, Nginx)` (+57 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 67`** (2 nodes): `App()`, `App.jsx`
+- **Thin community `Community 71`** (2 nodes): `App()`, `App.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (2 nodes): `MarketingFooter.jsx`, `MarketingFooter()`
+- **Thin community `Community 72`** (2 nodes): `MarketingFooter.jsx`, `MarketingFooter()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (2 nodes): `NewsletterSignup.jsx`, `NewsletterSignup()`
+- **Thin community `Community 73`** (2 nodes): `NewsletterSignup.jsx`, `NewsletterSignup()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 70`** (2 nodes): `PageMeta.jsx`, `PageMeta()`
+- **Thin community `Community 74`** (2 nodes): `PageMeta.jsx`, `PageMeta()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 71`** (2 nodes): `Badge()`, `Badge.jsx`
+- **Thin community `Community 75`** (2 nodes): `Badge()`, `Badge.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 72`** (2 nodes): `Button()`, `Button.jsx`
+- **Thin community `Community 76`** (2 nodes): `Button()`, `Button.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 73`** (2 nodes): `Card()`, `Card.jsx`
+- **Thin community `Community 77`** (2 nodes): `Card()`, `Card.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 74`** (2 nodes): `HintCallout.jsx`, `HintCallout()`
+- **Thin community `Community 78`** (2 nodes): `HintCallout.jsx`, `HintCallout()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 75`** (2 nodes): `Input.jsx`, `Input()`
+- **Thin community `Community 79`** (2 nodes): `Input.jsx`, `Input()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 76`** (2 nodes): `AuthLayout()`, `AuthLayout.jsx`
+- **Thin community `Community 80`** (2 nodes): `AuthLayout()`, `AuthLayout.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 77`** (2 nodes): `request()`, `api.js`
+- **Thin community `Community 81`** (2 nodes): `request()`, `api.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 78`** (2 nodes): `About()`, `About.jsx`
+- **Thin community `Community 82`** (2 nodes): `About()`, `About.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (2 nodes): `AdminDashboard()`, `AdminDashboard.jsx`
+- **Thin community `Community 83`** (2 nodes): `AdminDashboard()`, `AdminDashboard.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (2 nodes): `AdminPlaceholder()`, `AdminPlaceholder.jsx`
+- **Thin community `Community 84`** (2 nodes): `AdminPlaceholder()`, `AdminPlaceholder.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (2 nodes): `EditorialHome.jsx`, `EditorialHome()`
+- **Thin community `Community 85`** (2 nodes): `EditorialHome.jsx`, `EditorialHome()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (2 nodes): `EditorialSession.jsx`, `EditorialSession()`
+- **Thin community `Community 86`** (2 nodes): `EditorialSession.jsx`, `EditorialSession()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (2 nodes): `Skills.jsx`, `Skills()`
+- **Thin community `Community 87`** (2 nodes): `Skills.jsx`, `Skills()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (2 nodes): `VoiceMemory.jsx`, `VoiceMemory()`
+- **Thin community `Community 88`** (2 nodes): `VoiceMemory.jsx`, `VoiceMemory()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 85`** (2 nodes): `Author()`, `Author.jsx`
+- **Thin community `Community 89`** (2 nodes): `Author()`, `Author.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 86`** (2 nodes): `Pricing.jsx`, `Pricing()`
+- **Thin community `Community 90`** (2 nodes): `Pricing.jsx`, `Pricing()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 87`** (2 nodes): `ScoringMethodology.jsx`, `ScoringMethodology()`
+- **Thin community `Community 91`** (2 nodes): `ScoringMethodology.jsx`, `ScoringMethodology()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 88`** (2 nodes): `StaticPage.jsx`, `StaticPage()`
+- **Thin community `Community 92`** (2 nodes): `StaticPage.jsx`, `StaticPage()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 89`** (2 nodes): `audit()`, `audit-internal-links.js`
+- **Thin community `Community 93`** (2 nodes): `audit()`, `audit-internal-links.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 90`** (2 nodes): `generate()`, `generate-report-pdf.js`
+- **Thin community `Community 94`** (2 nodes): `generate()`, `generate-report-pdf.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 91`** (2 nodes): `migrate.js`, `run()`
+- **Thin community `Community 95`** (2 nodes): `migrate.js`, `run()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 92`** (2 nodes): `start()`, `app.js`
+- **Thin community `Community 96`** (2 nodes): `start()`, `app.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 93`** (2 nodes): `tools.js`, `subscriberTier()`
+- **Thin community `Community 97`** (2 nodes): `tools.js`, `subscriberTier()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 94`** (2 nodes): `acquisitionRoutes()`, `acquisitionRoutes.js`
+- **Thin community `Community 98`** (2 nodes): `nicheAdjacency.js`, `getBrandFit()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 95`** (2 nodes): `nicheRoutes()`, `nicheRoutes.js`
+- **Thin community `Community 99`** (2 nodes): `acquisitionRoutes()`, `acquisitionRoutes.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 96`** (2 nodes): `scoreRoutes()`, `scoreRoutes.js`
+- **Thin community `Community 100`** (2 nodes): `nicheRoutes()`, `nicheRoutes.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 97`** (2 nodes): `gdprRoutes.js`, `gdprRoutes()`
+- **Thin community `Community 101`** (2 nodes): `scoreRoutes()`, `scoreRoutes.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 98`** (2 nodes): `platformConnectRoutes()`, `platformConnectRoutes.js`
+- **Thin community `Community 102`** (2 nodes): `gdprRoutes.js`, `gdprRoutes()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 99`** (2 nodes): `claimRoutes()`, `claimRoutes.js`
+- **Thin community `Community 103`** (2 nodes): `newsletterRoutes.js`, `newsletterRoutes()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 100`** (2 nodes): `gmailWebhookRoutes.js`, `gmailWebhookRoutes()`
+- **Thin community `Community 104`** (2 nodes): `platformConnectRoutes()`, `platformConnectRoutes.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 101`** (1 nodes): `eslint.config.js`
+- **Thin community `Community 105`** (2 nodes): `claimRoutes()`, `claimRoutes.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 102`** (1 nodes): `vite.config.js`
+- **Thin community `Community 106`** (2 nodes): `gmailWebhookRoutes.js`, `gmailWebhookRoutes()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 103`** (1 nodes): `main.jsx`
+- **Thin community `Community 107`** (1 nodes): `eslint.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 104`** (1 nodes): `index.js`
+- **Thin community `Community 108`** (1 nodes): `vite.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 105`** (1 nodes): `copy-assets.ps1`
+- **Thin community `Community 109`** (1 nodes): `main.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 106`** (1 nodes): `get-profiles.js`
+- **Thin community `Community 110`** (1 nodes): `index.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 107`** (1 nodes): `trigger-sync.js`
+- **Thin community `Community 111`** (1 nodes): `copy-assets.ps1`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 108`** (1 nodes): `tools.js`
+- **Thin community `Community 112`** (1 nodes): `get-profiles.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 109`** (1 nodes): `tools.js`
+- **Thin community `Community 113`** (1 nodes): `trigger-sync.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 114`** (1 nodes): `tools.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 115`** (1 nodes): `tools.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getPrisma()` connect `Community 0` to `Community 1`, `Community 3`, `Community 6`, `Community 7`, `Community 18`, `Community 19`?**
-  _High betweenness centrality (0.101) - this node is a cross-community bridge._
-- **Why does `getPool()` connect `Community 1` to `Community 0`, `Community 6`, `Community 7`, `Community 8`, `Community 19`, `Community 27`?**
-  _High betweenness centrality (0.057) - this node is a cross-community bridge._
-- **Why does `useAuth()` connect `Community 3` to `Community 14`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
-- **Are the 34 inferred relationships involving `getPool()` (e.g. with `createSession()` and `sendMessage()`) actually correct?**
-  _`getPool()` has 34 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `getPrisma()` connect `Community 3` to `Community 0`, `Community 1`, `Community 4`, `Community 7`, `Community 20`, `Community 21`, `Community 25`, `Community 26`?**
+  _High betweenness centrality (0.115) - this node is a cross-community bridge._
+- **Why does `getPool()` connect `Community 0` to `Community 3`, `Community 4`, `Community 7`, `Community 8`, `Community 10`, `Community 21`, `Community 26`, `Community 29`?**
+  _High betweenness centrality (0.072) - this node is a cross-community bridge._
+- **Why does `useAuth()` connect `Community 1` to `Community 16`?**
+  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **Are the 37 inferred relationships involving `getPool()` (e.g. with `run()` and `createSession()`) actually correct?**
+  _`getPool()` has 37 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 34 inferred relationships involving `getPrisma()` (e.g. with `contentRoutes()` and `signup()`) actually correct?**
   _`getPrisma()` has 34 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 19 inferred relationships involving `getDataCollectionQueue()` (e.g. with `logOutreach()` and `updateOutreachStatus()`) actually correct?**
-  _`getDataCollectionQueue()` has 19 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 22 inferred relationships involving `getDataCollectionQueue()` (e.g. with `addToWatchlist()` and `logOutreach()`) actually correct?**
+  _`getDataCollectionQueue()` has 22 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 13 inferred relationships involving `useAuth()` (e.g. with `UpgradeGate()` and `AppLayout()`) actually correct?**
   _`useAuth()` has 13 INFERRED edges - model-reasoned connections that need verification._

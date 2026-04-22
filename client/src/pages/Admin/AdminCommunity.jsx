@@ -214,7 +214,7 @@ export function AdminCommunity() {
     if (q)   params.set('search', q);
     api.get(`/admin/community/suggestions?${params}`)
       .then(r => { setSuggestions(r.suggestions || []); setTotal(r.total || 0); })
-      .catch(() => {})
+      .catch(err => console.error('[AdminCommunity]', err))
       .finally(() => setLoading(false));
   }
 

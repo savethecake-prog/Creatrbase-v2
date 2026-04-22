@@ -8,8 +8,8 @@ export function EditorialHome() {
   const [voiceCount, setVoiceCount] = useState(0);
 
   useEffect(() => {
-    api.get('/admin/agent-runs').then(d => setAgentRuns(d.runs || [])).catch(() => {});
-    api.get('/admin/voice-memory').then(d => setVoiceCount((d.entries || []).length)).catch(() => {});
+    api.get('/admin/agent-runs').then(d => setAgentRuns(d.runs || [])).catch(err => console.error('[EditorialHome]', err));
+    api.get('/admin/voice-memory').then(d => setVoiceCount((d.entries || []).length)).catch(err => console.error('[EditorialHome]', err));
   }, []);
 
   const recentRuns = agentRuns.slice(0, 5);

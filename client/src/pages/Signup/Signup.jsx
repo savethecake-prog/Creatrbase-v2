@@ -25,7 +25,7 @@ export function Signup() {
     if (!claimId) return;
     api.get('/public/claim/' + claimId)
       .then(info => { if (!info.isClaimed) setClaimInfo(info); })
-      .catch(() => {});
+      .catch(err => console.error('[Signup]', err));
   }, [claimId]);
 
   function set(field) {
@@ -45,7 +45,7 @@ export function Signup() {
         api.post('/newsletter/subscribe', {
           email: form.email, source: 'product_signup',
           segments: ['creator-economy', 'ai-for-creators', 'editorial'],
-        }).catch(() => {});
+        }).catch(err => console.error('[Signup]', err));
       }
       // Claim the score if we have a claim param
       if (claimId) {

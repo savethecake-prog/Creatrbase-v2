@@ -32,7 +32,7 @@ export function Onboarding() {
     api.get('/connect/platforms').then(({ platforms }) => {
       const yt = platforms.find(p => p.platform === 'youtube' && p.sync_status !== 'disconnected');
       if (yt) setStep('processing');
-    }).catch(() => {});
+    }).catch(err => console.error('[Onboarding]', err));
   }, []);
 
   // Polling — runs when step === 'processing'

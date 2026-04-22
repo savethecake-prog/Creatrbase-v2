@@ -23,7 +23,7 @@ function ApiKeySection() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    api.get('/apikey').then(r => setKeys(r.keys || [])).catch(() => {});
+    api.get('/apikey').then(r => setKeys(r.keys || [])).catch(err => console.error('[Settings]', err));
   }, []);
 
   const anthropicKey = keys.find(k => k.provider === 'anthropic');

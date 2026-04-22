@@ -105,7 +105,7 @@ export function AdminRoadmap() {
   useEffect(() => {
     api.get('/admin/roadmap')
       .then(r => setItems(r.items || []))
-      .catch(() => {})
+      .catch(err => console.error('[AdminRoadmap]', err))
       .finally(() => setLoading(false));
   }, []);
 

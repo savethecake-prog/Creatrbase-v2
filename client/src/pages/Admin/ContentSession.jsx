@@ -185,7 +185,7 @@ export function ContentSession() {
         const displayMsgs = reconstructMessages(session.messages || []);
         setMessages(displayMsgs);
       })
-      .catch(() => {});
+      .catch(err => console.error('[ContentSession]', err));
   }, [id]);
 
   useEffect(() => {

@@ -15,7 +15,7 @@ export function AdminDashboard() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    api.get('/admin/stats').then(setStats).catch(() => {});
+    api.get('/admin/stats').then(setStats).catch(err => console.error('[AdminDashboard]', err));
   }, []);
 
   return (

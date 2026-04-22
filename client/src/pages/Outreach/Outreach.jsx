@@ -434,7 +434,7 @@ export function Outreach() {
   useEffect(() => {
     if (brandsData === null) return;
     const path = category ? `/brands?category=${encodeURIComponent(category)}` : '/brands';
-    api.get(path).then(res => setBrandsData(res)).catch(() => {});
+    api.get(path).then(res => setBrandsData(res)).catch(err => console.error('[Outreach]', err));
   }, [category]); // eslint-disable-line
 
   const creatorCtx = useMemo(() => {
@@ -512,7 +512,7 @@ export function Outreach() {
   function handleBrandsAdded() {
     // Re-fetch brands so newly added watchlist brands appear immediately
     const path = category ? `/brands?category=${encodeURIComponent(category)}` : '/brands';
-    api.get(path).then(res => setBrandsData(res)).catch(() => {});
+    api.get(path).then(res => setBrandsData(res)).catch(err => console.error('[Outreach]', err));
   }
 
   async function handleBatchDiscover() {

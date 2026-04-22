@@ -4,6 +4,7 @@ import { MarketingFooter } from '../../components/MarketingFooter/MarketingFoote
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
+import { PageLoader } from '../../components/PageLoader/PageLoader';
 import styles from './Honesty.module.css';
 
 function factorLines(factors) {
@@ -141,7 +142,7 @@ function LearningLog() {
     setLoadingMore(false);
   };
 
-  if (loading) return null;
+  if (loading) return <PageLoader />;
   if (error || signals.length === 0) return null;
 
   const hasMore = signals.length < total;

@@ -10,7 +10,7 @@ export function Skills() {
     api.get('/admin/skills').then(d => {
       setSkills(d.skills || []);
       if (d.skills?.length) setSelected(d.skills[0]);
-    }).catch(() => {});
+    }).catch(err => console.error('[Skills]', err));
   }, []);
 
   return (

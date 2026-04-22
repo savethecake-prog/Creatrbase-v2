@@ -167,7 +167,7 @@ export function Roadmap() {
   useEffect(() => {
     api.get('/admin/roadmap')
       .then(r => setItems(r.items || []))
-      .catch(() => {})
+      .catch(err => console.error('[Roadmap]', err))
       .finally(() => setLoading(false));
   }, []);
 

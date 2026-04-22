@@ -247,11 +247,11 @@ export function Dashboard() {
     api.get('/connect/platforms')
       .then(({ platforms }) => { setPlatforms(platforms); setPlatformsLoaded(true); })
       .catch((err) => { setPlatformsLoaded(true); setConnectMsg({ type: 'error', text: `Could not load platform status (${err.status ?? 'network error'}). Refresh to retry.` }); });
-    api.get('/creator/niche').then(setNiche).catch(() => {});
-    api.get('/creator/score').then(setScoreData).catch(() => {});
-    api.get('/creator/recommendation').then(setRecData).catch(() => {});
-    api.get('/creator/score/history').then(setHistory).catch(() => {});
-    api.get('/creator/score/weekly-progress').then(setProgress).catch(() => {});
+    api.get('/creator/niche').then(setNiche).catch(err => console.error('[Dashboard]', err));
+    api.get('/creator/score').then(setScoreData).catch(err => console.error('[Dashboard]', err));
+    api.get('/creator/recommendation').then(setRecData).catch(err => console.error('[Dashboard]', err));
+    api.get('/creator/score/history').then(setHistory).catch(err => console.error('[Dashboard]', err));
+    api.get('/creator/score/weekly-progress').then(setProgress).catch(err => console.error('[Dashboard]', err));
   }, []);
 
   // Handle ?welcome=1, ?connected=, ?connect_error= params

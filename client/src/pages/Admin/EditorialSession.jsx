@@ -11,7 +11,7 @@ export function EditorialSession() {
   const chatRef = useRef(null);
 
   useEffect(() => {
-    api.get('/admin/voice-memory').then(d => setVoiceMemory((d.entries || []).slice(0, 20))).catch(() => {});
+    api.get('/admin/voice-memory').then(d => setVoiceMemory((d.entries || []).slice(0, 20))).catch(err => console.error('[EditorialSession]', err));
   }, []);
 
   async function startSession() {
@@ -43,7 +43,7 @@ export function EditorialSession() {
 
   async function endCurrentSession() {
     if (sessionId) {
-      await api.post('/admin/editorial/session/end', { sessionId }).catch(() => {});
+      await api.post('/admin/editorial/session/end', { sessionId }).catch(err => console.error('[EditorialSession]', err));
       setSessionId(null);
     }
   }

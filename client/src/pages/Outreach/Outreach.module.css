@@ -254,3 +254,190 @@
 @media (max-width: 1024px) {
   .grid { grid-template-columns: 1fr; }
 }
+
+/* ── Niche fit band labels ─────────────────────────────────────────────────── */
+
+.fitBandLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.fitBand_adjacent { color: rgba(209,185,255,0.9); background: rgba(209,185,255,0.08); }
+.fitBand_broad    { color: var(--text-muted);     background: var(--bg-hover); }
+.fitBand_outside  { color: var(--text-disabled);  background: var(--bg-hover); }
+
+/* ── Card state: selected & dimmed ───────────────────────────────────────────── */
+
+.cardSelected { border-color: var(--neon-purple) !important; box-shadow: 0 0 0 2px rgba(209,185,255,0.2); }
+.cardDimmed   { opacity: 0.75; }
+
+/* ── Checkbox overlay ────────────────────────────────────────────────────────── */
+
+.card { position: relative; }
+
+.checkWrap {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.12s;
+}
+.checkWrap:hover { background: var(--bg-hover); }
+
+.checkBox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--glass-border);
+  border-radius: 5px;
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+.checkWrapActive .checkBox {
+  background: var(--neon-purple);
+  border-color: var(--neon-purple);
+}
+
+.checkMark { font-size: 11px; color: #1B1040; font-weight: 800; line-height: 1; }
+
+/* ── Brand groups (niche bands) ──────────────────────────────────────────────── */
+
+.brandGroup { margin-bottom: 40px; }
+
+.groupLabel {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.groupCount {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-disabled);
+  background: var(--bg-hover);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ── Broaden search ──────────────────────────────────────────────────────────── */
+
+.broadenRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 32px;
+  flex-wrap: wrap;
+}
+
+.broadenBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px dashed var(--glass-border);
+  border-radius: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.broadenBtn:hover { border-color: var(--border); color: var(--text-primary); background: var(--bg-hover); }
+
+.broadenHint {
+  font-size: 12px;
+  color: var(--text-disabled);
+}
+
+/* ── Batch action bar ─────────────────────────────────────────────────────────── */
+
+.batchBar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 16px 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 32px rgba(27,16,64,0.18);
+  z-index: 50;
+  white-space: nowrap;
+  animation: slideUp 0.18s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.batchCount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.batchActions { display: flex; gap: 8px; }
+
+.batchClearBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.batchClearBtn:hover { background: var(--bg-hover); }
+
+.batchDiscoverBtn {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1B1040;
+  background: var(--neon-purple);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+.batchDiscoverBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+.batchDiscoverBtn:not(:disabled):hover { opacity: 0.85; }
+
+/* ── Batch toast ─────────────────────────────────────────────────────────────── */
+
+.batchToast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 8px;
+  z-index: 999;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.batchToastError { background: #C0392B; color: #fff; }

@@ -57,6 +57,7 @@ const FILES = [
   '040_prospect_outreach.sql',
   '041_platform_metrics_tiktok.sql',
   '042_community_roadmap.sql',
+  '043_brand_contacts.sql',
 ];
 
 async function run() {

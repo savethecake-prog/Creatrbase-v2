@@ -810,3 +810,282 @@
   color: var(--text-secondary);
   line-height: 1.5;
 }
+
+/* ── Contacts tab ─────────────────────────────────────────────────────────────── */
+
+.contactsBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Loading skeleton */
+.contactsLoading {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+/* Running state */
+.contactsRunning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.contactsSpinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--glass-border);
+  border-top-color: var(--neon-purple);
+  border-radius: 50%;
+  animation: spinContact 0.9s linear infinite;
+}
+
+@keyframes spinContact {
+  to { transform: rotate(360deg); }
+}
+
+.contactsRunningTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.contactsRunningDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* Contact list */
+.contactsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contactCard {
+  background: var(--bg-hover);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.15s;
+}
+
+.contactCard:hover {
+  border-color: var(--border);
+}
+
+.contactMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contactName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.contactTitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.contactEmail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.emailText {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.verifiedBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--neon-mint);
+  background: rgba(164, 255, 219, 0.1);
+  border: 1px solid rgba(164, 255, 219, 0.2);
+  padding: 1px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.unknownBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  padding: 1px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.invalidBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #ff7b7b;
+  background: rgba(255, 123, 123, 0.08);
+  border: 1px solid rgba(255, 123, 123, 0.2);
+  padding: 1px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.contactActions {
+  display: flex;
+  gap: 8px;
+}
+
+.contactCopyBtn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+
+.contactCopyBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.contactUseBtn {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1B1040;
+  background: var(--neon-purple);
+  border: none;
+  border-radius: 8px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+}
+
+.contactUseBtn:hover {
+  opacity: 0.85;
+}
+
+/* Empty state */
+.contactsEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.contactsEmptyTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.contactsEmptyDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* Error state */
+.contactsError {
+  padding: 14px 16px;
+  background: rgba(255, 123, 123, 0.06);
+  border: 1px solid rgba(255, 123, 123, 0.15);
+  border-radius: 12px;
+  font-size: 13px;
+  color: #ff7b7b;
+  line-height: 1.5;
+}
+
+/* Action buttons */
+.discoverBtn {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1B1040;
+  background: var(--neon-purple);
+  border: none;
+  border-radius: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.discoverBtn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.discoverBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.rediscoverBtn {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px dashed var(--glass-border);
+  border-radius: 10px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rediscoverBtn:hover:not(:disabled) {
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.rediscoverBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Footnote */
+.contactsFootnote {
+  font-size: 11px;
+  color: var(--text-disabled);
+  line-height: 1.5;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 12px;
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Badge } from '../../components/ui/Badge/Badge';
 import { useAuth } from '../../lib/AuthContext';
 import { api } from '../../lib/api';
@@ -83,11 +83,181 @@ Best regards,
 ${displayName}`;
 }
 
+// ── ContactsTab ───────────────────────────────────────────────────────────────
+
+const VERIFIED_LABELS = {
+  verified:   { label: 'Verified',   cls: 'verifiedBadge' },
+  unknown:    { label: 'Unverified', cls: 'unknownBadge' },
+  unverified: { label: 'Invalid',    cls: 'invalidBadge' },
+};
+
+function ContactCard({ contact, onUseEmail }) {
+  const [copied, setCopied] = useState(false);
+  const vd = VERIFIED_LABELS[contact.email_verified] ?? VERIFIED_LABELS.unknown;
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(contact.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  }
+
+  return (
+    <div className={styles.contactCard}>
+      <div className={styles.contactMeta}>
+        {contact.full_name && <p className={styles.contactName}>{contact.full_name}</p>}
+        {contact.job_title && <p className={styles.contactTitle}>{contact.job_title}</p>}
+      </div>
+      <div className={styles.contactEmail}>
+        <span className={styles.emailText}>{contact.email}</span>
+        <span className={`${styles.verifiedBadge} ${styles[vd.cls]}`}>{vd.label}</span>
+      </div>
+      <div className={styles.contactActions}>
+        <button type="button" className={styles.contactCopyBtn} onClick={handleCopy}>
+          {copied ? 'Copied!' : 'Copy email'}
+        </button>
+        {onUseEmail && (
+          <button type="button" className={styles.contactUseBtn} onClick={() => onUseEmail(contact.email)}>
+            Use in outreach
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ContactsTab({ brand, onUseEmail, tier }) {
+  const [contacts,   setContacts]   = useState(null); // null = not loaded yet
+  const [jobStatus,  setJobStatus]  = useState(null); // null | { id, status }
+  const [error,      setError]      = useState(null);
+  const [starting,   setStarting]   = useState(false);
+  const pollRef = useRef(null);
+
+  // Load cached contacts on mount
+  useEffect(() => {
+    api.get(`/contacts/brand/${brand.id}`)
+      .then(res => setContacts(res.contacts))
+      .catch(() => setContacts([]));
+    return () => clearInterval(pollRef.current);
+  }, [brand.id]);
+
+  // Poll when a job is running
+  useEffect(() => {
+    if (!jobStatus || !['queued','running'].includes(jobStatus.status)) {
+      clearInterval(pollRef.current);
+      return;
+    }
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await api.get(`/contacts/job/${jobStatus.id}`);
+        setJobStatus(prev => ({ ...prev, status: res.status }));
+        if (res.status === 'complete') {
+          setContacts(res.contacts);
+          clearInterval(pollRef.current);
+        }
+        if (res.status === 'failed') {
+          setError('Contact search failed. Try again.');
+          clearInterval(pollRef.current);
+        }
+      } catch {}
+    }, 3000);
+    return () => clearInterval(pollRef.current);
+  }, [jobStatus?.id, jobStatus?.status]);
+
+  async function handleDiscover() {
+    setStarting(true);
+    setError(null);
+    try {
+      const res = await api.post('/contacts/discover', { brandId: brand.id });
+      if (res.status === 'cached') {
+        setContacts(res.contacts);
+      } else {
+        setJobStatus({ id: res.jobId, status: res.status });
+      }
+    } catch (err) {
+      setError(err?.data?.error ?? 'Could not start contact search.');
+    } finally {
+      setStarting(false);
+    }
+  }
+
+  const isRunning = jobStatus && ['queued','running'].includes(jobStatus.status);
+
+  // Not loaded yet
+  if (contacts === null) {
+    return <div className={styles.contactsLoading}>Loading contacts…</div>;
+  }
+
+  return (
+    <div className={styles.contactsBody}>
+
+      {/* Running state */}
+      {isRunning && (
+        <div className={styles.contactsRunning}>
+          <div className={styles.contactsSpinner} />
+          <div>
+            <p className={styles.contactsRunningTitle}>Searching {brand.brand_name}&apos;s website</p>
+            <p className={styles.contactsRunningDesc}>Finding and verifying influencer marketing contacts. This takes 30-90 seconds.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Results */}
+      {!isRunning && contacts.length > 0 && (
+        <>
+          <div className={styles.contactsList}>
+            {contacts.map(c => (
+              <ContactCard key={c.id} contact={c} onUseEmail={onUseEmail} />
+            ))}
+          </div>
+          <p className={styles.contactsFootnote}>
+            Contacts found on {brand.brand_name}&apos;s public website. Re-search any time to refresh.
+          </p>
+          {tier === 'pro' && (
+            <button type="button" className={styles.rediscoverBtn} onClick={handleDiscover} disabled={starting}>
+              Re-search
+            </button>
+          )}
+        </>
+      )}
+
+      {/* Empty + not running */}
+      {!isRunning && contacts.length === 0 && (
+        <div className={styles.contactsEmpty}>
+          {!brand.website ? (
+            <>
+              <p className={styles.contactsEmptyTitle}>No website on file</p>
+              <p className={styles.contactsEmptyDesc}>This brand doesn&apos;t have a website recorded yet. Contact discovery is not possible until one is added.</p>
+            </>
+          ) : tier === 'pro' ? (
+            <>
+              <p className={styles.contactsEmptyTitle}>No contacts found yet</p>
+              <p className={styles.contactsEmptyDesc}>
+                Search {brand.brand_name}&apos;s website for influencer marketing contacts. We&apos;ll look for partnership, brand, and social media roles.
+              </p>
+              {error && <p className={styles.contactsError}>{error}</p>}
+              <button type="button" className={styles.discoverBtn} onClick={handleDiscover} disabled={starting}>
+                {starting ? 'Starting search…' : `Find contacts at ${brand.brand_name}`}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className={styles.contactsEmptyTitle}>Pro feature</p>
+              <p className={styles.contactsEmptyDesc}>Contact discovery is available on the Pro plan. Upgrade to find verified email addresses for brand marketing contacts.</p>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── BrandModal ────────────────────────────────────────────────────────────────
 
 export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
-  const { user } = useAuth();
-  const [tab,         setTab]         = useState('details'); // 'details' | 'compose' | 'history'
+  const { user, tier } = useAuth();
+  const [tab,         setTab]         = useState('details'); // 'details' | 'contacts' | 'compose' | 'history'
   const [template,    setTemplate]    = useState('');
   const [copied,      setCopied]      = useState(false);
   const [markingDone, setMarkingDone] = useState(false);
@@ -271,6 +441,12 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
             Details
           </button>
           <button
+            className={`${styles.tab} ${tab === 'contacts' ? styles.tabActive : ''}`}
+            onClick={() => setTab('contacts')}
+          >
+            Contacts
+          </button>
+          <button
             className={`${styles.tab} ${tab === 'compose'  ? styles.tabActive : ''}`}
             onClick={() => setTab('compose')}
           >
@@ -359,6 +535,18 @@ export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
                 </div>
               )}
             </>
+          )}
+
+          {/* ── Contacts tab ── */}
+          {tab === 'contacts' && (
+            <ContactsTab
+              brand={brand}
+              tier={tier}
+              onUseEmail={(email) => {
+                setSendTo(email);
+                setTab('compose');
+              }}
+            />
           )}
 
           {/* ── Compose tab ── */}

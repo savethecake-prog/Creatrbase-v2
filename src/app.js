@@ -77,6 +77,7 @@ app.register(require('./domains/gdpr/gdprRoutes').gdprRoutes);
 app.register(require('./domains/apikeys/apiKeyRoutes').apiKeyRoutes);
 app.register(require('./domains/roadmap/roadmapRoutes').roadmapRoutes);
 app.register(require('./domains/community/communityRoutes').communityRoutes);
+app.register(require('./domains/contacts/contactRoutes').contactRoutes);
 app.register(require('./domains/commercialCoach/auditRoutes'));
 app.register(require('./domains/commercialCoach/coachRoutes'));
 
@@ -95,6 +96,7 @@ require('./jobs/workers/ingestionFetcher').startIngestionFetcherWorker();
 require('./jobs/workers/newsletterDigests').startNewsletterDigestWorkers();
 require('./jobs/workers/signalProcessor').startSignalProcessorWorker();
 require('./jobs/workers/contentResearch').startContentResearchWorkers();
+require('./jobs/workers/contactDiscovery').startContactDiscoveryWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

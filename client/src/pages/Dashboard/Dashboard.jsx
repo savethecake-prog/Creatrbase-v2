@@ -37,7 +37,6 @@ const CONNECT_ERRORS = {
 };
 
 export function Dashboard() {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const firstName = user?.displayName?.split(' ')[0] ?? 'there';
 

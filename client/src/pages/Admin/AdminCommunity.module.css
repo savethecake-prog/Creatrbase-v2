@@ -1,5 +1,22 @@
 .page { display: flex; flex-direction: column; padding: 0 0 80px; }
 
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 8px;
+  z-index: 999;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 .pageHeader {
   display: flex;
   align-items: center;

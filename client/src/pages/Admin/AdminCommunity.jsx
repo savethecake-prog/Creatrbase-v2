@@ -200,6 +200,12 @@ export function AdminCommunity() {
   const [activeTab, setActiveTab] = useState('open');
   const [search, setSearch]     = useState('');
   const [modal, setModal]       = useState(null); // { type, suggestion }
+  const [toast, setToast]       = useState('');   // brief status-change feedback
+
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(''), 2500);
+  }
 
   function load(tab = activeTab, q = search) {
     setLoading(true);
@@ -225,14 +231,19 @@ export function AdminCommunity() {
   }
 
   async function handleStatus(id, status, extra = {}) {
-    const updated = await api.patch(`/admin/community/suggestions/${id}/status`, { status, ...extra });
-    setSuggestions(prev => prev.map(s => s.id === id ? { ...s, ...updated } : s));
+    await api.patch(`/admin/community/suggestions/${id}/status`, { status, ...extra });
+    // Reload current tab so the item moves to its correct filtered view
+    load(activeTab, search);
+    const labels = { considering: 'Considering', declined: 'Declined', archived: 'Archived', open: 'Open' };
+    showToast(`Moved to ${labels[status] || status} — switch tabs to see it`);
   }
 
   async function handleDecline(id, decline_reason) {
-    await handleStatus(id, 'declined', { decline_reason });
-    // Also email author
+    // Capture suggestion before list reloads
     const s = suggestions.find(x => x.id === id);
+    await api.patch(`/admin/community/suggestions/${id}/status`, { status: 'declined', decline_reason });
+    load(activeTab, search);
+    showToast('Declined and moved — check the Declined tab');
     if (s?.author_email) {
       try {
         await api.post(`/admin/community/suggestions/${id}/email-author`, {
@@ -244,12 +255,14 @@ export function AdminCommunity() {
   }
 
   async function handlePromote(id, opts) {
-    const res = await api.post(`/admin/community/suggestions/${id}/promote`, opts);
-    setSuggestions(prev => prev.map(s => s.id === id ? { ...s, status: 'promoted', roadmap_item_id: res.roadmapItem?.id } : s));
+    await api.post(`/admin/community/suggestions/${id}/promote`, opts);
+    load(activeTab, search);
+    showToast('Promoted to roadmap — check the Promoted tab');
   }
 
   return (
     <div className={styles.page}>
+      {toast && <div className={styles.toast}>{toast}</div>}
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Community Suggestions</h1>
         <form className={styles.searchForm} onSubmit={handleSearch}>

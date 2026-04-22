@@ -256,7 +256,8 @@ function ContactsTab({ brand, onUseEmail, tier }) {
 // ── BrandModal ────────────────────────────────────────────────────────────────
 
 export function BrandModal({ brand, niche, onClose, onOutreachLogged }) {
-  const { user, tier } = useAuth();
+  const { user } = useAuth();
+  const tier = user?.tier;
   const [tab,         setTab]         = useState('details'); // 'details' | 'contacts' | 'compose' | 'history'
   const [template,    setTemplate]    = useState('');
   const [copied,      setCopied]      = useState(false);

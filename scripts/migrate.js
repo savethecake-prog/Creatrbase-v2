@@ -60,6 +60,7 @@ const FILES = [
   '043_brand_contacts.sql',
   '044_brand_watchlist.sql',
   '045_email_verification.sql',
+  '046_email_confidence.sql',
 ];
 
 async function run() {

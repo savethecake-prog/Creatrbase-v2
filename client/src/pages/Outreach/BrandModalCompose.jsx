@@ -3,6 +3,32 @@ import { api } from '../../lib/api';
 import { buildEmailTemplate } from './brandModalUtils';
 import styles from './BrandModal.module.css';
 
+// ─── RegistryEmailNotice ──────────────────────────────────────────────────────
+
+const EMAIL_STATUS_CONFIG = {
+  verified:  { icon: '✓', text: 'Delivery verified. This address accepted our SMTP probe.',                                      cls: 'gmailEmailNoticeGood' },
+  catch_all: { icon: '⚠', text: 'Catch-all domain. The server accepts any address — we cannot confirm this mailbox specifically.', cls: '' },
+  invalid:   { icon: '✕', text: 'This address appears invalid. Our probe received a hard rejection from the mail server.',         cls: 'gmailEmailNoticeBad' },
+  bounced:   { icon: '✕', text: 'Confirmed bounce. This address previously returned undeliverable. Use a different contact.',      cls: 'gmailEmailNoticeBad' },
+  no_mx:     { icon: '✕', text: 'This domain has no mail server configured. Email cannot be delivered here.',                     cls: 'gmailEmailNoticeBad' },
+  unknown:   { icon: '⚠', text: 'This address is sourced from our brand registry and has not been delivery-verified. It may be a form-redirect or monitored inbox.', cls: '' },
+};
+
+function RegistryEmailNotice({ status, confidence }) {
+  const cfg = EMAIL_STATUS_CONFIG[status] ?? EMAIL_STATUS_CONFIG.unknown;
+  return (
+    <p className={`${styles.gmailEmailNotice}${cfg.cls ? ' ' + styles[cfg.cls] : ''}`}>
+      <span className={styles.gmailEmailNoticeIcon}>{cfg.icon}</span>
+      <span>
+        {cfg.text}
+        {confidence != null && status !== 'unknown' && (
+          <span className={styles.gmailEmailConfidence}> Confidence: {Math.round(confidence * 100)}%</span>
+        )}
+      </span>
+    </p>
+  );
+}
+
 export function BrandModalCompose({ brand, niche, displayName, initialSendTo, alreadyContacted, onOutreachLogged, onMarkSent }) {
   const [template,      setTemplate]      = useState('');
   const [copied,        setCopied]        = useState(false);
@@ -258,11 +284,7 @@ export function BrandModalCompose({ brand, niche, displayName, initialSendTo, al
               />
             </div>
             {sendTo && brand.partnership_email && sendTo.trim().toLowerCase() === brand.partnership_email.trim().toLowerCase() && (
-              <p className={styles.gmailEmailNotice}>
-                <span className={styles.gmailEmailNoticeIcon}>⚠</span>
-                This address is sourced from our brand registry and has not been delivery-verified. It may be a
-                form-redirect or monitored inbox. If your email bounces, update it manually.
-              </p>
+              <RegistryEmailNotice status={brand.partnership_email_status} confidence={brand.partnership_email_confidence} />
             )}
             <p className={styles.gmailFromHint}>Sending from {gmailStatus.gmailAddress}</p>
 

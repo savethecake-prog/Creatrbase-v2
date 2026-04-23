@@ -4,15 +4,29 @@ import styles from './BrandModal.module.css';
 
 // ── ContactCard ───────────────────────────────────────────────────────────────
 
-const VERIFIED_LABELS = {
-  verified:   { label: 'Verified',   cls: 'verifiedBadge' },
-  unknown:    { label: 'Unverified', cls: 'unknownBadge' },
-  unverified: { label: 'Invalid',    cls: 'invalidBadge' },
+// New email_status field (from migration 046)
+const EMAIL_STATUS_LABELS = {
+  verified:  { label: 'Verified',   cls: 'verifiedBadge' },
+  catch_all: { label: 'Catch-all',  cls: 'catchAllBadge' },
+  invalid:   { label: 'Invalid',    cls: 'invalidBadge' },
+  bounced:   { label: 'Bounced',    cls: 'invalidBadge' },
+  no_mx:     { label: 'No email',   cls: 'invalidBadge' },
+  unknown:   { label: 'Unverified', cls: 'unknownBadge' },
+};
+
+// Legacy email_verified field fallback (pre-migration values)
+const LEGACY_LABELS = {
+  yes: { label: 'Verified', cls: 'verifiedBadge' },
+  no:  { label: 'Invalid',  cls: 'invalidBadge' },
 };
 
 function ContactCard({ contact, onUseEmail }) {
   const [copied, setCopied] = useState(false);
-  const vd = VERIFIED_LABELS[contact.email_verified] ?? VERIFIED_LABELS.unknown;
+  const badge = EMAIL_STATUS_LABELS[contact.email_status]
+    ?? LEGACY_LABELS[contact.email_verified]
+    ?? EMAIL_STATUS_LABELS.unknown;
+  // keep vd alias for the JSX below
+  const vd = badge;
 
   async function handleCopy() {
     try {

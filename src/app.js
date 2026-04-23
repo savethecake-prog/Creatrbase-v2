@@ -155,6 +155,7 @@ require('./jobs/workers/signalProcessor').startSignalProcessorWorker();
 require('./jobs/workers/contentResearch').startContentResearchWorkers();
 require('./jobs/workers/contactDiscovery').startContactDiscoveryWorker();
 require('./jobs/workers/gdprHardDelete').startGdprHardDeleteWorker();
+require('./jobs/workers/emailVerifier').startEmailVerifierWorker();
 
 // ── Static frontend (production only) ────────────────────────────────────────
 

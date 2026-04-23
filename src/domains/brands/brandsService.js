@@ -23,6 +23,8 @@ async function getBrands({ niche = null, category = null, creatorId = null, tena
       b.sub_category,
       b.website,
       b.partnership_email,
+      b.partnership_email_status,
+      b.partnership_email_confidence,
       b.partnership_url,
       b.geo_presence,
       b.creator_programme_type,

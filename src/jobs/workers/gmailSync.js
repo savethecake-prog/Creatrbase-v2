@@ -42,6 +42,89 @@ const APP_URL = process.env.APP_URL || 'https://creatrbase.com';
 // Terminal states after which we stop watching the thread
 const TERMINAL_STAGES = new Set(['deal_completed', 'deal_declined', 'outreach_declined']);
 
+// ─── Bounce / DSN detection ───────────────────────────────────────────────────
+
+const BOUNCE_FROM_PATTERNS = [
+  /MAILER-DAEMON/i,
+  /postmaster@/i,
+  /mail-daemon@/i,
+  /Mail Delivery Subsystem/i,
+];
+
+function isBounceDSN(message) {
+  return BOUNCE_FROM_PATTERNS.some(p => p.test(message.from || ''));
+}
+
+function extractBouncedAddress(body) {
+  if (!body) return null;
+  // RFC 3464 structured DSN header (Final-Recipient or Original-Recipient)
+  const rfcMatch = body.match(/Final-Recipient:\s*rfc822;\s*([^\r\n]+)/i)
+    || body.match(/Original-Recipient:\s*rfc822;\s*([^\r\n]+)/i);
+  if (rfcMatch) return rfcMatch[1].trim().toLowerCase();
+  // Plain-text bounce message patterns from common MTAs
+  const textMatch = body.match(
+    /(?:could not be delivered|couldn't be delivered|failed to deliver|undeliverable|address not found|does not exist)[^<\n]*?<?([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})>?/i
+  );
+  if (textMatch) return textMatch[1].trim().toLowerCase();
+  // Fallback: first email address found in the body
+  const anyEmail = body.match(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
+  return anyEmail ? anyEmail[1].trim().toLowerCase() : null;
+}
+
+async function handleBounceDetected({ pool, row, bouncedEmail, job }) {
+  const description = bouncedEmail
+    ? `Your email to ${bouncedEmail} bounced. This address has been flagged in the brand registry.`
+    : `An email to ${row.brand_name} bounced. The partnership address has been flagged.`;
+
+  job.log(`Bounce detected — ${bouncedEmail ?? '(address unknown)'}`);
+
+  // Update brands.partnership_email_status
+  const brandRes = await pool.query(
+    `UPDATE brands
+     SET partnership_email_status           = 'bounced',
+         partnership_email_confidence       = 0.02,
+         partnership_email_last_verified_at = NOW()
+     WHERE id = $1
+       AND ($2::text IS NULL OR partnership_email = $2)
+     RETURNING id`,
+    [row.brand_id, bouncedEmail]
+  );
+
+  // Update brand_contacts.email_status if the address matches a stored contact
+  if (bouncedEmail) {
+    await pool.query(
+      `UPDATE brand_contacts
+       SET email_status           = 'bounced',
+           email_confidence       = 0.02,
+           email_last_verified_at = NOW()
+       WHERE brand_id = $1 AND email = $2`,
+      [row.brand_id, bouncedEmail]
+    );
+  }
+
+  // Insert signal_event (status=applied — bounce is 100% authoritative)
+  try {
+    await pool.query(
+      `INSERT INTO signal_events
+         (tenant_id, creator_id, source_feature, signal_type, status,
+          source_interaction_id, quality_score, quality_factors, payload, description)
+       VALUES ($1, $2, 'gmail_sync', 'email_bounced', 'applied',
+               $3, 1.0, '{}', $4, $5)`,
+      [
+        row.tenant_id,
+        row.creator_id,
+        row.id,
+        JSON.stringify({ bouncedEmail, brandId: row.brand_id }),
+        description,
+      ]
+    );
+  } catch (err) {
+    job.log(`signal_events INSERT failed (non-fatal): ${err.message}`);
+  }
+
+  job.log(`Bounce handled: brands updated=${brandRes.rowCount} — "${description}"`);
+}
+
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
 function getResend() {
@@ -203,6 +286,16 @@ function startGmailSyncWorker() {
     const { messages } = await getThreadContent(accessToken, threadId);
     if (messages.length === 0) {
       job.log(`Thread ${threadId}: empty or deleted`);
+      return;
+    }
+
+    // ── Bounce / DSN detection ────────────────────────────────────────────
+    // If any message in the thread is from MAILER-DAEMON / postmaster, this
+    // is a delivery failure notification — not a brand reply. Handle and exit.
+    const bounceMsg = messages.find(m => isBounceDSN(m));
+    if (bounceMsg) {
+      const bouncedEmail = extractBouncedAddress(bounceMsg.body);
+      await handleBounceDetected({ pool, row, bouncedEmail, job });
       return;
     }
 

@@ -257,6 +257,13 @@ export function BrandModalCompose({ brand, niche, displayName, initialSendTo, al
                 placeholder="partnerships@brand.com"
               />
             </div>
+            {sendTo && brand.partnership_email && sendTo.trim().toLowerCase() === brand.partnership_email.trim().toLowerCase() && (
+              <p className={styles.gmailEmailNotice}>
+                <span className={styles.gmailEmailNoticeIcon}>⚠</span>
+                This address is sourced from our brand registry and has not been delivery-verified. It may be a
+                form-redirect or monitored inbox. If your email bounces, update it manually.
+              </p>
+            )}
             <p className={styles.gmailFromHint}>Sending from {gmailStatus.gmailAddress}</p>
 
             {sendError && <p className={styles.gmailError}>{sendError}</p>}

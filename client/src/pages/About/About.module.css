@@ -49,11 +49,11 @@
 }
 
 .heroTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(30px, 4.8vw, 50px);
-  font-weight: 400;
+  font-weight: 800;
   line-height: 1.1;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.025em;
   color: var(--cb-navy);
   margin: 0 0 20px;
 }
@@ -144,9 +144,9 @@
 }
 
 .statNumber {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: 36px;
-  font-weight: 400;
+  font-weight: 800;
   color: var(--cb-navy);
   line-height: 1;
 }
@@ -229,9 +229,9 @@
 }
 
 .ctaTitle {
-  font-family: 'Lilita One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(26px, 3.5vw, 36px);
-  font-weight: 400;
+  font-weight: 800;
   color: var(--bg-page);
   margin: 0 0 12px;
   line-height: 1.15;

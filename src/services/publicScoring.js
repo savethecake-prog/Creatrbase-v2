@@ -32,15 +32,22 @@ const TIER_SENTENCES = {
 
 function calculatePublicScore(platform, channelData) {
   const isYoutube = platform === 'youtube';
+  const isTikTok  = platform === 'tiktok';
 
   const input = {
-    subscriberCount:         isYoutube ? channelData.subscriberCount : channelData.followerCount,
+    subscriberCount:         isYoutube ? channelData.subscriberCount
+                           : isTikTok  ? (channelData.followerCount ?? channelData.subscriberCount ?? 0)
+                           :              (channelData.followerCount ?? 0),
     totalViewCount:          isYoutube ? channelData.totalViewCount : null,
-    videoCount:              isYoutube ? channelData.videoCount : null,
-    engagementRate30d:       null,       // requires analytics OAuth
-    avgViewsPerVideo30d:     isYoutube ? channelData.avgViewsLast15 : null,
+    videoCount:              isYoutube ? channelData.videoCount
+                           : isTikTok  ? (channelData.videoCount ?? null)
+                           :              null,
+    engagementRate30d:       isTikTok  ? (channelData.engagementRate30d ?? null) : null,
+    avgViewsPerVideo30d:     isYoutube ? channelData.avgViewsLast15
+                           : isTikTok  ? (channelData.avgViewsPerVideo30d ?? null)
+                           :              null,
     publicUploads90d:        null,       // requires analytics OAuth
-    primaryAudienceGeo:      null,       // requires analytics OAuth
+    primaryAudienceGeo:      null,       // not available from TikTok public API
     subVelocityPerDay:       null,       // requires snapshot history
     snapshotCount:           0,          // no snapshots for public score
     primaryNicheCategory:    null,       // requires content analysis

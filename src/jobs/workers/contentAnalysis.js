@@ -23,11 +23,20 @@ const { getPrisma }   = require('../../lib/prisma');
 const { decrypt, encrypt } = require('../../lib/crypto');
 const { getVideoSignals }  = require('../../services/youtubeContent');
 const { refreshAccessToken } = require('../../services/youtube');
+const { refreshTikTokToken,
+        getTikTokVideoList }           = require('../../services/tiktok');
+const { extractVideoSignals: extractTikTokVideoSignals } = require('../../services/tiktokContent');
 const { getDataCollectionQueue } = require('../queue');
 
 const PROMPT_VERSION  = 'niche-classification-v1';
 const PROMPT_TEMPLATE = fs.readFileSync(
   path.join(__dirname, '../../prompts/niche-classification-v1.txt'),
+  'utf8'
+);
+
+const TIKTOK_PROMPT_VERSION  = 'niche-classification-tiktok-v1';
+const TIKTOK_PROMPT_TEMPLATE = fs.readFileSync(
+  path.join(__dirname, '../../prompts/niche-classification-tiktok-v1.txt'),
   'utf8'
 );
 const MODEL      = 'claude-sonnet-4-6';
@@ -55,6 +64,17 @@ function buildPrompt(signals) {
     .replace('{{video_signals_json}}',    JSON.stringify(signals.videoSignals, null, 2))
     .replace('{{channel_description}}',   signals.channelDescription || 'Not provided')
     .replace('{{channel_keywords}}',      signals.channelKeywords    || 'Not provided')
+    .replace('{{affiliate_domains_raw}}', signals.affiliateDomains.join(', ') || 'none detected')
+    .replace('{{promo_codes_raw}}',       signals.promoCodes.join(', ')       || 'none detected');
+}
+
+function buildTikTokPrompt(signals) {
+  return TIKTOK_PROMPT_TEMPLATE
+    .replace('{{platform}}',              'tiktok')
+    .replace('{{video_count}}',           String(signals.videoCount))
+    .replace('{{sample_days}}',           String(signals.sampleDays))
+    .replace('{{video_signals_json}}',    JSON.stringify(signals.videoSignals, null, 2))
+    .replace('{{channel_description}}',   signals.channelDescription || 'Not provided')
     .replace('{{affiliate_domains_raw}}', signals.affiliateDomains.join(', ') || 'none detected')
     .replace('{{promo_codes_raw}}',       signals.promoCodes.join(', ')       || 'none detected');
 }
@@ -105,8 +125,8 @@ function startContentAnalysisWorker() {
     });
 
     if (!profile) throw new Error(`Platform profile ${platformProfileId} not found`);
-    if (profile.platform !== 'youtube') {
-      job.log(`Skipping non-YouTube platform: ${profile.platform}`);
+    if (profile.platform !== 'youtube' && profile.platform !== 'tiktok') {
+      job.log(`Platform ${profile.platform}: content analysis not yet supported`);
       return;
     }
 
@@ -118,7 +138,12 @@ function startContentAnalysisWorker() {
 
     if (nearExpiry) {
       if (!profile.refreshToken) throw new Error('Token expired and no refresh token available');
-      const refreshed = await refreshAccessToken(decrypt(profile.refreshToken));
+      let refreshed;
+      if (profile.platform === 'tiktok') {
+        refreshed = await refreshTikTokToken(decrypt(profile.refreshToken));
+      } else {
+        refreshed = await refreshAccessToken(decrypt(profile.refreshToken));
+      }
 
       await prisma.creatorPlatformProfile.update({
         where: { id: platformProfileId },
@@ -133,7 +158,24 @@ function startContentAnalysisWorker() {
     }
 
     // ── 3. Fetch content signals ───────────────────────────────────────────────
-    const signals = await getVideoSignals(accessToken);
+    let signals;
+
+    if (profile.platform === 'tiktok') {
+      const videos = await getTikTokVideoList(accessToken, { maxCount: 20 });
+      const videoSignals = extractTikTokVideoSignals(videos);
+      signals = {
+        videoCount:         videoSignals.length,
+        sampleDays:         30,
+        channelDescription: '',
+        channelKeywords:    '',
+        affiliateDomains:   [],
+        promoCodes:         [],
+        videoSignals,
+      };
+    } else {
+      signals = await getVideoSignals(accessToken);
+    }
+
     job.log(`Fetched ${signals.videoCount} video signals`);
 
     const signalsExtracted = {
@@ -147,22 +189,25 @@ function startContentAnalysisWorker() {
     };
 
     // ── 4. Create run record ───────────────────────────────────────────────────
+    const promptVersion = profile.platform === 'tiktok' ? TIKTOK_PROMPT_VERSION : PROMPT_VERSION;
+    const prompt = profile.platform === 'tiktok'
+      ? buildTikTokPrompt(signals)
+      : buildPrompt(signals);
+
     const run = await prisma.contentAnalysisRun.create({
       data: {
-        tenantId:           profile.tenantId,
-        creatorId:          profile.creatorId,
+        tenantId:            profile.tenantId,
+        creatorId:           profile.creatorId,
         platformProfileId,
-        platform:           'youtube',
-        runType:            'baseline',
-        triggeredBy:        'system_onboarding',
-        runStatus:          'running',
-        claudePromptVersion: PROMPT_VERSION,
+        platform:            profile.platform,
+        runType:             'baseline',
+        triggeredBy:         'system_onboarding',
+        runStatus:           'running',
+        claudePromptVersion: promptVersion,
         signalsExtracted,
-        startedAt:          new Date(),
+        startedAt:           new Date(),
       },
     });
-
-    const prompt = buildPrompt(signals);
 
     // ── 5. Call Claude — one retry on invalid JSON ────────────────────────────
     let rawOutput, tokensUsed, parsed;
@@ -173,7 +218,7 @@ function startContentAnalysisWorker() {
         job.log(`Claude response (attempt ${attempt}): ${rawOutput.slice(0, 200)}`);
 
         // Rule #3: log prompt_version + raw output on every Claude call
-        console.log(`[contentAnalysis] prompt_version=${PROMPT_VERSION} raw_output=${rawOutput}`);
+        console.log(`[contentAnalysis] prompt_version=${promptVersion} raw_output=${rawOutput}`);
 
         parsed = JSON.parse(rawOutput.trim());
         if (!validateOutput(parsed)) throw new Error('Missing required fields in Claude output');
@@ -211,7 +256,7 @@ function startContentAnalysisWorker() {
 
       // Upsert — one niche profile per creator per platform
       await tx.creatorNicheProfile.upsert({
-        where:  { creatorId_platform: { creatorId: profile.creatorId, platform: 'youtube' } },
+        where:  { creatorId_platform: { creatorId: profile.creatorId, platform: profile.platform } },
         update: {
           primaryNicheCategory:    parsed.primary_niche_category,
           primaryNicheSpecific:    parsed.primary_niche_specific,
@@ -233,7 +278,7 @@ function startContentAnalysisWorker() {
         create: {
           tenantId:                profile.tenantId,
           creatorId:               profile.creatorId,
-          platform:                'youtube',
+          platform:                profile.platform,
           primaryNicheCategory:    parsed.primary_niche_category,
           primaryNicheSpecific:    parsed.primary_niche_specific,
           secondaryNicheSpecific:  parsed.secondary_niche_specific ?? null,

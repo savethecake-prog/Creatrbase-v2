@@ -22,6 +22,7 @@ const { refreshTwitchToken,
 const { refreshTikTokToken,
         getTikTokUserInfo,
         getTikTokVideoList }              = require('../../services/tiktok');
+const { calculateTikTokAnalytics }       = require('../../services/tiktokContent');
 const { refreshInstagramToken,
         getInstagramProfile,
         getInstagramInsights }            = require('../../services/instagram');
@@ -182,33 +183,51 @@ function startPlatformSyncWorker() {
       } else if (profile.platform === 'tiktok') {
         const userInfo = await getTikTokUserInfo(accessToken, profile.platformUserId);
 
+        // Fetch video list to derive analytics (non-fatal if unavailable)
+        let videos = [];
+        try {
+          videos = await getTikTokVideoList(accessToken, { maxCount: 20 });
+        } catch (err) {
+          job.log(`TikTok video list fetch failed (non-fatal): ${err.message}`);
+        }
+
+        const analytics = calculateTikTokAnalytics(videos, userInfo);
+
         await tx.creatorPlatformProfile.update({
           where: { id: platformProfileId },
           data:  {
-            subscriberCount:       userInfo.followerCount,
-            tiktokFollowingCount:  userInfo.followingCount,
-            tiktokLikeCount:       userInfo.likesCount,
-            tiktokVideoCount:      userInfo.videoCount,
-            tiktokVerified:        userInfo.isVerified,
-            analyticsLastSyncedAt: new Date(),
-            syncStatus:            'active',
-            lastSyncedAt:          new Date(),
+            subscriberCount:              userInfo.followerCount,
+            tiktokFollowerCount:          userInfo.followerCount,
+            tiktokFollowingCount:         userInfo.followingCount,
+            tiktokLikeCount:              userInfo.likesCount,
+            tiktokVideoCount:             userInfo.videoCount,
+            tiktokVerified:               userInfo.isVerified,
+            tiktokAvgViewsPerVideo30d:    analytics.avgViews30d,
+            tiktokVideoPosts30d:          analytics.videoPosts30d,
+            tiktokEngagementRate30d:      analytics.engagementRate30d,
+            analyticsLastSyncedAt:        new Date(),
+            syncStatus:                   'active',
+            lastSyncedAt:                 new Date(),
           },
         });
 
         await tx.platformMetricsSnapshot.create({
           data: {
-            tenantId:         profile.tenantId,
+            tenantId:               profile.tenantId,
             platformProfileId,
-            platform:         'tiktok',
-            subscriberCount:  userInfo.followerCount,
+            platform:               'tiktok',
+            subscriberCount:        userInfo.followerCount,
+            tiktokFollowerCount:    userInfo.followerCount,
+            tiktokAvgViewsPerVideo: analytics.avgViews30d,
+            tiktokEngagementRate:   analytics.engagementRate30d,
           },
         });
 
         job.log(
           `TikTok sync complete: ${userInfo.followerCount} followers` +
-          `, likes=${userInfo.likesCount ?? 'n/a'}` +
-          `, videos=${userInfo.videoCount ?? 'n/a'}` +
+          `, avg_views_30d=${analytics.avgViews30d ?? 'n/a'}` +
+          `, posts_30d=${analytics.videoPosts30d}` +
+          `, engagement=${analytics.engagementRate30d ?? 'n/a'}` +
           `, verified=${userInfo.isVerified}`
         );
       } else if (profile.platform === 'instagram') {
@@ -267,6 +286,10 @@ function startPlatformSyncWorker() {
       // Auto-complete content_consistency tasks if new uploads detected
       if (synced.platform === 'youtube') {
         await queue.add('content:detect-uploads', { creatorId: synced.creatorId });
+      }
+      // Queue niche classification for TikTok (runs on every sync to keep niche current)
+      if (synced.platform === 'tiktok') {
+        await queue.add('analysis:baseline-run', { platformProfileId });
       }
     }
   });

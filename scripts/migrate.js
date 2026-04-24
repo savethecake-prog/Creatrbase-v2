@@ -61,6 +61,7 @@ const FILES = [
   '044_brand_watchlist.sql',
   '045_email_verification.sql',
   '046_email_confidence.sql',
+  '047_tiktok_analytics.sql',
 ];
 
 async function run() {

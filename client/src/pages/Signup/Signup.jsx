@@ -45,6 +45,7 @@ export function Signup() {
         api.post('/newsletter/subscribe', {
           email: form.email, source: 'product_signup',
           segments: ['creator-economy', 'ai-for-creators', 'editorial'],
+          marketing_consent: true,
         }).catch(err => console.error('[Signup]', err));
       }
       // Claim the score if we have a claim param

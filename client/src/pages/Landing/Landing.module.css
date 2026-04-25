@@ -320,7 +320,7 @@
 .tiersGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 48px; }
 .tierCard { background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 18px; padding: 28px 24px; box-shadow: 4px 4px 0 var(--lp-navy); }
 .tierRange { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--lp-muted); margin-bottom: 18px; display: block; }
-.tierName { font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--lp-navy); letter-spacing: -0.04em; margin-bottom: 10px; }
+.tierName { font-family: var(--font-display-ui); font-size: 28px; font-weight: 700; line-height: 1; color: var(--lp-navy); letter-spacing: -0.015em; margin-bottom: 10px; }
 .tierCard p { font-size: 13px; color: var(--lp-ink-soft); line-height: 1.55; margin-bottom: 20px; min-height: 82px; }
 .tierStrip { height: 8px; border-radius: 999px; background: var(--lp-cream-2); border: 1px solid var(--lp-line); overflow: hidden; margin-bottom: 6px; }
 .tierStripFill { height: 100%; border-radius: 999px; }

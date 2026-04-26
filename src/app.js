@@ -126,6 +126,7 @@ app.register(require('./domains/newsletter/newsletterRoutes').newsletterRoutes);
 app.register(require('./domains/compare/compareRoutes').compareRoutes);
 app.register(require('./domains/programmatic/programmaticRoutes').programmaticRoutes);
 app.register(require('./domains/public/publicRoutes'));
+app.register(require('./domains/public/unsubscribeRoutes'));
 app.register(require('./domains/public/scoreCardRoutes').scoreCardRoutes);
 app.register(require('./domains/public/claimRoutes').claimRoutes);
 app.register(require('./domains/public/ogImage').ogImageRoutes);

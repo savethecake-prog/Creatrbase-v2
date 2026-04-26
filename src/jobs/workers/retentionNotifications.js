@@ -26,6 +26,7 @@ const { Resend }             = require('resend');
 const { getPrisma }          = require('../../lib/prisma');
 const { getPool }            = require('../../db/pool');
 const { getDataCollectionQueue } = require('../queue');
+const { generateToken, isOptedOut } = require('../../services/unsubscribeToken');
 
 const APP_URL = process.env.APP_URL || 'https://creatrbase.com';
 
@@ -43,7 +44,15 @@ function escHtml(str) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function emailWrapper(subject, bodyHtml) {
+function buildUnsubUrl(userId) {
+  const token = generateToken(userId);
+  return `${APP_URL}/api/unsubscribe?token=${token}&uid=${encodeURIComponent(userId)}`;
+}
+
+function emailWrapper(subject, bodyHtml, unsubUrl) {
+  const footerLink = unsubUrl
+    ? `You're receiving this from Creatrbase. <a href="${unsubUrl}" style="color:#4A4860">Unsubscribe</a>`
+    : `You're receiving this from Creatrbase.`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(subject)}</title></head>
@@ -57,7 +66,7 @@ function emailWrapper(subject, bodyHtml) {
         ${bodyHtml}
         <tr><td style="padding:24px 0 0">
           <p style="margin:0;font-size:12px;color:#4A4860;text-align:center">
-            You're receiving this from Creatrbase. <a href="${APP_URL}/connections" style="color:#4A4860">Manage preferences</a>
+            ${footerLink}
           </p>
         </td></tr>
       </table>
@@ -84,6 +93,7 @@ async function getCreatorEmailInfo(prisma, creatorId) {
     where:  { id: creatorId },
     select: {
       id:          true,
+      userId:      true,
       displayName: true,
       user:        { select: { email: true } },
     },
@@ -95,6 +105,10 @@ async function getCreatorEmailInfo(prisma, creatorId) {
 async function sendDealNudge(prisma, resend, creatorId, brandName, daysSince) {
   const creator = await getCreatorEmailInfo(prisma, creatorId);
   if (!creator?.user?.email) return;
+  if (await isOptedOut(prisma, creatorId)) return;
+
+  const unsubUrl = buildUnsubUrl(creator.userId);
+  const subject  = `Any update on your deal with ${brandName}?`;
 
   const body = card(`
     <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7B7A8E">DEAL UPDATE</p>
@@ -109,8 +123,12 @@ async function sendDealNudge(prisma, resend, creatorId, brandName, daysSince) {
   await resend.emails.send({
     from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
     to:      creator.user.email,
-    subject: `Any update on your deal with ${brandName}?`,
-    html:    emailWrapper(`Any update on your deal with ${brandName}?`, body),
+    subject,
+    html:    emailWrapper(subject, body, unsubUrl),
+    headers: {
+      'List-Unsubscribe':      `<${unsubUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
   });
 
   console.log(`[retentionNotifications] deal nudge sent: creator=${creatorId} brand=${brandName}`);
@@ -137,9 +155,12 @@ const MILESTONE_DESCRIPTIONS = {
 async function sendMilestoneAlert(prisma, resend, creatorId, milestoneType) {
   const creator = await getCreatorEmailInfo(prisma, creatorId);
   if (!creator?.user?.email) return;
+  if (await isOptedOut(prisma, creatorId)) return;
 
-  const label = MILESTONE_LABELS[milestoneType] ?? milestoneType;
-  const desc  = MILESTONE_DESCRIPTIONS[milestoneType] ?? 'Keep up the momentum.';
+  const unsubUrl = buildUnsubUrl(creator.userId);
+  const label    = MILESTONE_LABELS[milestoneType] ?? milestoneType;
+  const desc     = MILESTONE_DESCRIPTIONS[milestoneType] ?? 'Keep up the momentum.';
+  const subject  = `You just unlocked: ${label}`;
 
   const body = card(`
     <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9EFFD8">MILESTONE UNLOCKED</p>
@@ -151,8 +172,12 @@ async function sendMilestoneAlert(prisma, resend, creatorId, milestoneType) {
   await resend.emails.send({
     from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
     to:      creator.user.email,
-    subject: `You just unlocked: ${label}`,
-    html:    emailWrapper(`Milestone unlocked: ${label}`, body),
+    subject,
+    html:    emailWrapper(`Milestone unlocked: ${label}`, body, unsubUrl),
+    headers: {
+      'List-Unsubscribe':      `<${unsubUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
   });
 
   console.log(`[retentionNotifications] milestone alert sent: creator=${creatorId} milestone=${milestoneType}`);
@@ -163,12 +188,15 @@ async function sendMilestoneAlert(prisma, resend, creatorId, milestoneType) {
 async function sendScoreChangeAlert(prisma, resend, creatorId, currentScore, previousScore) {
   const creator = await getCreatorEmailInfo(prisma, creatorId);
   if (!creator?.user?.email) return;
+  if (await isOptedOut(prisma, creatorId)) return;
 
+  const unsubUrl  = buildUnsubUrl(creator.userId);
   const delta     = currentScore - previousScore;
   const direction = delta > 0 ? 'up' : 'down';
   const color     = delta > 0 ? '#9EFFD8' : '#FFBFA3';
   const emoji     = delta > 0 ? '📈' : '📉';
   const verb      = delta > 0 ? 'increased' : 'dropped';
+  const subject   = `Your score ${verb} by ${Math.abs(delta)} points`;
 
   const body = card(`
     <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7B7A8E">SCORE UPDATE</p>
@@ -189,8 +217,12 @@ async function sendScoreChangeAlert(prisma, resend, creatorId, currentScore, pre
   await resend.emails.send({
     from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
     to:      creator.user.email,
-    subject: `Your score ${verb} by ${Math.abs(delta)} points`,
-    html:    emailWrapper(`Score update: ${currentScore}/100`, body),
+    subject,
+    html:    emailWrapper(`Score update: ${currentScore}/100`, body, unsubUrl),
+    headers: {
+      'List-Unsubscribe':      `<${unsubUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
   });
 
   console.log(`[retentionNotifications] score change alert sent: creator=${creatorId} delta=${delta}`);
@@ -201,6 +233,10 @@ async function sendScoreChangeAlert(prisma, resend, creatorId, currentScore, pre
 async function sendBrandMatchAlert(prisma, resend, creatorId, brandCount, niche) {
   const creator = await getCreatorEmailInfo(prisma, creatorId);
   if (!creator?.user?.email) return;
+  if (await isOptedOut(prisma, creatorId)) return;
+
+  const unsubUrl = buildUnsubUrl(creator.userId);
+  const subject  = `${brandCount} brand${brandCount !== 1 ? 's' : ''} in your niche are now within reach`;
 
   const body = card(`
     <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9EFFD8">BRAND MATCH</p>
@@ -217,8 +253,12 @@ async function sendBrandMatchAlert(prisma, resend, creatorId, brandCount, niche)
   await resend.emails.send({
     from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
     to:      creator.user.email,
-    subject: `${brandCount} brand${brandCount !== 1 ? 's' : ''} in your niche are now within reach`,
-    html:    emailWrapper('Brand match alert', body),
+    subject,
+    html:    emailWrapper('Brand match alert', body, unsubUrl),
+    headers: {
+      'List-Unsubscribe':      `<${unsubUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
   });
 
   console.log(`[retentionNotifications] brand match alert sent: creator=${creatorId} brands=${brandCount}`);

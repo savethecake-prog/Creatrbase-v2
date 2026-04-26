@@ -114,6 +114,7 @@ model Creator {
   digestSendDay         Int       @default(1) @map("digest_send_day")
   digestSendTime        DateTime  @default(dbgenerated("'08:00:00'::time")) @map("digest_send_time") @db.Time(6)
   analysisMode          String    @default("automatic") @map("analysis_mode")
+  notificationsOptOut   Boolean   @default(false) @map("notifications_opt_out")
   createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 

@@ -415,6 +415,265 @@ function startRetentionNotificationsWorker() {
     await sendBrandMatchAlert(prisma, resend, creatorId, brandCount, niche);
   });
 
+  // ── notifications:trial-warning ───────────────────────────────────────────
+  // Daily cron: finds trials expiring within 3 days that haven't been warned yet.
+
+  queue.process('notifications:trial-warning', async (job) => {
+    if (!process.env.RESEND_API_KEY) { job.log('RESEND_API_KEY not set — skipping'); return; }
+
+    const soon = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    const subs  = await prisma.subscription.findMany({
+      where: {
+        status:          'trialling',
+        trialWarningSent: false,
+        trialEnd:        { lte: soon, gt: new Date() },
+      },
+      select: { id: true, tenantId: true, trialEnd: true },
+    });
+
+    job.log(`Found ${subs.length} trial(s) ending within 3 days`);
+    const resend = getResend();
+
+    for (const sub of subs) {
+      const creator = await prisma.creator.findFirst({
+        where:  { tenantId: sub.tenantId },
+        select: { id: true, userId: true, displayName: true, user: { select: { email: true } } },
+      });
+      if (!creator?.user?.email) continue;
+
+      const daysLeft = Math.max(1, Math.ceil((new Date(sub.trialEnd) - Date.now()) / 86_400_000));
+      const unsubUrl = buildUnsubUrl(creator.userId);
+      const subject  = `Your Creatrbase trial ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`;
+
+      const body = card(`
+        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#FFBFA3">TRIAL ENDING SOON</p>
+        <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">Your trial ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''} ⏱</p>
+        <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
+          After your trial, you'll drop to the free plan and lose access to score tracking, gap analysis, and deal management.
+          Upgrade now to keep everything.
+        </p>
+        ${ctaButton('Upgrade to Core →', `${APP_URL}/dashboard`)}
+      `);
+
+      try {
+        await resend.emails.send({
+          from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
+          to:      creator.user.email,
+          subject,
+          html:    emailWrapper(subject, body, unsubUrl),
+          headers: {
+            'List-Unsubscribe':      `<${unsubUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          },
+        });
+        await prisma.subscription.update({
+          where: { id: sub.id },
+          data:  { trialWarningSent: true },
+        });
+        console.log(`[retentionNotifications] trial warning sent: creator=${creator.id}`);
+      } catch (err) {
+        job.log(`Failed to send trial warning for creator=${creator.id}: ${err.message}`);
+      }
+    }
+  });
+
+  // ── notifications:onboarding-welcome ─────────────────────────────────────
+  // Queued 30 min after signup. Sends welcome + connect-channel email.
+
+  queue.process('notifications:onboarding-welcome', async (job) => {
+    const { tenantId } = job.data;
+    if (!tenantId) throw new Error('notifications:onboarding-welcome missing tenantId');
+    if (!process.env.RESEND_API_KEY) { job.log('RESEND_API_KEY not set — skipping'); return; }
+
+    const sub = await prisma.subscription.findUnique({
+      where:  { tenantId },
+      select: { id: true, onboardingEmailsSent: true },
+    });
+    if (!sub) { job.log(`No subscription for tenantId=${tenantId}`); return; }
+
+    const sent = (sub.onboardingEmailsSent && typeof sub.onboardingEmailsSent === 'object') ? sub.onboardingEmailsSent : {};
+    if (sent.welcome) { job.log('Welcome email already sent — skipping'); return; }
+
+    const creator = await prisma.creator.findFirst({
+      where:  { tenantId },
+      select: { id: true, userId: true, displayName: true, notificationsOptOut: true, user: { select: { email: true } } },
+    });
+    if (!creator?.user?.email) return;
+    if (creator.notificationsOptOut) { job.log('Creator opted out'); return; }
+
+    const unsubUrl = buildUnsubUrl(creator.userId);
+    const subject  = 'Connect your channel to get your score';
+
+    const body = card(`
+      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9EFFD8">WELCOME TO CREATRBASE</p>
+      <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">Hey ${escHtml(creator.displayName ?? 'there')} — you're in 👋</p>
+      <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
+        One step left: connect your YouTube or Twitch channel to generate your Commercial Viability Score.
+        It takes 30 seconds and tells you exactly where you stand with brands.
+      </p>
+      ${ctaButton('Connect your channel →', `${APP_URL}/connections`)}
+    `);
+
+    const resend = getResend();
+    await resend.emails.send({
+      from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
+      to:      creator.user.email,
+      subject,
+      html:    emailWrapper(subject, body, unsubUrl),
+      headers: {
+        'List-Unsubscribe':      `<${unsubUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+    });
+
+    await prisma.subscription.update({
+      where: { id: sub.id },
+      data:  { onboardingEmailsSent: { ...sent, welcome: true } },
+    });
+
+    // Queue day-3 follow-up
+    await queue.add('notifications:onboarding-day3', { tenantId }, {
+      delay:    47.5 * 60 * 60 * 1000,
+      attempts: 2,
+      backoff:  { type: 'exponential', delay: 5000 },
+    });
+
+    console.log(`[retentionNotifications] onboarding welcome sent: creator=${creator.id}`);
+  });
+
+  // ── notifications:onboarding-day3 ────────────────────────────────────────
+  // Queued 47.5h after the welcome email.
+
+  queue.process('notifications:onboarding-day3', async (job) => {
+    const { tenantId } = job.data;
+    if (!tenantId) throw new Error('notifications:onboarding-day3 missing tenantId');
+    if (!process.env.RESEND_API_KEY) { job.log('RESEND_API_KEY not set — skipping'); return; }
+
+    const sub = await prisma.subscription.findUnique({
+      where:  { tenantId },
+      select: { id: true, onboardingEmailsSent: true },
+    });
+    if (!sub) { job.log(`No subscription for tenantId=${tenantId}`); return; }
+
+    const sent = (sub.onboardingEmailsSent && typeof sub.onboardingEmailsSent === 'object') ? sub.onboardingEmailsSent : {};
+    if (sent.day3) { job.log('Day-3 email already sent — skipping'); return; }
+
+    const creator = await prisma.creator.findFirst({
+      where:  { tenantId },
+      select: { id: true, userId: true, displayName: true, notificationsOptOut: true, user: { select: { email: true } } },
+    });
+    if (!creator?.user?.email) return;
+    if (creator.notificationsOptOut) { job.log('Creator opted out'); return; }
+
+    const unsubUrl = buildUnsubUrl(creator.userId);
+    const subject  = 'Check your Creatrbase score this week';
+
+    const body = card(`
+      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C8AAFF">YOUR SCORE IS READY</p>
+      <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">See what's holding you back</p>
+      <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
+        Your Commercial Viability Score breaks down the 6 dimensions brands actually care about — and shows you exactly which one is holding back your deals.
+        Check your dashboard to see where to focus this week.
+      </p>
+      ${ctaButton('View your dashboard →', `${APP_URL}/dashboard`)}
+    `);
+
+    const resend = getResend();
+    await resend.emails.send({
+      from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
+      to:      creator.user.email,
+      subject,
+      html:    emailWrapper(subject, body, unsubUrl),
+      headers: {
+        'List-Unsubscribe':      `<${unsubUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+    });
+
+    await prisma.subscription.update({
+      where: { id: sub.id },
+      data:  { onboardingEmailsSent: { ...sent, day3: true } },
+    });
+
+    console.log(`[retentionNotifications] onboarding day-3 sent: creator=${creator.id}`);
+  });
+
+  // ── notifications:upgrade-nudge ───────────────────────────────────────────
+  // Daily cron: free users who joined 7+ days ago and haven't been nudged yet.
+
+  queue.process('notifications:upgrade-nudge', async (job) => {
+    if (!process.env.RESEND_API_KEY) { job.log('RESEND_API_KEY not set — skipping'); return; }
+
+    const freePlans = await prisma.subscriptionPlan.findMany({
+      where:  { name: 'free' },
+      select: { id: true },
+    });
+    if (!freePlans.length) { job.log('No free plan found — skipping'); return; }
+    const freePlanIds = freePlans.map(p => p.id);
+
+    const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const subs   = await prisma.subscription.findMany({
+      where: {
+        planId:            { in: freePlanIds },
+        status:            'active',
+        upgradeNudgeSentAt: null,
+        createdAt:         { lte: cutoff },
+      },
+      select: { id: true, tenantId: true, createdAt: true },
+    });
+
+    job.log(`Found ${subs.length} free user(s) eligible for upgrade nudge`);
+    const resend = getResend();
+
+    for (const sub of subs) {
+      const creator = await prisma.creator.findFirst({
+        where:  { tenantId: sub.tenantId },
+        select: { id: true, userId: true, displayName: true, notificationsOptOut: true, user: { select: { email: true } } },
+      });
+      if (!creator?.user?.email) continue;
+      if (creator.notificationsOptOut) continue;
+
+      const daysSince = Math.floor((Date.now() - new Date(sub.createdAt).getTime()) / 86_400_000);
+      const unsubUrl  = buildUnsubUrl(creator.userId);
+      const subject   = `What you're missing on the free plan`;
+
+      const body = card(`
+        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C8AAFF">UPGRADE AVAILABLE</p>
+        <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">You've been on Creatrbase for ${daysSince} day${daysSince !== 1 ? 's' : ''}</p>
+        <p style="margin:0 0 12px;font-size:14px;color:#9B99B0;line-height:1.6">
+          The free plan shows your score. Core unlocks the things that actually move the needle:
+        </p>
+        <ul style="margin:0 0 16px;padding-left:20px;color:#9B99B0;font-size:14px;line-height:2">
+          <li>Weekly digest with your score trend and top action</li>
+          <li>Gap Tracker — see your 6 scoring dimensions over time</li>
+          <li>Deal management and brand outreach tools</li>
+          <li>Milestone alerts when you hit brand-readiness thresholds</li>
+        </ul>
+        ${ctaButton('Start your Core trial →', `${APP_URL}/dashboard`)}
+      `);
+
+      try {
+        await resend.emails.send({
+          from:    'Creatrbase <notifications@dashboard.creatrbase.com>',
+          to:      creator.user.email,
+          subject,
+          html:    emailWrapper(subject, body, unsubUrl),
+          headers: {
+            'List-Unsubscribe':      `<${unsubUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          },
+        });
+        await prisma.subscription.update({
+          where: { id: sub.id },
+          data:  { upgradeNudgeSentAt: new Date() },
+        });
+        console.log(`[retentionNotifications] upgrade nudge sent: creator=${creator.id}`);
+      } catch (err) {
+        job.log(`Failed to send upgrade nudge for creator=${creator.id}: ${err.message}`);
+      }
+    }
+  });
+
   // ── Scheduled daily deal nudge at 09:00 UTC ───────────────────────────────
   queue.add('notifications:deal-nudge', {}, {
     repeat:           { cron: '0 9 * * *' },
@@ -422,8 +681,24 @@ function startRetentionNotificationsWorker() {
     removeOnFail:     10,
   });
 
+  // ── Scheduled daily trial warning at 02:00 UTC ───────────────────────────
+  queue.add('notifications:trial-warning', {}, {
+    repeat:           { cron: '0 2 * * *' },
+    removeOnComplete: 5,
+    removeOnFail:     10,
+  });
+
+  // ── Scheduled daily upgrade nudge at 10:00 UTC ───────────────────────────
+  queue.add('notifications:upgrade-nudge', {}, {
+    repeat:           { cron: '0 10 * * *' },
+    removeOnComplete: 5,
+    removeOnFail:     10,
+  });
+
   console.log('[retentionNotifications] worker registered');
   console.log('[retentionNotifications] deal nudge scheduled at 09:00 UTC');
+  console.log('[retentionNotifications] trial warning scheduled at 02:00 UTC');
+  console.log('[retentionNotifications] upgrade nudge scheduled at 10:00 UTC');
 }
 
 module.exports = { startRetentionNotificationsWorker };

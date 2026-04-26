@@ -54,6 +54,18 @@ async function signup({ firstName, lastName, email, password, ip, userAgent }) {
     console.error('Verification email failed at signup (non-fatal):', emailErr.message);
   }
 
+  // 4. Queue onboarding welcome email (30 min delay) — non-fatal
+  try {
+    const { getDataCollectionQueue } = require('../../jobs/queue');
+    await getDataCollectionQueue().add('notifications:onboarding-welcome', { tenantId }, {
+      delay:    30 * 60 * 1000,
+      attempts: 2,
+      backoff:  { type: 'exponential', delay: 5000 },
+    });
+  } catch (qErr) {
+    console.error('Onboarding welcome queue failed (non-fatal):', qErr.message);
+  }
+
   return { userId, tenantId, sessionId, displayName };
 }
 

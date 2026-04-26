@@ -63,6 +63,7 @@ const FILES = [
   '046_email_confidence.sql',
   '047_tiktok_analytics.sql',
   '048_unsubscribe.sql',
+  '049_lifecycle_email_flags.sql',
 ];
 
 async function run() {

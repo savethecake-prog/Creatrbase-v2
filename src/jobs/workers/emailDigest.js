@@ -93,27 +93,34 @@ function buildUnsubUrl(userId) {
 function buildEmailHtml({ displayName, score, tier, scoreDelta, weakestDimension, recommendation, activeTaskCount, milestone, unsubUrl }) {
   const tierLabel     = TIER_LABELS[tier] ?? tier ?? 'Unknown';
   const dimLabel      = DIMENSION_LABELS[weakestDimension] ?? weakestDimension ?? 'Unknown';
-  const changeText    = scoreDelta != null ? ` <span style="color:${scoreDelta >= 0 ? '#9EFFD8' : '#FFBFA3'}">(${formatChange(scoreDelta)} this week)</span>` : '';
+  const changeColor   = scoreDelta != null ? (scoreDelta >= 0 ? '#4FB893' : '#C56D45') : '#A69BB8';
+  const changeText    = scoreDelta != null
+    ? ` <span style="font-size:18px;color:${changeColor};font-family:'DM Sans',system-ui,sans-serif">(${formatChange(scoreDelta)} this week)</span>`
+    : '';
   const milestoneHtml = milestone
-    ? `<p style="margin:0 0 8px">Next milestone: <strong style="color:#C8AAFF">${milestone.label}</strong></p>`
+    ? `<p style="margin:6px 0 0;font-size:13px;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">Next milestone: <strong style="color:#1B1040">${milestone.label}</strong></p>`
     : '';
   const recHtml = recommendation
     ? `
       <tr>
-        <td style="padding:24px 32px">
-          <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7B7A8E">THIS WEEK'S TASK</p>
-          <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#F5F4FF">${escHtml(recommendation.title)}</p>
-          <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">${escHtml(recommendation.specificAction)}</p>
-          <a href="${APP_URL}/tasks" style="display:inline-block;background:#9EFFD8;color:#05040A;font-size:13px;font-weight:700;padding:10px 22px;border-radius:999px;text-decoration:none">View task →</a>
+        <td style="padding:24px 32px;border-top:1px solid #E8E1D4">
+          <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">THIS WEEK'S TASK</p>
+          <p style="margin:0 0 8px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:18px;font-weight:700;color:#1B1040;line-height:1.3">${escHtml(recommendation.title)}</p>
+          <p style="margin:0 0 20px;font-size:14px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">${escHtml(recommendation.specificAction)}</p>
+          <a href="${APP_URL}/tasks" style="display:inline-block;background:#9EFFD8;color:#1B1040;font-family:'DM Sans',system-ui,sans-serif;font-size:14px;font-weight:700;padding:12px 26px;border-radius:9999px;text-decoration:none;box-shadow:3px 3px 0 #1B1040">View task →</a>
         </td>
       </tr>`
     : `
       <tr>
-        <td style="padding:24px 32px">
-          <p style="margin:0 0 8px;font-size:14px;color:#9B99B0">No task recommendation yet — your next sync will generate one.</p>
-          <a href="${APP_URL}/dashboard" style="display:inline-block;background:#9EFFD8;color:#05040A;font-size:13px;font-weight:700;padding:10px 22px;border-radius:999px;text-decoration:none">Go to dashboard →</a>
+        <td style="padding:24px 32px;border-top:1px solid #E8E1D4">
+          <p style="margin:0 0 16px;font-size:14px;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">No task recommendation yet — your next sync will generate one.</p>
+          <a href="${APP_URL}/dashboard" style="display:inline-block;background:#9EFFD8;color:#1B1040;font-family:'DM Sans',system-ui,sans-serif;font-size:14px;font-weight:700;padding:12px 26px;border-radius:9999px;text-decoration:none;box-shadow:3px 3px 0 #1B1040">Go to dashboard →</a>
         </td>
       </tr>`;
+
+  const footerUnsub = unsubUrl
+    ? `You're receiving this because you signed up for Creatrbase. <a href="${unsubUrl}" style="color:#A69BB8;text-decoration:underline">Unsubscribe</a>`
+    : `You're receiving this because you signed up for Creatrbase.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -121,49 +128,42 @@ function buildEmailHtml({ displayName, score, tier, scoreDelta, weakestDimension
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Your Creatrbase Weekly Digest</title>
+  <style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap');</style>
 </head>
-<body style="margin:0;padding:0;background:#05040A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+<body style="margin:0;padding:0;background:#FAF6EF;font-family:'DM Sans',system-ui,sans-serif">
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
-      <td align="center" style="padding:32px 16px">
+      <td align="center" style="padding:40px 16px">
         <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%">
 
-          <!-- Header -->
+          <!-- Wordmark -->
           <tr>
-            <td style="padding:0 0 24px">
-              <p style="margin:0;font-size:22px;font-weight:900;color:#9EFFD8;letter-spacing:-0.02em">creatrbase</p>
+            <td style="padding:0 0 28px">
+              <img src="https://creatrbase.com/brand/wordmark-light.png" width="160" alt="creatrbase" style="display:block;border:0">
             </td>
           </tr>
 
           <!-- Greeting -->
           <tr>
-            <td style="padding:0 0 24px">
-              <p style="margin:0 0 4px;font-size:26px;font-weight:800;color:#F5F4FF">Your weekly digest</p>
-              <p style="margin:0;font-size:15px;color:#9B99B0">Hey ${escHtml(displayName)} — here's where you stand this week.</p>
+            <td style="padding:0 0 20px">
+              <p style="margin:0 0 4px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:28px;font-weight:700;color:#1B1040;letter-spacing:-0.02em">Your weekly digest</p>
+              <p style="margin:0;font-size:15px;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">Hey ${escHtml(displayName)} — here's where you stand this week.</p>
             </td>
           </tr>
 
           <!-- Score card -->
           <tr>
             <td style="padding:0 0 16px">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#111019;border:1px solid rgba(255,255,255,0.08);border-radius:16px">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFFFFF;border:1px solid #E8E1D4;border-radius:14px">
                 <tr>
-                  <td style="padding:24px 32px">
-                    <p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7B7A8E">COMMERCIAL VIABILITY SCORE</p>
-                    <p style="margin:0 0 8px;font-size:42px;font-weight:900;color:#F5F4FF;line-height:1">${score ?? '–'}<span style="font-size:20px;color:#7B7A8E">/100</span>${changeText}</p>
-                    <p style="margin:0 0 8px;display:inline-block;background:rgba(158,255,216,0.1);color:#9EFFD8;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px">${tierLabel}</p>
+                  <td style="padding:28px 32px">
+                    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#A69BB8;font-family:'DM Sans',system-ui,sans-serif">COMMERCIAL VIABILITY SCORE</p>
+                    <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:48px;font-weight:700;color:#1B1040;line-height:1;letter-spacing:-0.02em">${score ?? '–'}<span style="font-size:22px;color:#A69BB8;font-family:'DM Sans',system-ui,sans-serif">/100</span>${changeText}</p>
+                    <span style="display:inline-block;background:#9EFFD8;color:#1B1040;font-size:11px;font-weight:700;padding:3px 12px;border-radius:9999px;letter-spacing:0.04em;font-family:'DM Sans',system-ui,sans-serif">${tierLabel}</span>
                     ${milestoneHtml}
-                    <p style="margin:0;font-size:13px;color:#7B7A8E">Primary gap: <strong style="color:#FFBFA3">${dimLabel}</strong></p>
+                    <p style="margin:8px 0 0;font-size:13px;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">Primary gap: <strong style="color:#C56D45">${dimLabel}</strong></p>
                   </td>
                 </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Recommendation -->
-          <tr>
-            <td style="padding:0 0 16px">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#111019;border:1px solid rgba(255,255,255,0.08);border-radius:16px">
                 ${recHtml}
               </table>
             </td>
@@ -173,10 +173,10 @@ function buildEmailHtml({ displayName, score, tier, scoreDelta, weakestDimension
           ${activeTaskCount > 0 ? `
           <tr>
             <td style="padding:0 0 16px">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#111019;border:1px solid rgba(255,255,255,0.08);border-radius:16px">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFFFFF;border:1px solid #E8E1D4;border-radius:14px">
                 <tr>
-                  <td style="padding:20px 32px">
-                    <p style="margin:0;font-size:14px;color:#9B99B0">You have <strong style="color:#F5F4FF">${activeTaskCount} active task${activeTaskCount !== 1 ? 's' : ''}</strong> in progress. <a href="${APP_URL}/tasks" style="color:#9EFFD8;text-decoration:none">View tasks →</a></p>
+                  <td style="padding:18px 32px">
+                    <p style="margin:0;font-size:14px;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">You have <strong style="color:#1B1040">${activeTaskCount} active task${activeTaskCount !== 1 ? 's' : ''}</strong> in progress. <a href="${APP_URL}/tasks" style="color:#4FB893;text-decoration:none;font-weight:600">View tasks →</a></p>
                   </td>
                 </tr>
               </table>
@@ -185,8 +185,8 @@ function buildEmailHtml({ displayName, score, tier, scoreDelta, weakestDimension
 
           <!-- Footer -->
           <tr>
-            <td style="padding:24px 0 0">
-              <p style="margin:0;font-size:12px;color:#4A4860;text-align:center">You're receiving this because you signed up for Creatrbase. ${unsubUrl ? `<a href="${unsubUrl}" style="color:#4A4860">Unsubscribe</a>` : ''}</p>
+            <td style="padding:20px 0 0">
+              <p style="margin:0;font-size:12px;color:#A69BB8;text-align:center;font-family:'DM Sans',system-ui,sans-serif">${footerUnsub}</p>
             </td>
           </tr>
 

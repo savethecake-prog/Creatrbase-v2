@@ -68,37 +68,69 @@ function renderScoreCardHTML({
   const xShareUrl = 'https://x.com/intent/tweet?text=' + shareText + '&url=' + shareUrl;
   const redditShareUrl = 'https://reddit.com/submit?url=' + shareUrl + '&title=' + encodeURIComponent(displayName + ' - Commercial Viability Score: ' + scoreNum + '/100');
 
-  // Build dimension bars HTML
-  let dimensionBarsHtml = '';
+  // \u2500\u2500\u2500 Dimension rendering \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  // Verified dimensions render as score bars.
+  // Unverified (insufficient_data) render as intentional gaps \u2014 we explain why
+  // we won't estimate rather than showing a meaningless empty bar.
+
+  const UNLOCK_REASONS = {
+    niche_commercial_value:  'We only benchmark rates we can verify. YouTube content categories are too broad to reliably anchor commercial value. Connect to confirm your actual niche.',
+    audience_geo_alignment:  'Your channel country is not the same as where your viewers are. We cannot verify audience geography from public data, and guessing would mean nothing.',
+    content_brand_alignment: 'Brand safety and commercial readiness requires more than scanning public descriptions to assess meaningfully. Connect to verify.',
+  };
+
+  const signupUrl = '/signup?claim=' + scoreCardId + '&platform=' + esc(platform) + '&handle=' + encodeURIComponent(handle) + '&' + utmBase;
+
+  let scoredBarsHtml     = '';
+  let unverifiedRowsHtml = '';
+  let verifiedCount      = 0;
+
   if (scoreBreakdown && typeof scoreBreakdown === 'object') {
     for (const [key, dim] of Object.entries(scoreBreakdown)) {
       const dimScore = dim?.score ?? null;
       const dimConf  = dim?.confidence ?? 'insufficient_data';
       const label    = DIMENSION_LABELS[key] ?? key;
-      const barWidth = dimScore != null ? dimScore : 0;
-      const dimLevel = getDimensionLevel(dimScore);
-      const barOpacity = dimConf === 'insufficient_data' ? '0.3' : '1';
-      const confLabel  = dimConf === 'insufficient_data' ? 'No data' : dimConf;
 
-      dimensionBarsHtml += '<div style="margin-bottom:12px">' +
-        '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
-        '<span style="font-size:13px;color:var(--text-sec)">' + esc(label) + '</span>' +
-        '<span style="font-size:13px;color:var(--text)">' + (dimScore != null ? dimScore : '\u2014') + ' <span style="font-size:11px;color:' + dimLevel.color + '">' + esc(dimLevel.label) + '</span></span>' +
-        '</div>' +
-        '<div style="height:6px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:3px;overflow:hidden">' +
-        '<div style="height:100%;width:' + barWidth + '%;background:' + dimLevel.color + ';opacity:' + barOpacity + ';border-radius:3px"></div>' +
-        '</div></div>';
+      if (dimConf === 'insufficient_data') {
+        const reason = UNLOCK_REASONS[key] ?? 'Connect your channel to verify this dimension.';
+        unverifiedRowsHtml +=
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-top:1px solid var(--card-border)">' +
+          '<div style="flex:1;min-width:0;padding-right:16px">' +
+          '<span style="font-size:13px;color:var(--text-muted);display:block;margin-bottom:3px">' + esc(label) + '</span>' +
+          '<span style="font-size:12px;color:var(--text-muted);line-height:1.5;opacity:0.7">' + esc(reason) + '</span>' +
+          '</div>' +
+          '<a href="' + signupUrl + '" style="flex-shrink:0;font-size:12px;font-weight:600;color:var(--text-muted);text-decoration:none;white-space:nowrap;padding:4px 10px;border:1px solid var(--card-border);border-radius:999px">Verify \u2192</a>' +
+          '</div>';
+      } else {
+        verifiedCount++;
+        const barWidth = dimScore != null ? dimScore : 0;
+        const dimLevel = getDimensionLevel(dimScore);
+        scoredBarsHtml +=
+          '<div style="margin-bottom:12px">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+          '<span style="font-size:13px;color:var(--text-sec)">' + esc(label) + '</span>' +
+          '<span style="font-size:13px;color:var(--text)">' + (dimScore != null ? dimScore : '\u2014') +
+          ' <span style="font-size:11px;color:' + dimLevel.color + '">' + esc(dimLevel.label) + '</span></span>' +
+          '</div>' +
+          '<div style="height:6px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:3px;overflow:hidden">' +
+          '<div style="height:100%;width:' + barWidth + '%;background:' + dimLevel.color + ';border-radius:3px"></div>' +
+          '</div></div>';
+      }
     }
   }
 
-  // Confidence count
-  const confValues = Object.values(confidenceSummary || {});
-  const lowCount   = confValues.filter(function(c) { return c === 'low' || c === 'insufficient_data'; }).length;
-  const confNote   = lowCount >= 4
-    ? 'Low confidence \u2014 based on public data only. Connect your channel for full analysis.'
-    : lowCount >= 2
-    ? 'Medium confidence \u2014 some dimensions estimated from public data.'
-    : 'Reasonable confidence from available data.';
+  const dimensionSectionHtml =
+    scoredBarsHtml +
+    (unverifiedRowsHtml
+      ? '<div style="margin-top:20px">' +
+        '<div style="font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Needs verification</div>' +
+        '<p style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:8px;opacity:0.7">We don\u2019t estimate these dimensions. <a href="/honesty" style="color:var(--text-sec);text-decoration:underline">Here\u2019s why \u2192</a></p>' +
+        unverifiedRowsHtml +
+        '</div>'
+      : '');
+
+  // Confidence note \u2014 count verified only, plain honest statement
+  const confNote = verifiedCount + ' of 6 dimensions verified from public data. We only show what we can confirm.';
 
   const copyLinkUrl = pageUrl + '?' + utmBase;
 
@@ -206,7 +238,7 @@ function renderScoreCardHTML({
 '\n' +
 '    <div class="dimensions">\n' +
 '      <div class="dims-title">Dimension Breakdown</div>\n' +
-       dimensionBarsHtml +
+       dimensionSectionHtml +
 '    </div>\n' +
 '\n' +
 '    <div class="what-means">\n' +
@@ -218,9 +250,9 @@ function renderScoreCardHTML({
     (claimedAt
       ? '      <div style="display:inline-block;padding:8px 20px;border-radius:999px;background:rgba(164,255,219,0.15);border:1px solid rgba(164,255,219,0.3);color:#A4FFDB;font-weight:600;font-size:14px;margin-bottom:12px">&#10003; Score claimed</div>\n' +
         '      <p style="font-size:13px;color:#555A66;margin-top:8px">This score has been saved to an account.</p>\n'
-      : '      <a class="btn-primary" href="/signup?claim=' + scoreCardId + '&platform=' + esc(platform) + '&handle=' + encodeURIComponent(handle) + '&' + utmBase + '">Save this score</a>\n' +
-        '      <a class="btn-secondary" href="/score?' + utmBase + '">Score your channel</a>\n' +
-        '      <p style="font-size:13px;color:#555A66;margin-top:16px">Own this channel? Sign up to connect via OAuth and get a full-confidence score.</p>\n') +
+      : '      <a class="btn-primary" href="/signup?claim=' + scoreCardId + '&platform=' + esc(platform) + '&handle=' + encodeURIComponent(handle) + '&' + utmBase + '">Verify your complete score</a>\n' +
+        '      <a class="btn-secondary" href="/score?' + utmBase + '">Score another channel</a>\n' +
+        '      <p style="font-size:13px;color:var(--text-muted);margin-top:16px">Connect your channel and we\'ll verify the remaining dimensions from your actual analytics — no estimates.</p>\n') +
 '    </div>\n' +
 '\n' +
 '    <div class="share-section">\n' +

@@ -64,20 +64,44 @@ async function getPublicChannelStats(channelId, apiKey) {
     uploadsPlaylistId: channel.contentDetails?.relatedPlaylists?.uploads
   };
 
-  // 2. Get last 15 videos views
+  // 2. Get recent videos — used for avg views, engagement rate, and upload consistency
   if (stats.uploadsPlaylistId) {
-    const listRes = await fetch(`${YOUTUBE_API}/playlistItems?part=contentDetails&playlistId=${stats.uploadsPlaylistId}&maxResults=15&key=${apiKey}`);
+    const listRes = await fetch(`${YOUTUBE_API}/playlistItems?part=contentDetails&playlistId=${stats.uploadsPlaylistId}&maxResults=50&key=${apiKey}`);
     const listData = await listRes.json();
 
     if (listRes.ok && listData.items?.length > 0) {
       const videoIds = listData.items.map(i => i.contentDetails.videoId).join(',');
-      const vidRes = await fetch(`${YOUTUBE_API}/videos?part=statistics&id=${videoIds}&key=${apiKey}`);
+
+      // Fetch statistics + snippet (publishedAt, likeCount, commentCount)
+      const vidRes = await fetch(`${YOUTUBE_API}/videos?part=statistics,snippet&id=${videoIds}&key=${apiKey}`);
       const vidData = await vidRes.json();
 
-      if (vidRes.ok) {
-        const views = vidData.items.map(v => parseInt(v.statistics.viewCount || '0', 10));
-        const totalViews = views.reduce((a, b) => a + b, 0);
-        stats.avgViewsLast15 = Math.round(totalViews / views.length);
+      if (vidRes.ok && vidData.items?.length > 0) {
+        const videos = vidData.items;
+
+        // Avg views across first 15 (backward-compatible metric)
+        const recentViews = videos.slice(0, 15).map(v => parseInt(v.statistics.viewCount || '0', 10));
+        if (recentViews.length > 0) {
+          stats.avgViewsLast15 = Math.round(recentViews.reduce((a, b) => a + b, 0) / recentViews.length);
+        }
+
+        // Engagement rate: (likes + comments) / views across all fetched videos
+        let totalLikes = 0, totalComments = 0, totalViews = 0;
+        for (const v of videos) {
+          totalLikes    += parseInt(v.statistics.likeCount    || '0', 10);
+          totalComments += parseInt(v.statistics.commentCount || '0', 10);
+          totalViews    += parseInt(v.statistics.viewCount    || '0', 10);
+        }
+        if (totalViews > 0) {
+          stats.engagementRate = parseFloat(((totalLikes + totalComments) / totalViews).toFixed(4));
+        }
+
+        // Upload count in last 90 days — direct measurement from publishedAt
+        const cutoff90d = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+        stats.publicUploads90d = videos.filter(v => {
+          const pub = v.snippet?.publishedAt ? new Date(v.snippet.publishedAt) : null;
+          return pub && pub >= cutoff90d;
+        }).length;
       }
     }
   }

@@ -49,23 +49,27 @@ function buildUnsubUrl(userId) {
   return `${APP_URL}/api/unsubscribe?token=${token}&uid=${encodeURIComponent(userId)}`;
 }
 
-function emailWrapper(subject, bodyHtml, unsubUrl) {
+function emailWrapper(subject, bodyHtml, unsubUrl, billingEmail = false) {
+  const footerText = billingEmail
+    ? 'This is a billing notification from Creatrbase.'
+    : "You're receiving this from Creatrbase.";
   const footerLink = unsubUrl
-    ? `You're receiving this from Creatrbase. <a href="${unsubUrl}" style="color:#4A4860">Unsubscribe</a>`
-    : `You're receiving this from Creatrbase.`;
+    ? `${footerText} <a href="${unsubUrl}" style="color:#A69BB8;text-decoration:underline">Unsubscribe</a>`
+    : footerText;
   return `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(subject)}</title></head>
-<body style="margin:0;padding:0;background:#05040A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(subject)}</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap');</style></head>
+<body style="margin:0;padding:0;background:#FAF6EF;font-family:'DM Sans',system-ui,sans-serif">
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
-    <tr><td align="center" style="padding:32px 16px">
+    <tr><td align="center" style="padding:40px 16px">
       <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%">
-        <tr><td style="padding:0 0 24px">
-          <p style="margin:0;font-size:22px;font-weight:900;color:#9EFFD8;letter-spacing:-0.02em">creatrbase</p>
+        <tr><td style="padding:0 0 28px">
+          <img src="https://creatrbase.com/brand/wordmark-light.png" width="160" alt="creatrbase" style="display:block;border:0">
         </td></tr>
         ${bodyHtml}
-        <tr><td style="padding:24px 0 0">
-          <p style="margin:0;font-size:12px;color:#4A4860;text-align:center">
+        <tr><td style="padding:20px 0 0">
+          <p style="margin:0;font-size:12px;color:#A69BB8;text-align:center;font-family:'DM Sans',system-ui,sans-serif">
             ${footerLink}
           </p>
         </td></tr>
@@ -78,14 +82,15 @@ function emailWrapper(subject, bodyHtml, unsubUrl) {
 function card(html) {
   return `<tr><td style="padding:0 0 16px">
     <table width="100%" cellpadding="0" cellspacing="0" border="0"
-      style="background:#111019;border:1px solid rgba(255,255,255,0.08);border-radius:16px">
-      <tr><td style="padding:24px 32px">${html}</td></tr>
+      style="background:#FFFFFF;border:1px solid #E8E1D4;border-radius:14px">
+      <tr><td style="padding:28px 32px">${html}</td></tr>
     </table>
   </td></tr>`;
 }
 
-function ctaButton(text, href) {
-  return `<a href="${href}" style="display:inline-block;background:#9EFFD8;color:#05040A;font-size:13px;font-weight:700;padding:10px 22px;border-radius:999px;text-decoration:none">${escHtml(text)}</a>`;
+function ctaButton(text, href, variant) {
+  const bg = variant === 'peach' ? '#FFBFA3' : '#9EFFD8';
+  return `<a href="${href}" style="display:inline-block;background:${bg};color:#1B1040;font-family:'DM Sans',system-ui,sans-serif;font-size:14px;font-weight:700;padding:12px 26px;border-radius:9999px;text-decoration:none;box-shadow:3px 3px 0 #1B1040">${escHtml(text)}</a>`;
 }
 
 async function getCreatorEmailInfo(prisma, creatorId) {
@@ -111,10 +116,10 @@ async function sendDealNudge(prisma, resend, creatorId, brandName, daysSince) {
   const subject  = `Any update on your deal with ${brandName}?`;
 
   const body = card(`
-    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7B7A8E">DEAL UPDATE</p>
-    <p style="margin:0 0 8px;font-size:20px;font-weight:800;color:#F5F4FF">Any update on your deal with ${escHtml(brandName)}?</p>
-    <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
-      It's been <strong style="color:#FFBFA3">${daysSince} days</strong> since your last activity on this deal.
+    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">DEAL UPDATE</p>
+    <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:22px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">Any update on your deal with ${escHtml(brandName)}?</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">
+      It's been <strong style="color:#C56D45">${daysSince} days</strong> since your last activity on this deal.
       Staying on top of open negotiations keeps momentum — even a quick follow-up can move things forward.
     </p>
     ${ctaButton('Log an update →', `${APP_URL}/negotiations`)}
@@ -163,9 +168,9 @@ async function sendMilestoneAlert(prisma, resend, creatorId, milestoneType) {
   const subject  = `You just unlocked: ${label}`;
 
   const body = card(`
-    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9EFFD8">MILESTONE UNLOCKED</p>
-    <p style="margin:0 0 8px;font-size:24px;font-weight:900;color:#F5F4FF">${escHtml(label)} 🎯</p>
-    <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">${escHtml(desc)}</p>
+    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4FB893;font-family:'DM Sans',system-ui,sans-serif">MILESTONE UNLOCKED</p>
+    <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">${escHtml(label)} 🎯</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">${escHtml(desc)}</p>
     ${ctaButton('See your score →', `${APP_URL}/dashboard`)}
   `);
 
@@ -198,17 +203,16 @@ async function sendScoreChangeAlert(prisma, resend, creatorId, currentScore, pre
   const verb      = delta > 0 ? 'increased' : 'dropped';
   const subject   = `Your score ${verb} by ${Math.abs(delta)} points`;
 
+  const textColor = delta > 0 ? '#4FB893' : '#C56D45';
   const body = card(`
-    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7B7A8E">SCORE UPDATE</p>
-    <p style="margin:0 0 8px;font-size:24px;font-weight:900;color:#F5F4FF">
-      Your score ${verb} ${emoji}
+    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#76688F;font-family:'DM Sans',system-ui,sans-serif">SCORE UPDATE</p>
+    <p style="margin:0 0 12px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">Your score ${verb} ${emoji}</p>
+    <p style="margin:0 0 4px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:48px;font-weight:700;color:#1B1040;line-height:1;letter-spacing:-0.02em">
+      ${currentScore}<span style="font-size:22px;color:#A69BB8;font-family:'DM Sans',system-ui,sans-serif">/100</span>
+      <span style="font-size:20px;color:${textColor};font-family:'DM Sans',system-ui,sans-serif">(${delta > 0 ? '+' : ''}${delta})</span>
     </p>
-    <p style="margin:0 0 4px;font-size:42px;font-weight:900;color:#F5F4FF;line-height:1">
-      ${currentScore}<span style="font-size:20px;color:#7B7A8E">/100</span>
-      <span style="font-size:20px;color:${color}">(${delta > 0 ? '+' : ''}${delta})</span>
-    </p>
-    <p style="margin:16px 0;font-size:14px;color:#9B99B0;line-height:1.6">
-      Your commercial viability score ${verb} by <strong style="color:${color}">${Math.abs(delta)} points</strong> since your last sync.
+    <p style="margin:16px 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">
+      Your commercial viability score ${verb} by <strong style="color:${textColor}">${Math.abs(delta)} points</strong> since your last sync.
       ${direction === 'up' ? 'Keep it going — check your dashboard to see what moved.' : 'Check your dashboard to see what changed and what to focus on next.'}
     </p>
     ${ctaButton('View breakdown →', `${APP_URL}/dashboard`)}
@@ -239,12 +243,12 @@ async function sendBrandMatchAlert(prisma, resend, creatorId, brandCount, niche)
   const subject  = `${brandCount} brand${brandCount !== 1 ? 's' : ''} in your niche are now within reach`;
 
   const body = card(`
-    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9EFFD8">BRAND MATCH</p>
-    <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">
+    <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4FB893;font-family:'DM Sans',system-ui,sans-serif">BRAND MATCH</p>
+    <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:24px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">
       ${brandCount} brand${brandCount !== 1 ? 's' : ''} in your niche are now within reach
     </p>
-    <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
-      Your score has crossed the eligibility threshold for <strong style="color:#F5F4FF">${brandCount} ${escHtml(niche ?? 'niche')} brand${brandCount !== 1 ? 's' : ''}</strong>.
+    <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">
+      Your score has crossed the eligibility threshold for <strong style="color:#1B1040">${brandCount} ${escHtml(niche ?? 'niche')} brand${brandCount !== 1 ? 's' : ''}</strong>.
       Now is a good time to review your outreach list and start pitching.
     </p>
     ${ctaButton('View brands →', `${APP_URL}/outreach`)}
@@ -446,9 +450,9 @@ function startRetentionNotificationsWorker() {
       const subject  = `Your Creatrbase trial ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`;
 
       const body = card(`
-        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#FFBFA3">TRIAL ENDING SOON</p>
-        <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">Your trial ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''} ⏱</p>
-        <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#C56D45;font-family:'DM Sans',system-ui,sans-serif">TRIAL ENDING SOON</p>
+        <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">Your trial ends in ${daysLeft} day${daysLeft !== 1 ? 's' : ''} ⏱</p>
+        <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">
           After your trial, you'll drop to the free plan and lose access to score tracking, gap analysis, and deal management.
           Upgrade now to keep everything.
         </p>
@@ -505,9 +509,9 @@ function startRetentionNotificationsWorker() {
     const subject  = 'Connect your channel to get your score';
 
     const body = card(`
-      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9EFFD8">WELCOME TO CREATRBASE</p>
-      <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">Hey ${escHtml(creator.displayName ?? 'there')} — you're in 👋</p>
-      <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
+      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4FB893;font-family:'DM Sans',system-ui,sans-serif">WELCOME TO CREATRBASE</p>
+      <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">Hey ${escHtml(creator.displayName ?? 'there')} — you're in 👋</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">
         One step left: connect your YouTube or Twitch channel to generate your Commercial Viability Score.
         It takes 30 seconds and tells you exactly where you stand with brands.
       </p>
@@ -569,9 +573,9 @@ function startRetentionNotificationsWorker() {
     const subject  = 'Check your Creatrbase score this week';
 
     const body = card(`
-      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C8AAFF">YOUR SCORE IS READY</p>
-      <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">See what's holding you back</p>
-      <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">
+      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#7A5CBF;font-family:'DM Sans',system-ui,sans-serif">YOUR SCORE IS READY</p>
+      <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">See what's holding you back</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">
         Your Commercial Viability Score breaks down the 6 dimensions brands actually care about — and shows you exactly which one is holding back your deals.
         Check your dashboard to see where to focus this week.
       </p>
@@ -638,12 +642,12 @@ function startRetentionNotificationsWorker() {
       const subject   = `What you're missing on the free plan`;
 
       const body = card(`
-        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C8AAFF">UPGRADE AVAILABLE</p>
-        <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">You've been on Creatrbase for ${daysSince} day${daysSince !== 1 ? 's' : ''}</p>
-        <p style="margin:0 0 12px;font-size:14px;color:#9B99B0;line-height:1.6">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#7A5CBF;font-family:'DM Sans',system-ui,sans-serif">UPGRADE AVAILABLE</p>
+        <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">You've been on Creatrbase for ${daysSince} day${daysSince !== 1 ? 's' : ''}</p>
+        <p style="margin:0 0 12px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">
           The free plan shows your score. Core unlocks the things that actually move the needle:
         </p>
-        <ul style="margin:0 0 16px;padding-left:20px;color:#9B99B0;font-size:14px;line-height:2">
+        <ul style="margin:0 0 20px;padding-left:20px;color:#76688F;font-size:15px;line-height:2;font-family:'DM Sans',system-ui,sans-serif">
           <li>Weekly digest with your score trend and top action</li>
           <li>Gap Tracker — see your 6 scoring dimensions over time</li>
           <li>Deal management and brand outreach tools</li>

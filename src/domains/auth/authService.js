@@ -242,19 +242,34 @@ async function sendVerificationEmail(userId, email) {
     from:    process.env.EMAIL_FROM || 'noreply@creatrbase.com',
     to:      email,
     subject: 'Verify your Creatrbase email',
-    html: `
-      <p style="font-family:sans-serif;font-size:15px;color:#1B1040">
-        Hi — please verify your email address to unlock all features.
-      </p>
-      <p style="margin:24px 0">
-        <a href="${verifyUrl}" style="background:#A4FFDB;color:#1B1040;font-weight:700;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">
-          Verify email
-        </a>
-      </p>
-      <p style="font-family:sans-serif;font-size:12px;color:#666">
-        This link expires in 24 hours. If you didn't create a Creatrbase account, ignore this email.
-      </p>
-    `,
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verify your email</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap');</style></head>
+<body style="margin:0;padding:0;background:#FAF6EF;font-family:'DM Sans',system-ui,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td align="center" style="padding:40px 16px">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%">
+        <tr><td style="padding:0 0 28px">
+          <img src="https://creatrbase.com/brand/wordmark-light.png" width="160" alt="creatrbase" style="display:block;border:0">
+        </td></tr>
+        <tr><td style="padding:0 0 16px">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFFFFF;border:1px solid #E8E1D4;border-radius:14px">
+            <tr><td style="padding:28px 32px">
+              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4FB893;font-family:'DM Sans',system-ui,sans-serif">VERIFY YOUR ACCOUNT</p>
+              <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">Confirm your email address</p>
+              <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">Hi — please verify your email address to unlock all features. This link expires in 24 hours.</p>
+              <a href="${verifyUrl}" style="display:inline-block;background:#9EFFD8;color:#1B1040;font-family:'DM Sans',system-ui,sans-serif;font-size:14px;font-weight:700;padding:12px 26px;border-radius:9999px;text-decoration:none;box-shadow:3px 3px 0 #1B1040">Verify email →</a>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:20px 0 0">
+          <p style="margin:0;font-size:12px;color:#A69BB8;text-align:center;font-family:'DM Sans',system-ui,sans-serif">If you didn't create a Creatrbase account, you can safely ignore this email.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`,
   });
 }
 

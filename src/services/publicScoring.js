@@ -42,11 +42,13 @@ function calculatePublicScore(platform, channelData) {
     videoCount:              isYoutube ? channelData.videoCount
                            : isTikTok  ? (channelData.videoCount ?? null)
                            :              null,
-    engagementRate30d:       isTikTok  ? (channelData.engagementRate30d ?? null) : null,
+    engagementRate30d:       isTikTok  ? (channelData.engagementRate30d ?? null)
+                           : isYoutube ? (channelData.engagementRate    ?? null)
+                           :              null,
     avgViewsPerVideo30d:     isYoutube ? channelData.avgViewsLast15
                            : isTikTok  ? (channelData.avgViewsPerVideo30d ?? null)
                            :              null,
-    publicUploads90d:        null,       // requires analytics OAuth
+    publicUploads90d:        isYoutube ? (channelData.publicUploads90d ?? null) : null,
     primaryAudienceGeo:      null,       // not available from TikTok public API
     subVelocityPerDay:       null,       // requires snapshot history
     snapshotCount:           0,          // no snapshots for public score

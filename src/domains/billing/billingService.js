@@ -252,24 +252,25 @@ async function sendPaymentFailedEmail(prisma, tenantId, stripeCustomerId) {
     subject: 'Payment failed — update your card to keep access',
     html: `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Payment failed</title></head>
-<body style="margin:0;padding:0;background:#05040A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Payment failed</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap');</style></head>
+<body style="margin:0;padding:0;background:#FAF6EF;font-family:'DM Sans',system-ui,sans-serif">
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
-    <tr><td align="center" style="padding:32px 16px">
+    <tr><td align="center" style="padding:40px 16px">
       <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%">
-        <tr><td style="padding:0 0 24px"><p style="margin:0;font-size:22px;font-weight:900;color:#9EFFD8;letter-spacing:-0.02em">creatrbase</p></td></tr>
+        <tr><td style="padding:0 0 28px"><img src="https://creatrbase.com/brand/wordmark-light.png" width="160" alt="creatrbase" style="display:block;border:0"></td></tr>
         <tr><td style="padding:0 0 16px">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#111019;border:1px solid rgba(255,255,255,0.08);border-radius:16px">
-            <tr><td style="padding:24px 32px">
-              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#FFBFA3">PAYMENT FAILED</p>
-              <p style="margin:0 0 8px;font-size:22px;font-weight:800;color:#F5F4FF">Your payment didn't go through</p>
-              <p style="margin:0 0 16px;font-size:14px;color:#9B99B0;line-height:1.6">Hey ${name} — your latest Creatrbase payment failed. Update your payment method to keep your Core subscription active.</p>
-              <a href="${portalUrl}" style="display:inline-block;background:#FFBFA3;color:#05040A;font-size:13px;font-weight:700;padding:10px 22px;border-radius:999px;text-decoration:none">Update payment method →</a>
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFFFFF;border:1px solid #E8E1D4;border-radius:14px">
+            <tr><td style="padding:28px 32px">
+              <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#C56D45;font-family:'DM Sans',system-ui,sans-serif">PAYMENT FAILED</p>
+              <p style="margin:0 0 10px;font-family:'Outfit','DM Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1B1040;line-height:1.2;letter-spacing:-0.01em">Your payment didn't go through</p>
+              <p style="margin:0 0 20px;font-size:15px;color:#76688F;line-height:1.6;font-family:'DM Sans',system-ui,sans-serif">Hey ${name} — your latest Creatrbase payment failed. Update your payment method to keep your Core subscription active.</p>
+              <a href="${portalUrl}" style="display:inline-block;background:#FFBFA3;color:#1B1040;font-family:'DM Sans',system-ui,sans-serif;font-size:14px;font-weight:700;padding:12px 26px;border-radius:9999px;text-decoration:none;box-shadow:3px 3px 0 #1B1040">Update payment method →</a>
             </td></tr>
           </table>
         </td></tr>
-        <tr><td style="padding:24px 0 0">
-          <p style="margin:0;font-size:12px;color:#4A4860;text-align:center">This is a billing notification from Creatrbase. <a href="${unsubUrl}" style="color:#4A4860">Unsubscribe</a></p>
+        <tr><td style="padding:20px 0 0">
+          <p style="margin:0;font-size:12px;color:#A69BB8;text-align:center;font-family:'DM Sans',system-ui,sans-serif">This is a billing notification from Creatrbase. <a href="${unsubUrl}" style="color:#A69BB8;text-decoration:underline">Unsubscribe</a></p>
         </td></tr>
       </table>
     </td></tr>

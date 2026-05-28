@@ -30,8 +30,17 @@ function toAbsoluteUrl(url) {
   return url;
 }
 
+function buildFullTitle(title) {
+  if (!title) return `${SITE_NAME} — Commercial Intelligence for Creators`;
+  // If the caller already worked the brand name into their title (e.g.
+  // "About Creatrbase — Creator commercial intelligence"), don't append
+  // " | Creatrbase" — that yielded titles like "Pricing — Creatrbase | Creatrbase".
+  if (title.toLowerCase().includes(SITE_NAME.toLowerCase())) return title;
+  return `${title} | ${SITE_NAME}`;
+}
+
 export function PageMeta({ title, description, canonical, ogImage, ogType = 'website', noIndex = false }) {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Commercial Intelligence for Creators`;
+  const fullTitle = buildFullTitle(title);
 
   const rawDesc  = description ?? DEFAULT_DESC;
   const desc     = rawDesc.length > 155 ? rawDesc.slice(0, 152) + '...' : rawDesc;

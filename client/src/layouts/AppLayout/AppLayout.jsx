@@ -13,6 +13,16 @@ async function goToCheckout(plan) {
   window.location.href = url;
 }
 
+async function goToBillingPortal() {
+  const { url } = await api.post('/billing/portal');
+  window.location.href = url;
+}
+
+// Statuses that mean the user has an actual Stripe subscription history
+// (trial counts — it's already a Stripe customer record). 'free' users
+// have no portal to manage and would get a 404 from /api/billing/portal.
+const PORTAL_STATUSES = new Set(['trialling', 'active', 'past_due', 'canceled', 'unpaid', 'incomplete']);
+
 const NAV = [
   {
     group: 'Overview',
@@ -76,6 +86,7 @@ export function AppLayout({ children }) {
   const isTrialling = sub?.status === 'trialling';
   const trialDaysLeft = sub?.trialDaysLeft ?? null;
   const showTrialBanner = isTrialling && trialDaysLeft !== null;
+  const showManageBilling = PORTAL_STATUSES.has(sub?.status);
 
   async function handleLogout() {
     await logout();
@@ -129,6 +140,19 @@ export function AppLayout({ children }) {
               <Link to="/settings" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                 Settings
               </Link>
+              {showManageBilling && (
+                <button
+                  type="button"
+                  className={styles.dropdownItem}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDropdownOpen(false);
+                    goToBillingPortal();
+                  }}
+                >
+                  Manage billing
+                </button>
+              )}
               <div className={styles.dropdownItem}>
                 <span className={styles.dropdownLabel}>Theme</span>
                 <select

@@ -65,14 +65,45 @@ app.register(require('@fastify/helmet'), {
   },
 });
 
+// ── Pre-rendered HTML serving (must register BEFORE rate-limit) ──────────────
+// Serves static pre-rendered HTML files via an onRequest hook. Registered here
+// — before the rate-limit plugin — so static page serving is never blocked by
+// the rate limiter. Previously the rate limiter fired first; the prerender
+// script then captured 429 responses and wrote them to disk as the
+// "pre-rendered" content, breaking /score and several blog pages.
+
+if (process.env.NODE_ENV === 'production') {
+  const clientDistEarly   = path.join(__dirname, '..', 'dist', 'client');
+  const prerenderedDirEarly = path.join(clientDistEarly, '_prerendered');
+
+  app.addHook('onRequest', async (req, reply) => {
+    if (req.method !== 'GET') return;
+    if (req.url.startsWith('/api/')) return;
+    if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|map|txt|xml)(\?|$)/i.test(req.url)) return;
+
+    const cleanPath = req.url.split('?')[0].split('#')[0];
+    const prerenderedPath = cleanPath === '/'
+      ? path.join(prerenderedDirEarly, 'index.html')
+      : path.join(prerenderedDirEarly, cleanPath, 'index.html');
+
+    if (fs.existsSync(prerenderedPath)) {
+      const html = fs.readFileSync(prerenderedPath, 'utf8');
+      reply.type('text/html').send(html);
+    }
+  });
+}
+
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 // Global default: 200 req/min per IP. Sensitive routes override below.
+// Localhost / internal calls (e.g. the prerender script running on the VPS)
+// bypass the limiter so they cannot poison the pre-render cache with 429s.
 
 app.register(require('@fastify/rate-limit'), {
   global:     true,
   max:        200,
   timeWindow: '1 minute',
   keyGenerator: (req) => req.ip,
+  allowList:  ['127.0.0.1', '::1', '::ffff:127.0.0.1'],
   errorResponseBuilder: () => ({
     statusCode: 429,
     error:      'Too Many Requests',
@@ -162,25 +193,7 @@ require('./jobs/workers/emailVerifier').startEmailVerifierWorker();
 
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '..', 'dist', 'client');
-  const prerenderedDir = path.join(clientDist, '_prerendered');
-
-  // Pre-rendered HTML hook: check before static files are served
-  app.addHook('onRequest', async (req, reply) => {
-    // Only intercept GET requests for HTML pages (not assets, API, etc.)
-    if (req.method !== 'GET') return;
-    if (req.url.startsWith('/api/')) return;
-    if (/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|map|txt|xml)(\?|$)/i.test(req.url)) return;
-
-    const cleanPath = req.url.split('?')[0].split('#')[0];
-    const prerenderedPath = cleanPath === '/'
-      ? path.join(prerenderedDir, 'index.html')
-      : path.join(prerenderedDir, cleanPath, 'index.html');
-
-    if (fs.existsSync(prerenderedPath)) {
-      const html = fs.readFileSync(prerenderedPath, 'utf8');
-      reply.type('text/html').send(html);
-    }
-  });
+  // Pre-rendered HTML hook is registered earlier (before rate-limit) — see above.
 
   app.register(require('@fastify/static'), {
     root:   clientDist,

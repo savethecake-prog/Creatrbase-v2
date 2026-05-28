@@ -13,15 +13,37 @@ const { renderScoreCardHTML }  = require('../../templates/scoreCard');
 const YOUTUBE_HANDLE_RE = /^@?[a-zA-Z0-9_.-]{1,100}$/;
 const TWITCH_HANDLE_RE  = /^[a-zA-Z0-9_]{4,25}$/;
 
-// Rate limiting: 5 scores per IP per hour
-const scoreRateLimit = {};
+// Rate limiting: 5 scores per IP per hour, in-memory.
+// Uses a Map and an amortised sweep so the dictionary stays bounded by the
+// count of IPs that hit /score within the last hour — previously the object
+// grew unboundedly because one-shot IPs were never removed.
+const WINDOW_MS    = 3600_000;
+const MAX_PER_HOUR = 5;
+const SWEEP_AT     = 1000;
+const scoreRateLimit = new Map(); // ip → number[] (recent timestamps, ms)
+
 function checkScoreRateLimit(ip) {
-  const now = Date.now();
-  const key = ip + ':score';
-  if (!scoreRateLimit[key]) scoreRateLimit[key] = [];
-  scoreRateLimit[key] = scoreRateLimit[key].filter(t => t > now - 3600000);
-  if (scoreRateLimit[key].length >= 5) return false;
-  scoreRateLimit[key].push(now);
+  const now    = Date.now();
+  const cutoff = now - WINDOW_MS;
+
+  const existing = scoreRateLimit.get(ip);
+  const times    = existing ? existing.filter((t) => t > cutoff) : [];
+
+  if (times.length >= MAX_PER_HOUR) {
+    scoreRateLimit.set(ip, times);
+    return false;
+  }
+  times.push(now);
+  scoreRateLimit.set(ip, times);
+
+  // Amortised sweep: when the Map grows past SWEEP_AT entries, walk it once
+  // and drop any IP whose entire window has now expired. Runs at most once
+  // per ~SWEEP_AT requests, so the cost is O(1) per call on average.
+  if (scoreRateLimit.size > SWEEP_AT) {
+    for (const [k, v] of scoreRateLimit) {
+      if (v.every((t) => t <= cutoff)) scoreRateLimit.delete(k);
+    }
+  }
   return true;
 }
 

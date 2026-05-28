@@ -60,6 +60,7 @@ export function BlogArticle() {
         description={post.excerpt || post.meta_description}
         canonical={`https://creatrbase.com/blog/${post.slug}`}
         ogImage={post.coverImageUrl || '/brand/og-image-with-tagline.png'}
+        ogType="article"
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         '@context': 'https://schema.org', '@type': 'Article',

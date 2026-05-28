@@ -7,20 +7,35 @@
  *   title       — page-specific title (appended with " | Creatrbase")
  *   description — page description (truncated to 155 chars)
  *   canonical   — full canonical URL (https://creatrbase.com/...)
- *   ogImage     — Open Graph image URL (defaults to /og-image.png)
+ *   ogImage     — Open Graph image URL. Relative paths are auto-resolved
+ *                 to absolute against SITE_ORIGIN — social crawlers (FB,
+ *                 LinkedIn) do not reliably resolve relative og:image URLs.
+ *   ogType      — Open Graph type. Defaults to "website". Set to "article"
+ *                 for blog posts and other editorial content.
  *   noIndex     — if true, adds noindex,nofollow (use on all auth pages)
  */
 
 const SITE_NAME    = 'Creatrbase';
+const SITE_ORIGIN  = 'https://creatrbase.com';
 const DEFAULT_DESC = 'Know your Commercial Viability Score. Track your gap to brand deals. Represent yourself directly — without an agency.';
-const DEFAULT_OG   = 'https://creatrbase.com/og-image.png';
+const DEFAULT_OG   = `${SITE_ORIGIN}/og-image.png`;
 
-export function PageMeta({ title, description, canonical, ogImage, noIndex = false }) {
+function toAbsoluteUrl(url) {
+  if (!url) return DEFAULT_OG;
+  // Already absolute (http, https, or protocol-relative)
+  if (/^https?:\/\//i.test(url) || url.startsWith('//')) return url;
+  // Site-relative path → resolve against origin
+  if (url.startsWith('/')) return `${SITE_ORIGIN}${url}`;
+  // Anything else (data: URI, etc.) — leave as is
+  return url;
+}
+
+export function PageMeta({ title, description, canonical, ogImage, ogType = 'website', noIndex = false }) {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Commercial Intelligence for Creators`;
 
   const rawDesc  = description ?? DEFAULT_DESC;
   const desc     = rawDesc.length > 155 ? rawDesc.slice(0, 152) + '...' : rawDesc;
-  const imageUrl = ogImage || DEFAULT_OG;
+  const imageUrl = toAbsoluteUrl(ogImage);
 
   return (
     <>
@@ -29,7 +44,7 @@ export function PageMeta({ title, description, canonical, ogImage, noIndex = fal
       {canonical && <link rel="canonical" href={canonical} />}
 
       {/* Open Graph */}
-      <meta property="og:type"        content="website" />
+      <meta property="og:type"        content={ogType} />
       <meta property="og:site_name"   content={SITE_NAME} />
       <meta property="og:title"       content={fullTitle} />
       <meta property="og:description" content={desc} />

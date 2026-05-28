@@ -207,6 +207,18 @@ if (process.env.NODE_ENV === 'production') {
     decorateReply: false,
   });
 
+  // Prefixes corresponding to SPA app/auth/admin routes (see client/src/App.jsx).
+  // Anything reaching this not-found handler matching one of these is a valid
+  // client-side route — serve index.html with 200 so the SPA can render it.
+  // Everything else is a genuine unknown URL: serve the SPA so React can render
+  // its NotFound component, but with HTTP 404 so crawlers don't treat it as a
+  // soft 404. (Valid public routes are pre-rendered and never reach here.)
+  const SPA_ROUTE_PREFIXES = [
+    '/dashboard', '/gap', '/tasks', '/outreach', '/negotiations',
+    '/connections', '/settings', '/community', '/toolkit', '/power',
+    '/onboarding', '/admin', '/login', '/signup',
+  ];
+
   app.setNotFoundHandler(async (req, reply) => {
     if (req.url.startsWith('/api/')) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
@@ -215,7 +227,16 @@ if (process.env.NODE_ENV === 'production') {
     if (blocked.test(req.url)) {
       return reply.code(404).send({ error: 'Not Found', statusCode: 404 });
     }
-    return reply.sendFile('index.html');
+
+    const cleanPath = req.url.split('?')[0].split('#')[0];
+    const isSpaAppRoute = SPA_ROUTE_PREFIXES.some(
+      (p) => cleanPath === p || cleanPath.startsWith(p + '/'),
+    );
+
+    if (isSpaAppRoute) {
+      return reply.sendFile('index.html');
+    }
+    return reply.code(404).sendFile('index.html');
   });
 }
 

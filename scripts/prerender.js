@@ -26,6 +26,10 @@ const STATIC_ROUTES = [
   '/cookies',
   '/author/anthony-saulderson',
   '/score',
+  '/agencies',
+  '/agencies/methodology',
+  '/agencies/sample',
+  '/agencies/brief',
 ];
 
 async function getDynamicRoutes() {

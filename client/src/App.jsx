@@ -25,6 +25,14 @@ const Author             = lazyNamed(() => import('./pages/Author/Author'),     
 const Compare            = lazyNamed(() => import('./pages/Compare/Compare'),                      'Compare');
 const StaticPage         = lazy(()       => import('./pages/Static/StaticPage'));
 
+// Agencies route (CB-KD-05 s.2)
+const Agencies           = lazyNamed(() => import('./pages/Agencies/Agencies'),       'Agencies');
+const AgenciesMethodology= lazyNamed(() => import('./pages/Agencies/Methodology'),    'Methodology');
+const AgenciesSample     = lazyNamed(() => import('./pages/Agencies/Sample'),         'Sample');
+const AgenciesBrief      = lazyNamed(() => import('./pages/Agencies/Brief'),          'Brief');
+const AgenciesPrivacy    = lazyNamed(() => import('./pages/Agencies/Privacy'),        'Privacy');
+const AgenciesTerms      = lazyNamed(() => import('./pages/Agencies/Terms'),          'Terms');
+
 // Programmatic
 const NichePage     = lazyNamed(() => import('./pages/Niche/NichePage'), 'NichePage');
 const RatePage      = lazyNamed(() => import('./pages/Niche/NichePage'), 'RatePage');
@@ -82,6 +90,15 @@ export default function App() {
               <Route path="/about"              element={<About />} />
               <Route path="/author/anthony-saulderson" element={<Author />} />
               <Route path="/compare/:competitor"       element={<Compare />} />
+
+              {/* Agencies route (registered before the catch-all /:slug) */}
+              <Route path="/agencies"             element={<Agencies />} />
+              <Route path="/agencies/methodology" element={<AgenciesMethodology />} />
+              <Route path="/agencies/sample"      element={<AgenciesSample />} />
+              <Route path="/agencies/brief"       element={<AgenciesBrief />} />
+              <Route path="/agencies/privacy"     element={<AgenciesPrivacy />} />
+              <Route path="/agencies/terms"       element={<AgenciesTerms />} />
+
               <Route path="/niche/:slug"               element={<NichePage />} />
               <Route path="/rates/:country/:niche"     element={<RatePage />} />
               <Route path="/threshold/:metric"         element={<ThresholdPage />} />

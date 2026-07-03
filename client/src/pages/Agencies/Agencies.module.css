@@ -1,0 +1,203 @@
+/* Agencies route — shared shell, hero, sections, pricing, doc pages.
+   Same tokens, same register as the rest of the site (CB-KD-05 s.1). */
+
+.page {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 0 var(--page-gutter);
+}
+
+/* ── Nav ── */
+.nav {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--bg-page) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.navInner {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  height: var(--nav-height);
+  padding: 0 var(--page-gutter);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.navLogo { display: inline-flex; align-items: center; }
+.navLinks { display: flex; align-items: center; gap: var(--space-6); }
+.navLink { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; }
+.navLink:hover { color: var(--text-primary); }
+.navCta {
+  background: var(--text-primary); color: var(--bg-surface);
+  padding: var(--space-2) var(--space-5); border-radius: var(--radius-full);
+  text-decoration: none; font-weight: 600; font-size: 0.95rem;
+}
+.navCta:hover { background: var(--cb-purple); }
+
+/* ── Hero / proposition ── */
+.hero { padding: var(--space-24) 0 var(--space-16); }
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.08; margin: 0 0 var(--space-5); max-width: 18ch;
+}
+.heroSub {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  color: var(--text-secondary); margin: 0 0 var(--space-8); font-weight: 500;
+}
+.heroActions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-10); }
+.bridge {
+  border-left: 3px solid var(--accent);
+  padding-left: var(--space-5);
+  color: var(--text-secondary); max-width: 60ch; margin: 0;
+}
+
+/* ── Buttons ── */
+.ctaPrimary {
+  display: inline-block;
+  background: var(--text-primary); color: var(--bg-surface);
+  padding: var(--space-3) var(--space-6); border-radius: var(--radius-full);
+  text-decoration: none; font-weight: 600; border: 0; cursor: pointer;
+  font-size: 1rem;
+}
+.ctaPrimary:hover { background: var(--cb-purple); }
+.ctaSecondary {
+  display: inline-block;
+  background: transparent; color: var(--text-primary);
+  padding: var(--space-3) var(--space-6); border-radius: var(--radius-full);
+  text-decoration: none; font-weight: 600; border: 1px solid var(--border-strong);
+  cursor: pointer; font-size: 1rem;
+}
+.ctaSecondary:hover { background: var(--bg-hover); }
+
+/* ── Sections ── */
+.section { padding: var(--space-16) 0; }
+.sectionAlt { background: var(--bg-surface-2); }
+.eyebrow {
+  text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem;
+  font-weight: 700; color: var(--accent-active); margin-bottom: var(--space-3);
+}
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem); line-height: 1.15;
+  margin: 0 0 var(--space-4); max-width: 24ch;
+}
+.lede { font-size: 1.1rem; color: var(--text-secondary); max-width: 62ch; margin: 0 0 var(--space-6); }
+
+/* ── Proof card ── */
+.proofCard {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-6);
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: var(--space-8);
+  box-shadow: var(--shadow-card); flex-wrap: wrap;
+}
+.proofLabel { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: var(--space-2); }
+.proofNote { color: var(--text-secondary); margin: 0; max-width: 46ch; }
+
+/* ── Method ── */
+.methodGrid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6); margin-bottom: var(--space-8);
+}
+.methodBlock {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: var(--space-6);
+}
+.methodBlock h3 { font-family: var(--font-display); font-size: 1.2rem; margin: 0 0 var(--space-3); }
+.methodBlock p { color: var(--text-secondary); margin: 0 0 var(--space-4); }
+.methodLink { color: var(--accent-active); text-decoration: none; font-weight: 600; }
+.methodLink:hover { text-decoration: underline; }
+.equivalence {
+  font-size: 1.15rem; font-weight: 600; text-align: center;
+  color: var(--text-primary); margin: 0;
+}
+
+/* ── Pricing ── */
+.priceGrid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-5); margin-bottom: var(--space-6);
+}
+.priceCard {
+  display: flex; flex-direction: column;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: var(--space-6);
+}
+.priceHead { border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-4); margin-bottom: var(--space-4); }
+.priceName { font-family: var(--font-display); font-size: 1.2rem; margin: 0 0 var(--space-2); }
+.priceFigure { font-size: 2rem; font-weight: 700; font-family: var(--font-display); }
+.priceAlt { font-size: 1.1rem; color: var(--text-secondary); font-weight: 500; }
+.priceUnit { color: var(--text-secondary); font-size: 0.9rem; margin-top: var(--space-1); }
+.priceBlurb { color: var(--text-secondary); font-size: 0.95rem; flex: 1; margin: 0 0 var(--space-5); }
+.freeRun {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-6);
+  background: var(--success-subtle); border: 1px solid var(--success-border);
+  border-radius: var(--radius-lg); padding: var(--space-8); flex-wrap: wrap;
+}
+
+.doorSection { text-align: center; }
+.doorSection .lede { margin-left: auto; margin-right: auto; }
+
+/* ── Doc pages (methodology, legal) ── */
+.doc { max-width: 760px; margin: 0 auto; padding: var(--space-12) var(--page-gutter) var(--space-16); }
+.docHeader { margin-bottom: var(--space-10); }
+.docTitle { font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.8rem); margin: 0 0 var(--space-3); }
+.docSub { color: var(--text-secondary); font-size: 1.05rem; margin: 0; }
+.docFlag {
+  background: var(--warning-subtle); border-left: 3px solid var(--warning);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
+  color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 var(--space-5);
+}
+.docSection { margin-bottom: var(--space-8); }
+.docSection h2 {
+  font-family: var(--font-display); font-size: 1.5rem;
+  border-top: 1px solid var(--border); padding-top: var(--space-6); margin: 0 0 var(--space-4);
+}
+.doc p { line-height: 1.7; margin: 0 0 var(--space-4); }
+.docList { margin: 0 0 var(--space-4); padding-left: var(--space-5); }
+.docList li { line-height: 1.7; margin-bottom: var(--space-2); }
+.independence {
+  background: var(--accent-subtle); border-left: 3px solid var(--accent);
+  padding: var(--space-4) var(--space-5); border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+.docFine { color: var(--text-tertiary); font-size: 0.9rem; font-style: italic; margin-top: var(--space-8); }
+
+/* ── Sample embed ── */
+.sampleFrame {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: var(--shadow-card); background: var(--bg-surface);
+  margin: var(--space-6) 0;
+}
+.sampleIframe { width: 100%; height: 78vh; border: 0; display: block; }
+.sampleActions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+
+/* ── Footer ── */
+.footer { background: var(--cb-navy); color: #F0EDE6; padding: var(--space-16) 0 var(--space-8); margin-top: var(--space-16); }
+.footerInner {
+  max-width: var(--page-max-width); margin: 0 auto; padding: 0 var(--page-gutter);
+  display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-12);
+}
+.footerBrand { max-width: 44ch; }
+.footerTag { color: #B9B3C8; margin: var(--space-4) 0; line-height: 1.6; }
+.footerIndependence { color: #9A95A8; font-size: 0.85rem; line-height: 1.6; }
+.footerCols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+.footerColTitle { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; color: #9A95A8; margin: 0 0 var(--space-4); }
+.footerLinks { list-style: none; margin: 0; padding: 0; }
+.footerLinks li { margin-bottom: var(--space-2); }
+.footerLinks a { color: #D1CCDE; text-decoration: none; }
+.footerLinks a:hover { color: #fff; }
+.footerBottom {
+  max-width: var(--page-max-width); margin: var(--space-12) auto 0; padding: var(--space-6) var(--page-gutter) 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex; justify-content: space-between; color: #9A95A8; font-size: 0.85rem; flex-wrap: wrap; gap: var(--space-2);
+}
+
+@media (max-width: 720px) {
+  .footerInner { grid-template-columns: 1fr; gap: var(--space-8); }
+  .sampleIframe { height: 70vh; }
+}

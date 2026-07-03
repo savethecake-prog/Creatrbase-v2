@@ -11,6 +11,13 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
+      // Dev-only: proxy the agencies service to production so the intake form and the
+      // pool-preview interstitial can be exercised locally against the live backend.
+      '/agencies-svc': {
+        target: 'https://creatrbase.com',
+        changeOrigin: true,
+        secure: true,
+      },
     },
   },
   build: {

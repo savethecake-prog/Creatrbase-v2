@@ -1,0 +1,102 @@
+/* The stepped conversational form. Thumb-zone binding (CB-KD-05 s.7): on mobile the
+   question sits at the top, the assurance line mid-screen, the primary action pinned
+   sticky in the lower third within thumb reach. */
+
+.page { background: var(--bg-page); color: var(--text-primary); min-height: 100vh; font-family: var(--font-body); }
+
+.formMain {
+  max-width: 640px; margin: 0 auto;
+  padding: var(--space-10) var(--page-gutter) var(--space-16);
+  min-height: calc(100vh - var(--nav-height));
+  display: flex; flex-direction: column;
+}
+
+.honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+/* progress */
+.progress { margin-bottom: var(--space-8); }
+.stepCount { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+.progressBar { height: 4px; background: var(--border-subtle); border-radius: var(--radius-full); margin-top: var(--space-2); overflow: hidden; }
+.progressFill { height: 100%; background: var(--accent); border-radius: var(--radius-full); transition: width var(--transition-base); }
+
+/* question block (top of thumb zone) */
+.question { flex: 1; }
+.ack { color: var(--accent-active); font-weight: 600; margin: 0 0 var(--space-3); }
+.qTitle { font-family: var(--font-display); font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.15; margin: 0 0 var(--space-3); }
+.qHint { color: var(--text-secondary); margin: 0 0 var(--space-6); }
+
+/* fields */
+.field { display: block; margin-bottom: var(--space-5); }
+.label { display: block; font-weight: 600; margin-bottom: var(--space-2); font-size: 0.95rem; }
+.optional { color: var(--text-tertiary); font-weight: 400; font-size: 0.85rem; }
+.input, .select, .textarea {
+  width: 100%; padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--bg-surface); color: var(--text-primary);
+  font-size: 1rem; font-family: var(--font-body);
+}
+.input:focus, .select:focus, .textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+.textarea { resize: vertical; }
+.counter { display: block; text-align: right; font-size: 0.8rem; color: var(--text-tertiary); margin-top: var(--space-1); }
+.help { display: block; font-size: 0.85rem; color: var(--text-tertiary); margin-top: var(--space-2); }
+
+/* fork / choice taps (pure taps at step one) */
+.taps { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
+.tap {
+  text-align: left; padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--bg-surface); cursor: pointer; transition: border-color var(--transition-fast);
+}
+.tap:hover { border-color: var(--accent); }
+.tapActive { border-color: var(--accent); background: var(--accent-subtle); box-shadow: 0 0 0 1px var(--accent); }
+.tapLabel { display: block; font-weight: 600; }
+.tapHint { display: block; color: var(--text-secondary); font-size: 0.9rem; margin-top: var(--space-1); }
+
+/* multi-row (platforms, metrics) */
+.row { display: flex; gap: var(--space-2); margin-bottom: var(--space-3); align-items: center; }
+.row .input, .row .select { flex: 1; min-width: 0; }
+.rowRemove { border: 0; background: var(--bg-hover); border-radius: var(--radius-sm); width: 32px; height: 32px; cursor: pointer; color: var(--text-secondary); font-size: 1.2rem; flex-shrink: 0; }
+.addRow { border: 1px dashed var(--border); background: transparent; color: var(--text-secondary); padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); cursor: pointer; }
+.addRow:hover { border-color: var(--accent); color: var(--text-primary); }
+
+/* sensitivity toggles */
+.toggles { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
+.toggleChip { border: 1px solid var(--border); background: var(--bg-surface); padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); cursor: pointer; font-size: 0.9rem; }
+.toggleActive { border-color: var(--accent); background: var(--accent-subtle); font-weight: 600; }
+
+/* assurance line (mid-screen) */
+.assurance { color: var(--text-secondary); font-size: 0.9rem; margin: var(--space-6) 0 var(--space-2); }
+.error { color: var(--error); font-size: 0.95rem; margin: var(--space-2) 0; }
+.savedNote { color: var(--success); font-size: 0.85rem; margin-top: var(--space-3); }
+
+/* actions (lower third; sticky on mobile) */
+.actions { display: flex; gap: var(--space-3); align-items: center; margin-top: var(--space-4); }
+.primary {
+  flex: 1; background: var(--text-primary); color: var(--bg-surface);
+  padding: var(--space-4) var(--space-6); border-radius: var(--radius-full);
+  font-weight: 600; border: 0; cursor: pointer; font-size: 1rem; text-align: center; text-decoration: none;
+}
+.primary:hover:not(:disabled) { background: var(--cb-purple); }
+.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.back { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: var(--space-4) var(--space-5); border-radius: var(--radius-full); cursor: pointer; }
+.back:hover:not(:disabled) { background: var(--bg-hover); }
+
+/* interstitials & confirmation */
+.interstitial, .confirm { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.interLede { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.7; max-width: 54ch; }
+.confirmLine { font-family: var(--font-display); font-size: 1.3rem; color: var(--text-primary); border-left: 3px solid var(--accent); padding-left: var(--space-4); margin: var(--space-4) 0; }
+.confirmList { padding-left: var(--space-5); color: var(--text-primary); line-height: 1.8; margin: var(--space-4) 0; }
+.privacyNote { color: var(--text-tertiary); font-size: 0.85rem; margin-top: var(--space-8); }
+.privacyNote a, .interLede a { color: var(--accent-active); }
+
+/* thumb-zone: pin the primary action in the lower third on mobile */
+@media (max-width: 600px) {
+  .formMain { padding-bottom: 96px; }
+  .actions {
+    position: sticky; bottom: 0;
+    background: linear-gradient(to top, var(--bg-page) 70%, transparent);
+    padding: var(--space-4) 0 var(--space-4);
+    margin: var(--space-4) calc(-1 * var(--page-gutter)) 0;
+    padding-left: var(--page-gutter); padding-right: var(--page-gutter);
+  }
+}

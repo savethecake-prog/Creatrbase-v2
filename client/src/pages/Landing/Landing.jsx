@@ -54,7 +54,7 @@ const FAQS = [
   { id: 'cancel', q: 'Can I cancel without talking to someone?', a: 'Yes. One click, in your settings. No \u201cschedule a call\u201d nonsense. Your score data stays available in read-only mode for 30 days so you can still reference it.' },
 ];
 
-const TICKER_ITEMS = ['Honest scoring', 'Real brand data', 'UK + US benchmarks', 'Built for independent creators', 'Weekly refresh', 'No agency middlemen'];
+const TICKER_ITEMS = ['Honest scoring', 'Real brand data', 'UK + US benchmarks', 'Built for independent creators', 'Weekly refresh', 'No gatekeepers'];
 
 export function Landing() {
   const [heroRef, heroVisible] = useIntersection({ once: true, threshold: 0.1 });
@@ -511,7 +511,7 @@ export function Landing() {
         <div className={styles.container}>
           <div className={`${styles.eyebrow} ${styles.eyebrowLav} ${styles.reveal}`}><span className={styles.eyebrowDot} /> For whom</div>
           <h2 className={`${styles.sectionTitle} ${styles.reveal} ${styles.stagger1}`}>Built for the creator who&rsquo;s been doing this alone.</h2>
-          <p className={`${styles.sectionLede} ${styles.reveal} ${styles.stagger2}`}>We designed Creatrbase for the independent creator in the 1k&ndash;100k range. Not agencies. Not mega-creators. People who are building real audiences and deserve real infrastructure.</p>
+          <p className={`${styles.sectionLede} ${styles.reveal} ${styles.stagger2}`}>We designed Creatrbase for the independent creator in the 1k&ndash;100k range &mdash; people building real audiences who deserve real infrastructure, working direct rather than through a mega-creator machine. <Link to="/agencies">Agencies, see how we vet.</Link></p>
           <div className={styles.whomGrid}>
             {[
               { name: 'The Stuck Climber', sub: '8\u201330k subs \u00b7 Growing', quote: '\u201cI\u2019m growing. I\u2019m engaged. But every time I pitch a brand I\u2019m guessing what they\u2019ll care about. Creatrbase gave me the frame to stop guessing.\u201d', tags: ['Lifestyle','UK','YouTube','Weekly uploads'], color: 'lav', img: '/brand/persona-climber.png' },

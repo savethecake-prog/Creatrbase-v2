@@ -57,7 +57,7 @@ app.register(require('@fastify/helmet'), {
         'https://graph.instagram.com',
         'https://api.instagram.com',
       ],
-      frameSrc:       ['https://js.stripe.com', 'https://hooks.stripe.com'],
+      frameSrc:       ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com'],
       frameAncestors: ["'none'"],
       formAction:     ["'self'"],
       baseUri:        ["'self'"],

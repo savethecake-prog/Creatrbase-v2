@@ -80,7 +80,7 @@
 .sectionAlt { background: var(--bg-surface-2); }
 .eyebrow {
   text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem;
-  font-weight: 700; color: var(--accent-active); margin-bottom: var(--space-3);
+  font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-3);
 }
 .sectionTitle {
   font-family: var(--font-display);
@@ -110,7 +110,7 @@
 }
 .methodBlock h3 { font-family: var(--font-display); font-size: 1.2rem; margin: 0 0 var(--space-3); }
 .methodBlock p { color: var(--text-secondary); margin: 0 0 var(--space-4); }
-.methodLink { color: var(--accent-active); text-decoration: none; font-weight: 600; }
+.methodLink { color: var(--text-secondary); text-decoration: underline; font-weight: 600; }
 .methodLink:hover { text-decoration: underline; }
 .equivalence {
   font-size: 1.15rem; font-weight: 600; text-align: center;
@@ -165,7 +165,7 @@
   padding: var(--space-4) var(--space-5); border-radius: var(--radius-sm);
   font-weight: 500;
 }
-.docFine { color: var(--text-tertiary); font-size: 0.9rem; font-style: italic; margin-top: var(--space-8); }
+.docFine { color: var(--text-secondary); font-size: 0.9rem; font-style: italic; margin-top: var(--space-8); }
 
 /* ── Sample embed ── */
 .sampleFrame {

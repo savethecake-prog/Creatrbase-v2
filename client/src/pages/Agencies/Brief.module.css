@@ -21,14 +21,14 @@
 
 /* question block (top of thumb zone) */
 .question { flex: 1; }
-.ack { color: var(--accent-active); font-weight: 600; margin: 0 0 var(--space-3); }
+.ack { color: var(--text-secondary); font-weight: 600; margin: 0 0 var(--space-3); }
 .qTitle { font-family: var(--font-display); font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.15; margin: 0 0 var(--space-3); }
 .qHint { color: var(--text-secondary); margin: 0 0 var(--space-6); }
 
 /* fields */
 .field { display: block; margin-bottom: var(--space-5); }
 .label { display: block; font-weight: 600; margin-bottom: var(--space-2); font-size: 0.95rem; }
-.optional { color: var(--text-tertiary); font-weight: 400; font-size: 0.85rem; }
+.optional { color: var(--text-secondary); font-weight: 400; font-size: 0.85rem; }
 .input, .select, .textarea {
   width: 100%; padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border); border-radius: var(--radius-md);
@@ -37,8 +37,8 @@
 }
 .input:focus, .select:focus, .textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
 .textarea { resize: vertical; }
-.counter { display: block; text-align: right; font-size: 0.8rem; color: var(--text-tertiary); margin-top: var(--space-1); }
-.help { display: block; font-size: 0.85rem; color: var(--text-tertiary); margin-top: var(--space-2); }
+.counter { display: block; text-align: right; font-size: 0.8rem; color: var(--text-secondary); margin-top: var(--space-1); }
+.help { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-top: var(--space-2); }
 
 /* fork / choice taps (pure taps at step one) */
 .taps { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
@@ -67,7 +67,7 @@
 /* assurance line (mid-screen) */
 .assurance { color: var(--text-secondary); font-size: 0.9rem; margin: var(--space-6) 0 var(--space-2); }
 .error { color: var(--error); font-size: 0.95rem; margin: var(--space-2) 0; }
-.savedNote { color: var(--success); font-size: 0.85rem; margin-top: var(--space-3); }
+.savedNote { color: var(--text-secondary); font-size: 0.85rem; margin-top: var(--space-3); }
 
 /* actions (lower third; sticky on mobile) */
 .actions { display: flex; gap: var(--space-3); align-items: center; margin-top: var(--space-4); }
@@ -86,8 +86,8 @@
 .interLede { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.7; max-width: 54ch; }
 .confirmLine { font-family: var(--font-display); font-size: 1.3rem; color: var(--text-primary); border-left: 3px solid var(--accent); padding-left: var(--space-4); margin: var(--space-4) 0; }
 .confirmList { padding-left: var(--space-5); color: var(--text-primary); line-height: 1.8; margin: var(--space-4) 0; }
-.privacyNote { color: var(--text-tertiary); font-size: 0.85rem; margin-top: var(--space-8); }
-.privacyNote a, .interLede a { color: var(--accent-active); }
+.privacyNote { color: var(--text-secondary); font-size: 0.85rem; margin-top: var(--space-8); }
+.privacyNote a, .interLede a { color: var(--text-primary); text-decoration: underline; }
 
 /* thumb-zone: pin the primary action in the lower third on mobile */
 @media (max-width: 600px) {

@@ -217,6 +217,10 @@ if (process.env.NODE_ENV === 'production') {
     '/dashboard', '/gap', '/tasks', '/outreach', '/negotiations',
     '/connections', '/settings', '/community', '/toolkit', '/power',
     '/onboarding', '/admin', '/login', '/signup',
+    // The agencies route: its indexable pages are pre-rendered, but the noIndex
+    // pages (/agencies/brief, /agencies/privacy, /agencies/terms) reach here and
+    // are valid client-side routes — serve the SPA shell with 200, not a soft 404.
+    '/agencies',
   ];
 
   app.setNotFoundHandler(async (req, reply) => {

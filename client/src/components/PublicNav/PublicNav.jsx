@@ -11,7 +11,25 @@ function NavLink({ hash, to, className, children }) {
   return <Link to={to || `/${hash}`} className={className}>{children}</Link>;
 }
 
-export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
+// Default v2 nav entries (the creator-side homepage set). Passing `links`/`cta`/`login`
+// overrides them while reusing the identical nav shell, v2 logo and styles — the agencies
+// route composes this same component rather than forking its own header.
+const V2_DEFAULT_LINKS = [
+  { hash: 'how-it-works', to: '/scoring-explained', label: 'How it works' },
+  { to: '/pricing', label: 'Pricing' },
+  { to: '/blog', label: 'Blog' },
+  { to: '/about', label: 'About' },
+  { to: '/honesty', label: 'Honesty' },
+];
+const V2_DEFAULT_CTA = { hash: 'score', to: '/score', label: 'Get your score' };
+
+export function PublicNav({
+  scrollEffect = false,
+  variant = 'v1',
+  links = V2_DEFAULT_LINKS,
+  cta = V2_DEFAULT_CTA,
+  login = { to: '/login', label: 'Log in' },
+}) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,15 +47,13 @@ export function PublicNav({ scrollEffect = false, variant = 'v1' }) {
             <LogoWordmark variant="v2" dark />
           </Link>
           <div className={styles.linksV2}>
-            <NavLink hash="#how-it-works" to="/scoring-explained" className={styles.linkV2}>How it works</NavLink>
-            <Link to="/pricing" className={styles.linkV2}>Pricing</Link>
-            <Link to="/blog" className={styles.linkV2}>Blog</Link>
-            <Link to="/about" className={styles.linkV2}>About</Link>
-            <Link to="/honesty" className={styles.linkV2}>Honesty</Link>
+            {links.map((l) => (
+              <NavLink key={l.to} hash={l.hash} to={l.to} className={styles.linkV2}>{l.label}</NavLink>
+            ))}
           </div>
           <div className={styles.rightV2}>
-            <Link to="/login" className={styles.loginV2}>Log in</Link>
-            <NavLink hash="#score" to="/score" className={styles.ctaV2}>Get your score</NavLink>
+            {login && <Link to={login.to} className={styles.loginV2}>{login.label}</Link>}
+            <NavLink hash={cta.hash} to={cta.to} className={styles.ctaV2}>{cta.label}</NavLink>
           </div>
         </div>
       </nav>

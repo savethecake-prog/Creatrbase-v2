@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
-import { AgenciesNav, AgenciesFooter } from './AgenciesLayout';
+import { AgenciesNav, AgenciesFooter } from './AgenciesChrome';
 import { CATALOGUE, FREE_RUN, SAMPLE_DOSSIER_URL } from './config';
 import styles from './Agencies.module.css';
 

@@ -1,5 +1,5 @@
 import { PageMeta } from '../../components/PageMeta/PageMeta';
-import { AgenciesNav, AgenciesFooter } from './AgenciesLayout';
+import { AgenciesNav, AgenciesFooter } from './AgenciesChrome';
 import { LEGAL_ENTITY_LINE, LEGAL_CONTACT_EMAIL, LEGAL_PENDING_LINE } from './config';
 import styles from './Agencies.module.css';
 

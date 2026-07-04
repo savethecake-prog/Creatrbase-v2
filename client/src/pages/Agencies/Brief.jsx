@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
-import { AgenciesNav } from './AgenciesLayout';
+import { AgenciesNav } from './AgenciesChrome';
 import { formApi } from './formApi';
 import { SAMPLE_DOSSIER_URL, TURNSTILE_SITE_KEY } from './config';
 import styles from './Brief.module.css';

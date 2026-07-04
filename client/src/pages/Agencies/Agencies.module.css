@@ -81,6 +81,10 @@
   border-radius: 16px; padding: 20px 24px; color: var(--lp-ink-soft); max-width: 62ch; margin: 0;
   line-height: 1.6;
 }
+.bridgeIndependence {
+  display: block; margin-top: 12px; padding-top: 12px;
+  border-top: 1.5px solid var(--lp-line); color: var(--lp-navy); font-weight: 600;
+}
 
 /* ── Sections ── */
 .section { padding: 96px 56px; }

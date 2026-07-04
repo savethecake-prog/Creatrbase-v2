@@ -2,13 +2,18 @@ import { Link } from 'react-router-dom';
 import { LogoWordmark } from '../ui/LogoWordmark';
 import styles from './MarketingFooter.module.css';
 
-export function MarketingFooter() {
+// `disclosure` and `extraLinks` are optional; passing neither reproduces the creator
+// footer verbatim (byte-identical). The agencies route passes the independence statement
+// (CB-KD-01 s.10) as the disclosure and its legal links (Privacy/Terms) as an extra
+// column, reusing this same footer rather than forking one.
+export function MarketingFooter({ disclosure = null, extraLinks = null }) {
   return (
     <footer className={styles.footer}>
       <div className={styles.grid}>
         <div className={styles.brand}>
           <Link to="/"><LogoWordmark variant="v2" height={36} className={styles.logo} /></Link>
           <p className={styles.tag}>Commercial intelligence for independent creators on YouTube and Twitch. Built in the UK.</p>
+          {disclosure && <p className={styles.disclosure}>{disclosure}</p>}
         </div>
         <div>
           <h5 className={styles.colTitle}>Product</h5>
@@ -45,6 +50,16 @@ export function MarketingFooter() {
             <li><Link to="/cookies">Cookies</Link></li>
           </ul>
         </div>
+        {extraLinks && (
+          <div>
+            <h5 className={styles.colTitle}>{extraLinks.title}</h5>
+            <ul className={styles.links}>
+              {extraLinks.items.map((l) => (
+                <li key={l.to}><Link to={l.to}>{l.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className={styles.bottom}>
         <span>&copy; 2026 Creatrbase &middot; Built with honesty</span>

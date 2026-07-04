@@ -17,6 +17,15 @@
 
 export const SERVICE_BASE = '/agencies-svc';
 
+// The bridge + independence statements (CB-KD-05 s.2). The bridge is used on /agencies
+// and anywhere the two sides meet; it is followed by the independence statement from
+// CB-KD-01 s.10, VERBATIM. Kept as constants so the /agencies body and the footer
+// disclosure draw from one canonical source and cannot drift.
+export const BRIDGE_STATEMENT =
+  'One engine, two sides of the table. Creators see how they score; agencies get the same rigour pointed at a brief.';
+export const INDEPENDENCE_STATEMENT =
+  'A creator’s purchase of any Creatrbase product never influences an agency-side vetting outcome. One engine, two sides of the table, no pay-to-play.';
+
 // The hosted fictional sample dossier (rendered by the vetting repo's render_sample.py,
 // uploaded via upload_bundles conventions). Slug URL serves at /agencies-svc/d/<slug>/.
 export const SAMPLE_DOSSIER_URL =

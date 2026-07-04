@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { AgenciesNav, AgenciesFooter } from './AgenciesChrome';
-import { CATALOGUE, FREE_RUN, SAMPLE_DOSSIER_URL } from './config';
+import { CATALOGUE, FREE_RUN, SAMPLE_DOSSIER_URL, BRIDGE_STATEMENT, INDEPENDENCE_STATEMENT } from './config';
 import styles from './Agencies.module.css';
 
 /**
@@ -32,9 +32,11 @@ export function Agencies() {
               See a sample dossier
             </a>
           </div>
+          {/* Bridge + independence statement (CB-KD-05 s.2): the bridge, followed by the
+              CB-KD-01 s.10 independence statement verbatim, on /agencies where the two sides meet. */}
           <p className={styles.bridge}>
-            One engine, two sides of the table. Creators see how they score; agencies get the same
-            rigour pointed at a brief.
+            {BRIDGE_STATEMENT}
+            <span className={styles.bridgeIndependence}>{INDEPENDENCE_STATEMENT}</span>
           </p>
         </div>
       </header>

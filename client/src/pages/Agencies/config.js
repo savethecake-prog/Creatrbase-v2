@@ -26,6 +26,60 @@ export const BRIDGE_STATEMENT =
 export const INDEPENDENCE_STATEMENT =
   'A creator’s purchase of any Creatrbase product never influences an agency-side vetting outcome. One engine, two sides of the table, no pay-to-play.';
 
+// "WHY THIS EXISTS" — owner-supplied, register-checked, installed VERBATIM (2026-07-05
+// design/copy cycle). Three paragraphs on /agencies (after proof); the first two are
+// excerpted on /agencies/methodology. Kept here so both surfaces draw one canonical
+// text and the banned-language check (which scans src/pages/Agencies/**) covers it.
+export const WHY_THIS_EXISTS = [
+  'Creator discovery is still, at most agencies, a manual job. Hours of scrolling, spreadsheets, screenshots, gut feel — repeated for every brief, under deadline. Doing it properly needs data access that platforms meter and price for software companies, not for a shortlist of fifty. So agencies pay twice: once in hours, once in subscriptions to creator databases that return profiles, not decisions.',
+  'We built the pipeline once so you don’t have to. Creatrbase points it at what brands actually evaluate — modelled delivery against your targets, brand safety on the record, audience fit with the working shown — and delivers the finished judgement, checked the same way for every creator, every time.',
+  'Databases like Modash and Kolsquare sell search over creator profiles: the haystack, sorted. Creatrbase delivers the decision layer an analyst would build from them — a dossier per creator with a verdict, evidence, and the maths shown, within 48 hours of an accepted brief.',
+];
+
+// The two real numbers the agencies side owns, rendered as stat-callout cards. Source
+// lines are internal, stated — never an invented external citation (observed-never-
+// invented). The labour-equivalence figure is the CB-KD-01 pricing basis.
+export const STAT_CALLOUTS = [
+  {
+    num: '£1,000',
+    unit: '–1,250',
+    desc: 'A fifty-creator brief is roughly a week and £1,000–£1,250 of salary cost, done manually — the research alone, before any judgement is applied.',
+    source: 'Basis · Creatrbase internal pricing model',
+  },
+  {
+    num: '48',
+    unit: 'hrs',
+    desc: 'The finished shortlist — a full dossier per creator, ranked, human-reviewed — inside 48 hours of an accepted brief. The clock pauses only while a query is with you.',
+    source: 'Basis · Creatrbase delivery SLA',
+  },
+];
+
+// FAQ block for /agencies/methodology, marked up as JSON-LD FAQPage (CB-KD-05 s.6,
+// AI-discovery). Answers are plain entity statements, register-checked. Q3/Q4/Q5 draw
+// the eight dossier sections, the SLA, and the catalogue from the ratified copy.
+export const METHODOLOGY_FAQ = [
+  {
+    q: 'What is Creatrbase for agencies?',
+    a: 'Creatrbase is a creator-vetting service for agencies. You submit a campaign brief; we deliver a dossier per creator — modelled delivery against your targets, a brand-safety record, audience fit, and a verdict — with the working shown, within 48 hours. Every dossier is reviewed by a person before release.',
+  },
+  {
+    q: 'How is Creatrbase different from creator databases like Modash or Kolsquare?',
+    a: 'Databases sell you search over creator profiles — you still do the judgement. Creatrbase delivers the judgement itself: a uniform, documented vetting method applied to every creator on your shortlist, ending in a verdict you can forward to your client.',
+  },
+  {
+    q: 'What does a dossier contain?',
+    a: 'Eight sections, in order: the methodology it was built by; the attested metrics with sources and dates; modelled delivery against your targets; the hit probability with its error band; audience composition and overlap; the risk register with evidence; the working shown beneath every figure; and the verdict, last.',
+  },
+  {
+    q: 'How fast is delivery?',
+    a: 'Five full dossiers, or the shortlist for a paid brief, inside 48 hours of an accepted brief. A person reviews every dossier before release, and the clock pauses whenever a clarifying query is with you — it restarts when you answer.',
+  },
+  {
+    q: 'What does it cost?',
+    a: 'Brand Safety Scan is £39 per creator; Score is £7 per creator (minimum 10); Vetting Batch is £15 per creator (minimum 10); the Full Brief is £695 for up to 50 creators (£895 across three or more platforms); retainers run from £750 to £2,850 a month. Every organisation gets one free run: your real brief, five full dossiers, no charge. Prices exclude VAT.',
+  },
+];
+
 // The hosted fictional sample dossier (rendered by the vetting repo's render_sample.py,
 // uploaded via upload_bundles conventions). Slug URL serves at /agencies-svc/d/<slug>/.
 export const SAMPLE_DOSSIER_URL =

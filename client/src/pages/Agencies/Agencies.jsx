@@ -1,8 +1,31 @@
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { AgenciesNav, AgenciesFooter } from './AgenciesChrome';
-import { CATALOGUE, FREE_RUN, SAMPLE_DOSSIER_URL, BRIDGE_STATEMENT, INDEPENDENCE_STATEMENT } from './config';
+import {
+  CATALOGUE, FREE_RUN, SAMPLE_DOSSIER_URL, BRIDGE_STATEMENT, INDEPENDENCE_STATEMENT,
+  WHY_THIS_EXISTS, STAT_CALLOUTS,
+} from './config';
 import styles from './Agencies.module.css';
+
+// JSON-LD for AI discovery / rich results (CB-KD-05 s.6). Organization identifies the
+// entity; Service describes the agency-side vetting offering. Plain entity statements,
+// no keyword stuffing — the register is the SEO strategy.
+const ORG_JSONLD = {
+  '@context': 'https://schema.org', '@type': 'Organization',
+  name: 'Creatrbase', url: 'https://creatrbase.com',
+  logo: 'https://creatrbase.com/brand/og-image.png',
+  description: 'Independent creator-vetting service for agencies. A dossier per creator — modelled delivery, brand safety, audience fit, and a verdict, with the working shown, within 48 hours.',
+  sameAs: ['https://www.linkedin.com/company/creatrbase/'],
+};
+const SERVICE_JSONLD = {
+  '@context': 'https://schema.org', '@type': 'Service',
+  name: 'Creatrbase creator vetting for agencies',
+  serviceType: 'Creator vetting and shortlisting',
+  provider: { '@type': 'Organization', name: 'Creatrbase', url: 'https://creatrbase.com' },
+  areaServed: 'GB',
+  url: 'https://creatrbase.com/agencies',
+  description: 'You submit a campaign brief; Creatrbase delivers a dossier per creator — modelled delivery against your targets, a brand-safety record, audience fit, and a verdict — with the working shown, within 48 hours. Every dossier is reviewed by a person before release.',
+};
 
 /**
  * /agencies — the agency front door, one scroll (CB-KD-05 s.2, s.4): proposition,
@@ -17,13 +40,16 @@ export function Agencies() {
         description="Independent creator vetting for agencies: every creator on the shortlist, checked the same way, on the record. Judgement you can forward."
         canonical="https://creatrbase.com/agencies"
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSONLD) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SERVICE_JSONLD) }} />
       <AgenciesNav />
 
       {/* Proposition — the liability truth, no feature list above the fold */}
       <header className={styles.hero}>
         <div className={styles.container}>
+          <span className={`${styles.stickerChip} ${styles.stickerMint}`}>For agencies · Creator vetting</span>
           <h1 className={styles.heroTitle}>
-            Every creator on the shortlist, checked the same way, on the record.
+            Every creator on the shortlist, checked the same way, <em>on the record.</em>
           </h1>
           <p className={styles.heroSub}>Judgement you can forward.</p>
           <div className={styles.heroActions}>
@@ -44,8 +70,8 @@ export function Agencies() {
       {/* Proof — the sample dossier does the convincing */}
       <section className={styles.section}>
         <div className={styles.container}>
-          <div className={styles.eyebrow}>The 30-second background check</div>
-          <h2 className={styles.sectionTitle}>One object tells you who clears the brief, and why.</h2>
+          <div className={styles.eyebrow}><span className={styles.eyebrowDot} /> The 30-second background check</div>
+          <h2 className={styles.sectionTitle}>One object tells you who clears the brief, and <em>why.</em></h2>
           <p className={styles.lede}>
             A dossier reads like a risk document, not a pitch: a figure, its confidence, its source
             and date; the flags with their evidence; a verdict with the reasoning beneath it. Read
@@ -66,50 +92,71 @@ export function Agencies() {
         </div>
       </section>
 
-      {/* Method summary — three short blocks, the equivalence line once */}
+      {/* Why this exists — owner copy VERBATIM (config.WHY_THIS_EXISTS), with the two
+          real numbers we own as stat-callout cards. */}
       <section className={`${styles.section} ${styles.sectionAlt}`}>
         <div className={styles.container}>
-          <div className={styles.eyebrow}>How it works</div>
-          <div className={styles.methodGrid}>
-            <div className={styles.methodBlock}>
-              <h3>What we check</h3>
+          <div className={styles.eyebrow}><span className={styles.eyebrowDot} /> Why this exists</div>
+          <h2 className={styles.sectionTitle}>Discovery is still a <em>manual job.</em></h2>
+          <div className={styles.whyGrid}>
+            {WHY_THIS_EXISTS.map((para, i) => <p key={i}>{para}</p>)}
+          </div>
+          <div className={styles.statGrid}>
+            {STAT_CALLOUTS.map((s) => (
+              <div key={s.source} className={styles.statCard}>
+                <div className={styles.statNum}>{s.num}<span className={styles.statUnit}>{s.unit}</span></div>
+                <p className={styles.statDesc}>{s.desc}</p>
+                <div className={styles.statSource}>{s.source}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works — the three-step row (01 Brief / 02 Vet / 03 Decide), mirroring
+          the homepage's three-card pattern; the equivalence line once, below. */}
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <div className={styles.eyebrow}><span className={styles.eyebrowDot} /> How it works</div>
+          <h2 className={styles.sectionTitle}>Three steps. One clear <em>decision.</em></h2>
+          <div className={styles.howGrid}>
+            <div className={styles.howStep}>
+              <div className={styles.howStepNum}>01 · Brief</div>
+              <h3 className={styles.howStepTitle}>Four minutes, one question at a time.</h3>
               <p>
-                Attested figures with their sources, engagement quality, audience composition, and a
-                content-history risk scan against your stated sensitivities. Each figure carries its
-                confidence tier.
+                A short, conversational brief captures your campaign, targets, platforms and
+                sensitivities. Nothing unclear is guessed — it becomes a question back to you.
               </p>
-              <Link to="/agencies/methodology" className={styles.methodLink}>Read the method →</Link>
             </div>
-            <div className={styles.methodBlock}>
-              <h3>How scoring works</h3>
+            <div className={styles.howStep}>
+              <div className={`${styles.howStepNum} ${styles.howStepPeach}`}>02 · Vet</div>
+              <h3 className={styles.howStepTitle}>Every creator checked the same way.</h3>
               <p>
-                Delivery is modelled against your stated targets and expressed as a range with a
-                central estimate. Hit probability carries an error band; it is a modelled estimate,
-                never a promise.
+                One documented method, applied uniformly: attested metrics with sources, modelled
+                delivery, a risk register with evidence. Every dossier is human-reviewed before release.
               </p>
-              <Link to="/agencies/methodology" className={styles.methodLink}>Read the method →</Link>
             </div>
-            <div className={styles.methodBlock}>
-              <h3>What the verdict means</h3>
+            <div className={styles.howStep}>
+              <div className={`${styles.howStepNum} ${styles.howStepMint}`}>03 · Decide</div>
+              <h3 className={styles.howStepTitle}>Dossiers with verdicts, in 48 hours.</h3>
               <p>
-                One of three verdicts — proceed, proceed with cautions, do not proceed — with the
-                reasoning immediately beneath it. The acceptance line is drawn across the shortlist;
-                shortfalls are stated in words.
+                A dossier per creator — a verdict with the working shown beneath it, ranked by hit
+                probability — inside 48 hours of an accepted brief. Judgement you can forward.
               </p>
-              <Link to="/agencies/methodology" className={styles.methodLink}>Read the method →</Link>
             </div>
           </div>
           <p className={styles.equivalence}>
-            Roughly five working days of internal labour, delivered in 48 hours.
+            Roughly five working days of internal labour, delivered in 48 hours.{' '}
+            <Link to="/agencies/methodology" className={styles.methodLink}>Read the full method →</Link>
           </p>
         </div>
       </section>
 
       {/* Pricing — plain table, prices visible, no contact-us gating */}
-      <section className={styles.section} id="pricing">
+      <section className={`${styles.section} ${styles.sectionAlt}`} id="pricing">
         <div className={styles.container}>
-          <div className={styles.eyebrow}>Pricing</div>
-          <h2 className={styles.sectionTitle}>Prices are on the page. All prices exclude VAT.</h2>
+          <div className={styles.eyebrow}><span className={styles.eyebrowDot} /> Pricing</div>
+          <h2 className={styles.sectionTitle}>Prices are on the <em>page.</em> All prices exclude VAT.</h2>
           <div className={styles.priceGrid}>
             {CATALOGUE.map((sku) => (
               <div key={sku.id} className={styles.priceCard}>
@@ -145,9 +192,9 @@ export function Agencies() {
       </section>
 
       {/* The door */}
-      <section className={`${styles.section} ${styles.sectionAlt} ${styles.doorSection}`}>
+      <section className={`${styles.section} ${styles.doorSection}`}>
         <div className={styles.container}>
-          <h2 className={styles.sectionTitle}>Bring us a brief.</h2>
+          <h2 className={styles.sectionTitle}>Bring us a <em>brief.</em></h2>
           <p className={styles.lede}>
             About four minutes. Five full dossiers inside 48 hours, and a person reviews every one
             before it reaches you.

@@ -44,11 +44,31 @@
 .eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
   background: var(--lp-paper); border: 1.5px solid var(--lp-navy);
-  box-shadow: 3px 3px 0 var(--lp-navy); padding: 7px 14px;
+  box-shadow: 3px 3px 0 var(--lp-navy); padding: 7px 14px 7px 8px;
   border-radius: 999px; font-family: 'JetBrains Mono', monospace;
   font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--lp-ink); margin-bottom: 28px;
 }
+/* the coloured dot Landing's eyebrow carries — reused, not reinvented */
+.eyebrowDot { width: 8px; height: 8px; border-radius: 50%; background: var(--lp-mint-deep); flex-shrink: 0; }
+.eyebrowPeach .eyebrowDot { background: var(--lp-peach-deep); }
+.eyebrowLav .eyebrowDot { background: var(--lp-lavender-deep); }
+
+/* ── Sticker chips (Landing's, verbatim recipe) ── */
+.stickerChip {
+  display: inline-block; background: var(--lp-lavender); border: 1.5px solid var(--lp-navy);
+  border-radius: 999px; padding: 7px 13px; font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--lp-navy); box-shadow: 2px 2px 0 var(--lp-navy);
+}
+.stickerPeach { background: var(--lp-peach); }
+.stickerMint { background: var(--lp-mint); }
+
+/* ── Accent word — Landing's <em> pattern (peach-shade). Only in large headlines:
+   peach-shade on cream/paper is 3.2–3.7:1 = AA for large text (≥24px) ONLY, never body. ── */
+.heroTitle em, .sectionTitle em { font-style: normal; color: var(--lp-peach-shade); }
+/* hero accent underline — Landing's .highlight (mint wash under the last word) */
+.heroHighlight { background: linear-gradient(180deg, transparent 60%, var(--lp-mint) 60%); padding: 0 4px; }
 
 /* ── Buttons (Landing's neo-brutalist set) ── */
 .ctaPrimary {
@@ -70,6 +90,7 @@
 
 /* ── Hero / proposition ── */
 .hero { padding: 72px 56px 96px; position: relative; overflow: hidden; }
+.hero .stickerChip { margin-bottom: 24px; }
 .heroTitle {
   font-family: var(--font-display); font-size: clamp(40px, 6vw, 72px); line-height: 1.0;
   color: var(--lp-navy); letter-spacing: -0.05em; margin: 0 0 20px; max-width: 16ch;
@@ -121,6 +142,65 @@
   font-size: 19px; font-weight: 600; text-align: center; color: var(--lp-navy); margin: 0;
 }
 
+/* ── How it works — three-step row (Landing's howGrid/howStep, floating number pills) ── */
+.howGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin: 44px 0 0; }
+.howStep {
+  background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 22px;
+  padding: 40px 32px 32px; box-shadow: 5px 5px 0 var(--lp-navy); position: relative;
+}
+.howStepNum {
+  position: absolute; top: -18px; left: 28px; background: var(--lp-lavender);
+  border: 1.5px solid var(--lp-navy); border-radius: 999px; padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; color: var(--lp-navy); box-shadow: 2px 2px 0 var(--lp-navy);
+}
+.howStepPeach { background: var(--lp-peach); }
+.howStepMint { background: var(--lp-mint); }
+.howStepTitle {
+  font-family: var(--font-display-ui); font-weight: 700; font-size: 26px; line-height: 1.05;
+  color: var(--lp-navy); letter-spacing: -0.015em; margin: 6px 0 12px;
+}
+.howStep p { font-size: 14px; color: var(--lp-ink-soft); line-height: 1.6; margin: 0; }
+
+/* ── Stat callout cards (Landing's statNum/statUnit/statSource; AA-safe colours) ── */
+.statGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 44px; }
+.statCard {
+  background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 22px;
+  padding: 36px 32px; box-shadow: 6px 6px 0 var(--lp-navy); display: flex; flex-direction: column;
+}
+.statNum {
+  font-family: var(--font-display); font-size: clamp(56px, 7vw, 84px); line-height: 1;
+  color: var(--lp-navy); letter-spacing: -0.05em; margin-bottom: 14px;
+}
+/* unit at large size on paper: peach-shade is 3.7:1 = AA for large text (unit ≥40px).
+   Landing uses peach-deep here, which fails contrast; peach-shade is the AA-safe choice. */
+.statUnit { color: var(--lp-peach-shade); font-size: 0.55em; letter-spacing: -0.03em; }
+.statDesc { font-size: 15px; color: var(--lp-ink-soft); line-height: 1.6; margin: 0 0 18px; flex: 1; }
+/* source line in ink-soft (11.4:1 = AA at any size), not muted (borderline on cream) */
+.statSource {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--lp-ink-soft);
+  letter-spacing: 0.06em; text-transform: uppercase; padding-top: 16px;
+  border-top: 1px dashed var(--lp-line);
+}
+
+/* ── Why this exists — quiet prose block with a paper interstitial card ── */
+.whyGrid { max-width: 760px; }
+.whyGrid p { font-size: 18px; color: var(--lp-ink-soft); line-height: 1.7; margin: 0 0 22px; }
+.whyGrid p:last-child { margin-bottom: 0; }
+.whyGrid strong, .whyGrid b { color: var(--lp-ink); font-weight: 600; }
+
+/* ── FAQ grid (Landing's faqItem, calmer: single column-friendly) ── */
+.faqGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin-top: 32px; }
+.faqItem {
+  background: var(--lp-paper); border: 1.5px solid var(--lp-navy); border-radius: 16px;
+  padding: 24px 26px; box-shadow: 3px 3px 0 var(--lp-navy);
+}
+.faqItem h3 {
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; color: var(--lp-navy);
+  letter-spacing: -0.01em; margin: 0 0 10px;
+}
+.faqItem p { font-size: 14px; color: var(--lp-ink-soft); line-height: 1.6; margin: 0; }
+
 /* ── Pricing ── */
 .priceGrid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -171,6 +251,15 @@
 .docFine { color: var(--lp-muted); font-size: 14px; font-style: italic; margin-top: 32px; }
 .doc a { color: var(--lp-purple); font-weight: 600; }
 
+/* Methodology FAQ — question/answer pairs (JSON-LD FAQPage backs these). h3 keeps the
+   one-h1 heading hierarchy intact (h1 doc title > h2 section > h3 question). */
+.docFaq { margin-bottom: 22px; }
+.docFaqQ {
+  font-family: var(--font-display-ui); font-weight: 700; font-size: 19px; line-height: 1.25;
+  color: var(--lp-navy); letter-spacing: -0.01em; margin: 0 0 8px;
+}
+.docFaq p { margin: 0; }
+
 /* ── Sample embed ── */
 .sampleFrame {
   border: 1.5px solid var(--lp-navy); border-radius: 18px; overflow: hidden;
@@ -179,9 +268,15 @@
 .sampleIframe { width: 100%; height: 78vh; border: 0; display: block; background: var(--lp-cream); }
 .sampleActions { display: flex; flex-wrap: wrap; gap: 16px; }
 
+@media (max-width: 900px) {
+  .howGrid { grid-template-columns: 1fr; gap: 32px; }
+  .statGrid { grid-template-columns: 1fr; }
+  .faqGrid { grid-template-columns: 1fr; }
+}
 @media (max-width: 768px) {
   .container, .section, .hero, .doc { padding-left: 24px; padding-right: 24px; }
   .sampleIframe { height: 70vh; }
+  .whyGrid p { font-size: 16px; }
 }
 @media (max-width: 560px) {
   .container, .section, .hero, .doc { padding-left: 16px; padding-right: 16px; }

@@ -144,6 +144,19 @@
 
 /* interstitials & confirmation */
 .interstitial, .confirm { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+/* the interstitial/confirmation content sits in a paper card with the site's offset
+   sticker shadow — the same card treatment as the marketing surface (Landing/Agencies). */
+.interCard {
+  background: var(--lp-paper); border: 1.5px solid var(--lp-navy); box-shadow: 5px 5px 0 var(--lp-navy);
+  border-radius: 20px; padding: 36px 32px; margin-bottom: 8px;
+}
+.interChip {
+  display: inline-block; background: var(--lp-mint); border: 1.5px solid var(--lp-navy);
+  border-radius: 999px; padding: 6px 13px; font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--lp-navy); box-shadow: 2px 2px 0 var(--lp-navy); margin-bottom: 18px;
+}
+.interChipPeach { background: var(--lp-peach); }
 .interLede { font-size: 18px; color: var(--lp-ink-soft); line-height: 1.7; max-width: 54ch; }
 .interLede a, .privacyNote a { color: var(--lp-purple); font-weight: 600; text-decoration: underline; }
 .confirmLine {

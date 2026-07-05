@@ -1,7 +1,18 @@
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../../components/PageMeta/PageMeta';
 import { AgenciesNav, AgenciesFooter } from './AgenciesChrome';
+import { WHY_THIS_EXISTS, METHODOLOGY_FAQ } from './config';
 import styles from './Agencies.module.css';
+
+// FAQPage JSON-LD (CB-KD-05 s.6). Built from the same METHODOLOGY_FAQ the page renders,
+// so the structured data and the visible answers cannot drift.
+const FAQ_JSONLD = {
+  '@context': 'https://schema.org', '@type': 'FAQPage',
+  mainEntity: METHODOLOGY_FAQ.map((f) => ({
+    '@type': 'Question', name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
 
 /**
  * /agencies/methodology — the brochure (CB-KD-05 s.2). Plain-language: what is checked,
@@ -18,6 +29,7 @@ export function Methodology() {
         description="What Creatrbase checks, how scoring works, what the confidence tiers mean, and how verdicts are reached. Plain-language, on the record."
         canonical="https://creatrbase.com/agencies/methodology"
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSONLD) }} />
       <AgenciesNav />
 
       <article className={styles.doc}>
@@ -40,6 +52,13 @@ export function Methodology() {
             every finding is set out with the evidence and the method behind it. We do not promise
             campaign outcomes; we set out what we checked, how we checked it, and what we found.
           </p>
+        </section>
+
+        <section className={styles.docSection}>
+          <h2>Why this exists</h2>
+          {/* WHY excerpt — first two paragraphs of config.WHY_THIS_EXISTS, VERBATIM. */}
+          <p>{WHY_THIS_EXISTS[0]}</p>
+          <p>{WHY_THIS_EXISTS[1]}</p>
         </section>
 
         <section className={styles.docSection}>
@@ -102,6 +121,16 @@ export function Methodology() {
             A creator’s purchase of any Creatrbase product never influences an agency-side vetting
             outcome. One engine, two sides of the table, no pay-to-play.
           </p>
+        </section>
+
+        <section className={styles.docSection}>
+          <h2>Questions agencies ask</h2>
+          {METHODOLOGY_FAQ.map((f) => (
+            <div key={f.q} className={styles.docFaq}>
+              <h3 className={styles.docFaqQ}>{f.q}</h3>
+              <p>{f.a}</p>
+            </div>
+          ))}
         </section>
 
         <section className={styles.docSection}>

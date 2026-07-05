@@ -421,27 +421,35 @@ function SensitivitiesField({ answers, set }) {
 
 // ── interstitials — every one states something true (CB-KD-04 s.2.1) ──────────
 function Interstitial({ kind, pool, answers, onContinue, onBack, busy }) {
-  let body;
-  if (kind === 'pool') body = <PoolBody pool={pool} />;
-  else if (kind === 'what_next') body = (
-    <>
-      <h1 className={styles.qTitle}>Here’s what you get.</h1>
-      <p className={styles.interLede}>Five full dossiers, inside 48 hours. A person reviews every dossier before it reaches you. No drip sequence — one delivery email, and the door stays open if you want more.</p>
-    </>
-  );
-  else body = (
-    <>
-      <h1 className={styles.qTitle}>We’re modelling against your targets.</h1>
-      <p className={styles.interLede}>
-        Your metrics{metricSummary(answers)} become the line we score each creator against: expected
-        delivery as a range, and a hit probability with its error band. Not a promise — a modelled
-        estimate you can interrogate.
-      </p>
-    </>
-  );
+  let chip, body;
+  if (kind === 'pool') { chip = 'Your mix'; body = <PoolBody pool={pool} />; }
+  else if (kind === 'what_next') {
+    chip = 'What you get';
+    body = (
+      <>
+        <h1 className={styles.qTitle}>Here’s what you get.</h1>
+        <p className={styles.interLede}>Five full dossiers, inside 48 hours. A person reviews every dossier before it reaches you. No drip sequence — one delivery email, and the door stays open if you want more.</p>
+      </>
+    );
+  } else {
+    chip = 'Modelling';
+    body = (
+      <>
+        <h1 className={styles.qTitle}>We’re modelling against your targets.</h1>
+        <p className={styles.interLede}>
+          Your metrics{metricSummary(answers)} become the line we score each creator against: expected
+          delivery as a range, and a hit probability with its error band. Not a promise — a modelled
+          estimate you can interrogate.
+        </p>
+      </>
+    );
+  }
   return (
     <div className={styles.interstitial}>
-      {body}
+      <div className={styles.interCard}>
+        <span className={`${styles.interChip} ${kind === 'modelling' ? styles.interChipPeach : ''}`}>{chip}</span>
+        {body}
+      </div>
       <div className={styles.actions}>
         <button type="button" className={styles.back} onClick={onBack} disabled={busy}>Back</button>
         <button type="button" className={styles.primary} onClick={onContinue} disabled={busy}>Continue</button>
@@ -489,13 +497,17 @@ function Confirmation({ result, answers, pool }) {
       <main className={styles.formMain}>
         <div className={styles.confirm}>
           {gateBlocked ? (
-            <>
+            <div className={styles.interCard}>
+              <span className={`${styles.interChip} ${styles.interChipPeach}`}>Free run used</span>
               <h1 className={styles.qTitle}>Your organisation has already had its free run.</h1>
               <p className={styles.interLede}>{result.message}</p>
-              <Link to="/agencies#pricing" className={styles.primary}>See the Vetting Batch</Link>
-            </>
+              <div className={styles.actions}>
+                <Link to="/agencies#pricing" className={styles.primary}>See the Vetting Batch</Link>
+              </div>
+            </div>
           ) : (
-            <>
+            <div className={styles.interCard}>
+              <span className={styles.interChip}>Brief received</span>
               <h1 className={styles.qTitle}>Brief received. The clock starts now.</h1>
               {answers.campaign_one_liner && (
                 <p className={styles.confirmLine}>“{answers.campaign_one_liner}”</p>
@@ -512,7 +524,7 @@ function Confirmation({ result, answers, pool }) {
               <div className={styles.actions}>
                 <a href={SAMPLE_DOSSIER_URL} className={styles.primary} target="_blank" rel="noopener noreferrer">Open the sample</a>
               </div>
-            </>
+            </div>
           )}
           <p className={styles.privacyNote}>
             We process your brief to prepare your dossiers. See the{' '}
